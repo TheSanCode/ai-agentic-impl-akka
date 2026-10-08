@@ -192,3 +192,95 @@ I also found a new user change to `AGENTS.md` requiring conversation records. I�
 - `git diff --check` passed; Git printed only line-ending conversion warnings. A PowerShell relative-link check passed for changed documentation. Surefire XML confirmed 7 + 2 passing tests.
 - `docs/ROADMAP.md` marks P1-02 scaffold complete and Phase 1 In progress; P1-01 combined compatibility/access/license decisions and P1-11 full lab documentation remain unchecked. No agents, integrations, frontend or deployment were implemented.
 - No pre-existing conversation files were found. This record is being saved under the newly observed instructions; its local commit result is pending.
+
+## Subsequent tool outcome
+
+The normal conversation-commit attempt failed with the same helper setup error before executing. An explicitly approved outside-sandbox command committed only this conversation file as `a1effa8` (`docs: record backend scaffold conversation`) on `feature/agentic`. Scaffold changes and the user's AGENTS.md change remain uncommitted and preserved. No push occurred. This outcome is an appended working-tree update after that commit; the final response remains pending for the next turn.
+
+## 16. Assistant — prior final response, appended on continuation
+
+Backend scaffold completed; existing changes preserved.
+
+- Maven Wrapper and package boundaries added.
+- Temurin 25 build passed: **9 tests, zero failures**, also verified from a fresh source copy.
+- Packaged application returned **HTTP 200** from `/api/health`; stopped afterward.
+- [Verified Windows commands](../implementation/backend-scaffold.md) documented.
+- [Roadmap](../ROADMAP.md) updated for the scaffold only; Phase 1 remains in progress.
+
+Normal shell execution remains blocked before startup:
+`Failed to create unified exec process: helper_unknown_error: setup refresh had errors`
+
+Verification required explicitly approved outside-sandbox runs. Spring AI/Akka compatibility, access and licensing remain pending. No deployment occurred.
+
+Next: resolve those dependency decisions before integration. Conversation-only commit: `a1effa8`; scaffold changes remain uncommitted.
+
+Record note: Relative link targets in entry 16 are adjusted to resolve from this record; visible labels and wording are preserved.
+
+## 17. User
+
+Commit the verified backend scaffold on feature/agentic.
+
+Review the diff first. Preserve unrelated changes and exclude secrets,
+build artifacts and local configuration. Include the verified setup
+documentation and accurate roadmap updates.
+
+Then investigate Spring AI and Akka integration separately:
+- Verify dependency resolution and Java 25 compatibility.
+- Record repository-access and licensing requirements.
+- Run a minimal integration test for each before adding agent workflows.
+- Keep unresolved decisions explicit.
+
+Record the conversation according to AGENTS.md.
+Do not deploy or repeat already-passed scaffold checks unless changes justify it.
+
+## 18. Assistant
+
+I’ll review the scaffold diff and commit only the verified backend files and documentation. Then I’ll investigate Spring AI and Akka separately, testing dependency resolution and minimal Java 25 integration without adding agent workflows.
+
+## 19. Assistant
+
+The staged diff contains the scaffold, its safe default configuration, and the verified setup and roadmap documentation. Build output, local credentials, conversation changes, and your `AGENTS.md` edit are excluded. The whitespace check passed; I won’t repeat the already-passed scaffold tests.
+
+## 20. Assistant — clarification tool
+
+Akka’s tokenized repository is not configured in the checked environment. Can you provision authorized access through local Maven settings outside the repository? Please don’t send a token in chat. I’ll continue the Spring AI probe and record any Akka resolution blocker meanwhile.
+
+Options: Leave Akka blocked for now; I’ll configure authorized access locally.
+
+## 21. Assistant
+
+Scaffold commit `d10a02d` is complete on `feature/agentic`. For Spring AI, I’ll test the Ollama adapter against a loopback HTTP fixture to check Boot wiring and request/response handling without a model download. Akka access is not configured in the checked environment; I’ll test resolution and prepare a minimal typed request/reply test, reporting it as blocked if dependencies remain unavailable.
+
+## 22. Assistant
+
+Spring AI 2.0.1 resolved successfully, and its isolated Boot 4.0.8 integration test passed on Temurin 25 using the HTTP fixture. Akka 2.10.23 failed dependency resolution: Maven Central does not contain `com.typesafe.akka:akka-actor-typed_2.13:2.10.23`. Its test could not compile or run; Java 25 compatibility remains vendor-documented, not locally verified.
+
+## Tool evidence through entry 22
+
+- Normal shell execution again failed before startup with `helper_unknown_error: setup refresh had errors`; subsequent command exceptions were explicitly approved.
+- Reviewed working-tree and staged diffs, source/configuration, generated wrapper locations, setup documentation and roadmap. `git diff --cached --check` passed; the staged list excluded AGENTS.md, conversations, generated target directories, secrets and user-local configuration. Committed 29 scaffold files as `d10a02d` (`feat: add verified Spring Boot backend scaffold`). No scaffold builds/tests were repeated.
+- Checked only configuration presence: user Maven settings file absent; `AKKA_REPOSITORY_URL` and `AKKA_LICENSE_KEY` absent. No credential values printed. Consulted official Spring AI and Akka repository, Java support and licensing documentation; references are recorded in decision 0002.
+- Added independent test-only projects under `compatibility/spring-ai` and `compatibility/akka`; root application dependencies and source unchanged.
+- Selected Temurin 25 via JAVA_HOME and shell PATH. Ran `.\mvnw.cmd -B -ntp -f compatibility/spring-ai/pom.xml verify`: BUILD SUCCESS at 23:15:48 America/Toronto, 1 test, 0 failures/errors/skips. The test exercised Boot auto-configuration and the real Ollama client against a synthetic loopback HTTP fixture. No model download or actual inference occurred.
+- Ran `.\mvnw.cmd -B -ntp -f compatibility/spring-ai/pom.xml dependency:tree '-DoutputFile=target/dependency-tree.txt'`: passed at 23:16:13. Inspected Boot 4.0.8 / AI 2.0.1 / Spring 7.0.9 / Jackson 3.1.5 / JUnit 6.0.3 versions. Generated evidence remains ignored beneath target.
+- Ran `.\mvnw.cmd -B -ntp -f compatibility/akka/pom.xml verify`: BUILD FAILURE at 23:16:34, dependency resolution failed because `com.typesafe.akka:akka-actor-typed_2.13:jar:2.10.23` was not found in Maven Central. No Akka test compiled or ran; authorized vendor repository access remains necessary. No older version or substitute runtime was used.
+- Added decision 0002 and compatibility commands with passed/blocked distinctions, repository requirements, BSL/development/production distinctions, runtime-key requirements and remaining combined-stack/model gates. Added only the evidenced Spring AI probe checkbox to the roadmap; combined compatibility remains unchecked.
+- No user answer to the access clarification was visible at this point. No deployment, push, account enrollment or license purchase occurred.
+
+## 23. Assistant
+
+`d10a02d` already contains the verified scaffold and Windows setup guide on `feature/agentic`; I won’t duplicate that commit or rerun its checks. The separate probe evidence is present: Spring AI passed its isolated Java 25 fixture test, while Akka remains blocked before compilation by unavailable repository access. I’m staging only the probe sources and related documentation, leaving `AGENTS.md` and conversation history untouched for a separate record update.
+
+## Tool evidence through entry 23
+
+- Re-read the required project references and reviewed all current diff surfaces, including the standalone test sources. The current branch was `feature/agentic`; `HEAD` already contained scaffold commit `d10a02d` with its setup guide.
+- Confirmed `compatibility/spring-ai/target/` is ignored build output. The probe commit excluded it, `AGENTS.md`, and the conversation file; no local configuration or credential was staged.
+- Updated README and technology-stack wording to distinguish the verified Spring AI fixture from untested capabilities and unresolved Akka integration. The roadmap records only evidenced Spring AI partial progress.
+- `git diff --cached --check` passed. Committed the 10 probe/documentation files as `9fd53c1` (`GCM-16403 Clara AI: test: record Spring AI and Akka integration probes`) on `feature/agentic`.
+- Final status after that commit showed only the pre-existing/user `AGENTS.md` edit and this conversation record modified. Spring AI and scaffold tests were not rerun; their reported results are the existing recorded evidence. Akka remains blocked before compilation/tests by missing Central artifact access. No deployment occurred.
+
+## 24. Assistant — final response
+
+**Commits:** The backend scaffold and verified Windows setup guide are already committed on `feature/agentic` as `d10a02d`. I committed the separate integration probes and documentation as `9fd53c1`; that includes accurate roadmap evidence and does not stage your `AGENTS.md` change, secrets, local config, or ignored `target/` output.
+
+**Results:** Spring AI 2.0.1 resolved and its Boot 4.0.8 / Temurin 25 Ollama-fixture integration test passed (1 test); dependency-tree inspection passed. Akka 2.10.23 resolution failed because it was unavailable from configured Maven Central, so its typed runtime test did not compile/run and Java 25 compatibility is not locally verified. Akka requires authorized vendor repository configuration; BSL licensing and runtime license-key decisions remain open. The roadmap marks only the Spring AI partial evidence; combined compatibility remains unchecked. I did not rerun the scaffold checks or deploy. `AGENTS.md` remains modified and uncommitted; next step is configure authorized Akka access locally and rerun its probe.
