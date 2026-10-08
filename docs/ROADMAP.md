@@ -4,7 +4,7 @@ Last reviewed: 7 October 2026
 
 ## Current position
 
-Requirements v0.4 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.5 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -40,7 +40,7 @@ Depends on: None. Independent connector proofs may run earlier without bypassing
 
 Deliverables:
 
-- [x] Document production requirements v0.4 and proposed phased design.
+- [x] Document production requirements v0.5 and proposed phased design.
 - [x] Draft the [technical design](design/technical-design.md), with unconfirmed choices marked proposed.
 - [x] Perform [documentation consistency review](reviews/documentation-review.md) and correct identified wording gaps.
 - [ ] Approve requirements and open decisions
@@ -164,6 +164,8 @@ Depends on: Phase 5. Independent connector proofs may run earlier without bypass
 
 Deliverables:
 
+- [ ] Implement and validate WhatsApp, Telegram and SMS channel adapters, linked identities and safe browser handoff
+- [ ] Test webhook deduplication, notification failures and channel data restrictions
 - [ ] Test actual delegated authentication, consent and revocation
 - [ ] Validate ingestion permissions and freshness
 - [ ] Run capacity, security and model-quality evaluations
@@ -183,3 +185,7 @@ Business acceptance remains a human decision. Admin visibility respects source p
 ## Background work scope
 
 See requirements BKG-01 through BKG-09. Phase 1 provides browser-independent tasks while the process is running; Phase 2 adds crash-safe continuation before operational writes. No recurring unattended task is authorized by this roadmap. The documentation review predates the v0.4 background-work additions; those changes require follow-up implementation acceptance evidence.
+
+## Messaging channel delivery
+
+Requirements CHN-01 through CHN-08 cover WhatsApp, Telegram and SMS. Design/mock adapter work may begin after core background contracts are stable; real-channel acceptance is part of Phase 6. Require durable request admission from Phase 2, same-user source authorization and a separately agreed provider/conversation policy. Protected approvals and business acceptance use authenticated browser handoff by default.
