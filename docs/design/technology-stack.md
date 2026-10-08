@@ -31,7 +31,7 @@ Use the following candidates for the local implementation. These are design sele
 | Telemetry | OpenTelemetry, Prometheus, Grafana; Loki optional | Correlated execution, metrics and redacted logs. |
 | Java tests | JUnit 5, AssertJ, Testcontainers and mock HTTP servers | Contracts, permissions, workflow states and infrastructure integration. Resolve library compatibility during setup. |
 | Browser tests | Playwright plus accessibility checks | Browser journeys, reconnect, denied access and review screens. |
-| Build/runtime | Maven Wrapper, npm lockfile, Docker Compose | Reproducible local startup; no cloud requirement for first slice. |
+| Build/runtime | Maven Wrapper, npm lockfile, Podman Compose (verify provider compatibility) | Reproducible local startup with an open-source container engine; no cloud requirement for first slice. Docker Compose remains a compatibility fallback if the local setup requires it. |
 | CI | GitHub Actions | Build, tests, dependency/security checks and evaluation evidence; deployment gates remain separate. |
 
 Do not add Kafka, Redis, a second vector store or a second durable workflow engine until a demonstrated requirement justifies them. Persistence tables and the Akka journal must not independently own the same state; choose ownership during the Phase 2 persistence decision.
@@ -42,7 +42,7 @@ Official documentation checked on 7 October 2026 lists Spring Boot 4.0.8 and 4.1
 
 ## Open source and external services
 
-Keycloak, Spring Security, PostgreSQL/pgvector and candidate OpenSearch fulfill the intended open-source component direction, subject to license inventory. Current Akka is BSL/source available; local development and production licensing differ. Model weights have their own licenses. WhatsApp, Telegram and SMS transports are external services, not an entirely open-source delivery stack. Twilio is a proposed paid service, not an account purchase or selected subscription.
+Keycloak, Spring Security, PostgreSQL/pgvector, candidate OpenSearch, Temurin, Node.js, Ollama and Podman fulfill the intended open-source component direction, subject to license inventory. Prefer VSCodium if an open-source editor distribution is required. Current Akka is BSL/source available; local development and production licensing differ. Model weights have their own licenses. WhatsApp, Telegram and SMS transports are external services, not an entirely open-source delivery stack. Twilio is a proposed paid service, not an account purchase or selected subscription.
 
 ## Setup and delivery boundaries
 

@@ -25,7 +25,7 @@ See the [technology stack](technology-stack.md) for the complete web, messaging,
 | Policy | Server-side authorization service; OPA adapter later if useful | Deny-first PolicyDecision contract; no model makes binding access decisions. |
 | Business state | PostgreSQL with schema migrations | Repository interfaces; separate identity-provider database from application schema. |
 | Retrieval | PostgreSQL full-text search plus pgvector initially | SearchGateway supports hybrid retrieval; optional OpenSearch profile for comparison. One vector store is sufficient. |
-| Local operation | Docker Compose, with an opt-in kind cluster in Phase 4 | Pin images. Select resource budgets after measuring laptop capacity. |
+| Local operation | Podman Compose as the open-source default, with an opt-in kind cluster in Phase 4 | Verify the Compose provider and kind compatibility. Pin images. Select resource budgets after measuring laptop capacity. Docker Compose remains a fallback if compatibility testing requires it. |
 | Telemetry | OpenTelemetry-compatible tracing and metrics | Mask source payloads and credentials; choose local collector/dashboard distribution later. |
 
 Authentication, authorization, search and vector components must meet the open-source policy. Akka is source available under BSL and requires an explicit licensing decision for production. All component and model licenses belong in the implementation inventory. These proposals do not authorize a production rollout.

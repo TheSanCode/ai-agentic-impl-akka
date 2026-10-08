@@ -68,7 +68,7 @@ See the [recommended technology stack](docs/design/technology-stack.md): Angular
 
 ## Local installation prerequisites
 
-Start with the [Windows local prerequisites](docs/local-prerequisites.md) for WinGet checks/install commands, WSL2, Docker, Java, Node.js and Ollama verification. The guide distinguishes installed tools from runnable application setup; Compose and application files remain pending.
+Start with the [Windows local prerequisites](docs/local-prerequisites.md) for WinGet checks/install commands, WSL2, the open-source Podman container engine, Java, Node.js and Ollama verification. The guide distinguishes installed tools from runnable application setup; Compose and application files remain pending.
 
 ## Implementation instructions
 
