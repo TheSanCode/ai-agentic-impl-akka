@@ -368,3 +368,7 @@ The probe still resolved only from Maven Central after your confirmation. I retr
 - Retried `.\mvnw.cmd -U -B -ntp -f compatibility/akka/pom.xml verify` to force resolution after the cached miss. It again failed to find `com.typesafe.akka:akka-actor-typed_2.13:2.10.23` in Central before compilation/tests. URL output was redacted.
 - Checked settings/configuration presence only after those attempts: `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, and `AKKA_LICENSE_KEY` are still absent. Did not inspect settings content or read any credential.
 - Updated decision 0002 to record the retry outcome and distinguish the user's confirmation from repository access actually visible to Maven. No application code, scaffold checks, deployment, or unrelated changes.
+
+## 38. Assistant
+
+To proceed, the authorized Akka repository configuration must be available to this process. Please ensure the vendor-directed Maven settings/profile is installed at `$HOME\.m2\settings.xml`, or provide the path to an alternate local settings file to use with Maven `-s`. Do not share the settings content, token, or tokenized URL.
