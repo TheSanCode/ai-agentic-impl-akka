@@ -38,6 +38,10 @@ The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Ob
 
 Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; the next artifact is implementation instructions.
 
+## Implementation instructions
+
+Start with the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md): ordered tasks for the two-agent local lab, identity and tool controls, synthetic fixtures, APIs and acceptance tests. The instructions are documented; implementation remains pending.
+
 ## Roadmap
 
 See the [project roadmap](docs/ROADMAP.md) for phase status, deliverables, dependencies and completion criteria. Maintain it with the reusable `project-roadmap` skill using verified progress.
