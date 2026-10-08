@@ -21,6 +21,8 @@ Could not find artifact com.typesafe.akka:akka-actor-typed_2.13:jar:2.10.23 in c
 
 No user Maven settings file or `AKKA_REPOSITORY_URL` / `AKKA_LICENSE_KEY` environment value was present in the checked execution environment. Only presence booleans were printed, not credential values. No authorized tokenized endpoint was tested. The missing Central artifact is an access/configuration blocker, not proof of Java incompatibility or proof that the vendor repository is unavailable.
 
+After the user indicated repository access was configured, the isolated Akka probe was retried on Temurin 25 both normally and with `-U` to bypass Maven's cached not-found result. Both attempts still resolved only against Maven Central and failed before compilation; no Akka test ran. A post-retry presence check still found no `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, or `AKKA_LICENSE_KEY` in this execution environment. The user may have configured access outside the environment visible to this Maven process; active vendor-repository access is not established. No credential values or settings contents were inspected.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).

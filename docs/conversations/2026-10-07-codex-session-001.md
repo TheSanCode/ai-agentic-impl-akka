@@ -353,3 +353,18 @@ I checked the current environment before retrying Akka. Authorized repository ac
 - Checked only presence, not contents or values: `$HOME\.m2\settings.xml` absent; `AKKA_REPOSITORY_URL` absent; `AKKA_LICENSE_KEY` absent. No secrets were accessed or printed.
 - Read decision 0002, which documents Akka's authorized tokenized repository requirement and existing resolution failure. No Akka build was retried because the required authorized configuration remains absent. No scaffold checks were repeated and no deployment occurred.
 - No source, build, dependency, or roadmap files changed in this turn; only this conversation record is updated.
+
+## 36. User — clarification response
+
+configured
+
+## 37. Assistant
+
+The probe still resolved only from Maven Central after your confirmation. I retried with `-U` to bypass Maven's cached not-found response, but dependency resolution again failed before compilation. This execution environment still has no `$HOME\.m2\settings.xml` or Akka repository/license environment variables, so the vendor repository configuration is not active for this Maven process. No Akka test ran; Java 25 compatibility remains unverified locally.
+
+## Tool evidence through entry 37
+
+- Ran `.\mvnw.cmd -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. It failed during dependency resolution; the reported source was Maven Central. Repository URLs in output were redacted.
+- Retried `.\mvnw.cmd -U -B -ntp -f compatibility/akka/pom.xml verify` to force resolution after the cached miss. It again failed to find `com.typesafe.akka:akka-actor-typed_2.13:2.10.23` in Central before compilation/tests. URL output was redacted.
+- Checked settings/configuration presence only after those attempts: `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, and `AKKA_LICENSE_KEY` are still absent. Did not inspect settings content or read any credential.
+- Updated decision 0002 to record the retry outcome and distinguish the user's confirmation from repository access actually visible to Maven. No application code, scaffold checks, deployment, or unrelated changes.
