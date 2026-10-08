@@ -628,3 +628,18 @@ how to
 ## 72. Assistant — final response
 
 Interpreted as how to prove vendor-repository resolution. Steps given: move `$HOME\.m2\repository\com\typesafe\akka` to a backup name; run `.\scripts\Test-AkkaCompatibility.ps1` and enter the authorized URL at the prompt; success requires `BUILD SUCCESS`, 1 test passed, and the `com\typesafe\akka\...\2.10.23` folders recreated; then delete the backup (or restore it on failure). No commands were run by the assistant.
+
+## 73. User
+
+Testing Spring AI and Akka together.
+• The Akka licensing and license-key decision.
+
+## 74. Assistant — work performed
+
+- Added `compatibility/combined` (POM with Spring AI 2.0.1 BOM + Ollama starter, Akka Typed 2.10.23, `akka-repository` profile) and `CombinedCompatibilityTest`: Boot context with a typed ActorSystem bean whose actor delegates a `ChatClient` call to a bounded 2-thread executor and replies via `pipeToSelf`; loopback Ollama fixture.
+- Added `-Probe akka|combined` to `scripts/Test-AkkaCompatibility.ps1`.
+- First offline run failed: cached Akka artifacts are tagged with repository ID `akka-repository` (from `_remote.repositories`), which is unavailable without the profile. Two attempts setting a placeholder URL environment variable were refused by the tool environment ("Access is denied"); no URL was used.
+- Offline rerun with `-P akka-repository`: `CombinedCompatibilityTest` Tests run: 1, Failures: 0, Errors: 0, Skipped: 0; `BUILD SUCCESS` on Temurin 25. `dependency:tree`: single `slf4j-api` 2.0.18, `scala-library` 2.13.17, Akka core brings no Jackson.
+- `-Probe combined -ValidateOnly` passed under Windows PowerShell 5.1.
+- Updated compatibility README, decision 0002 (table row, scope note, gate 3) and ROADMAP (new checked combined-probe item; remaining item narrowed to repository-access proof and licensing).
+- Licensing/runtime-key decision requires the user's authorization; asked rather than decided.

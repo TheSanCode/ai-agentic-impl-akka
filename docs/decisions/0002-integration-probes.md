@@ -8,8 +8,9 @@ Date: 7 October 2026. Follows scaffold commit `d10a02d` on `feature/agentic`. Sc
 | --- | --- | --- | --- |
 | Spring AI 2.0.1 Ollama starter with Boot 4.0.8 | Passed using Maven Central | 1 test passed on Temurin 25.0.4.1+1; actual Boot auto-configuration, ChatClient, Ollama HTTP adapter and JSON round trip against a loopback fixture | This narrow combination is verified. Keep application integration pending contracts and real-model acceptance. |
 | Akka Typed 2.10.23 (`_2.13`) with Boot 4.0.8 dependency management | Resolved from the local Maven cache; a fresh authorized repository resolution is not verified | 1 test passed on Temurin 25.0.4.1+1; Spring-managed typed ActorSystem, bounded ask/reply, and termination | This narrow runtime combination passed. Authorized repository access and profile activation remain unverified; licensing and production runtime-key decisions remain open. |
+| Combined: Spring AI 2.0.1 + Akka Typed 2.10.23 in one Boot 4.0.8 context | Offline from local cache; `_remote.repositories` records Akka jar/pom as downloaded from repository ID `akka-repository`; single `slf4j-api` 2.0.18, `scala-library` 2.13.17, no Jackson from Akka core | 1 test passed on Temurin 25.0.4.1+1 (8 October 2026); actor delegates a `ChatClient` call to a bounded executor, replies via `pipeToSelf`; loopback Ollama fixture called once | Co-existence and actor-to-model delegation verified. Agent communication, cancellation, persistence and recovery remain untested. |
 
-The independent POMs and test sources live in [compatibility](../../compatibility/README.md). The root application POM and source are unchanged. These are not combined Spring AI/Akka tests and do not demonstrate agent communication, cancellation, persistence or recovery.
+The independent POMs and test sources live in [compatibility](../../compatibility/README.md). The root application POM and source are unchanged. The combined probe shows only that both libraries co-exist and an actor can delegate one model call; none of the probes demonstrates agent communication, cancellation, persistence or recovery.
 
 Spring AI build completed at 23:15:48 America/Toronto; dependency tree completed at 23:16:13. Resolved versions inspected: Boot starters 4.0.8, Spring AI modules 2.0.1, Spring Framework 7.0.9, Jackson databind/core 3.1.5, Reactor Core 3.8.7, JUnit 6.0.3. The Boot parent manages shared dependencies; no Boot 4.1 starter was selected. Surefire: 1 test, 0 failures, 0 errors, 0 skipped. The test asserts Java feature version 25, a configured synthetic model ID, non-streaming request content and the parsed fixture response. No real inference was attempted.
 
@@ -53,7 +54,7 @@ On 8 October 2026 the user ran the full hardened script locally and pasted its r
 
 1. Prove authorized Akka repository resolution with a cache-isolated rerun of `scripts/Test-AkkaCompatibility.ps1` and inspect its resolved graph. The isolated test source compiles and passes on Java 25 with locally available artifacts.
 2. Resolve Akka licensing/eligibility and runtime key policy before sustained lab or production use. Do not infer permission from artifact availability.
-3. Test both integrations together before asserting full-stack compatibility; then define replaceable ports before workflows.
+3. Combined co-existence probe passed (8 October 2026). Next, define replaceable ports before workflows; full-stack claims still need the application build, not only isolated probes.
 4. Select and license actual model weights, measure hardware fit, and test actual Ollama chat/structured output, streaming and embeddings separately.
 
 The scaffold's 9 passing tests and packaged health checks were not repeated. The normal shell still fails before process creation with `helper_unknown_error: setup refresh had errors`; approved outside-sandbox commands supplied these probe results. That execution-environment issue remains open. Nothing was deployed.

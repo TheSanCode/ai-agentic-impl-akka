@@ -1,4 +1,6 @@
 param(
+    [ValidateSet('akka', 'combined')]
+    [string]$Probe = 'akka',
     [string]$JavaHome,
     [switch]$ValidateOnly
 )
@@ -51,7 +53,7 @@ $env:JAVA_HOME = $selectedJavaHome
 $env:Path = "$(Join-Path $selectedJavaHome 'bin');$env:Path"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $mavenWrapper = Join-Path $repoRoot 'mvnw.cmd'
-$pom = Join-Path $repoRoot 'compatibility\akka\pom.xml'
+$pom = Join-Path $repoRoot "compatibility\$Probe\pom.xml"
 $promptedForRepositoryUrl = $false
 
 $mavenVersion = (Invoke-NativeCapture $mavenWrapper @('--version') | Out-String)
