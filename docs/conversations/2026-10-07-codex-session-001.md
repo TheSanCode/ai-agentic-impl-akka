@@ -726,3 +726,14 @@ proceed next
 - Mutation check: bypassing the invocation policy gate made 4 tests fail (`ToolRegistryTest` and `ReadToolsTest`); the source was restored.
 - Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
 - Docs: new decision 0004; ROADMAP P1-06 tool part checked, skill registry and real-adapter wiring left open; backend-scaffold package text updated.
+## 91. Assistant — final response (pending entry from the previous turn)
+
+The tool half of P1-06 is committed as `c707ea2` (not pushed): a read-only tool registry with only `searchKnowledge`, `queryMockLogs` and `inspectMockHealth`, usable only by the Investigation agent; draft/write tools are refused at startup. Before a tool runs, unknown tools, wrong roles, bad or smuggled arguments, expired deadlines and policy denials stop the call; a policy outage refuses it. After it runs, cross-project results are discarded, each evidence source is rechecked and output is capped; source access uses the user's own delegated credentials with no shared fallback. 114 tests pass on Java 25 (55 new); disabling the policy check made 4 tests fail. Still open: skill registry (SKL-01..03), real policy/identity/search adapters (P1-04/P1-07/P1-08), tool-call auditing, concurrency limits and provisional limits (decision 0004). Suggested next: P1-04.
+
+## 92. User
+
+what is tool registry and how its implemented in this project
+
+## 93. Assistant — final response
+
+Explained the tool registry concept and its implementation in `src/main/java/io/agenticawithakka/tools` (definitions, registry gate, read tools, delegated access, tests). No code changes.
