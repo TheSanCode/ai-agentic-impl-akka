@@ -66,6 +66,7 @@ Depends on: Phase 0. Independent connector proofs may run earlier without bypass
 Deliverables:
 
 - [x] P1-02 backend scaffold: Maven Wrapper, package boundaries, configuration validation and local health endpoint; JDK 25 build, 9 tests and packaged-JAR HTTP check passed, including a fresh source-only copy.
+- [x] P1-01 partial evidence: resolve Spring AI 2.0.1 and pass an isolated Boot 4.0.8 / Temurin 25 Ollama HTTP-fixture integration test; [results and limits](decisions/0002-integration-probes.md).
 - [ ] Finish P1-01 combined Spring AI/Akka compatibility, repository access and license decisions; artifact availability is not runtime compatibility.
 - [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images

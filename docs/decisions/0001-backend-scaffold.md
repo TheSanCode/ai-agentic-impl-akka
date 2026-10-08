@@ -2,6 +2,8 @@
 
 Date: 7 October 2026. Scope: P1-01 dependency investigation and P1-02 backend scaffold only.
 
+Follow-up: [isolated integration probes](0002-integration-probes.md) now verify a limited Spring AI/Ollama fixture on Java 25; Akka resolution remains blocked. The table below records the original scaffold decision, not the later probe outcome.
+
 ## Versions and evidence
 
 | Component | Exact version | Decision / verification |

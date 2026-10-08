@@ -13,7 +13,7 @@ Use the following candidates for the local implementation. These are design sele
 | Browser UI | Angular 22, TypeScript, Angular Material | Responsive investigation screens in Phase 1; approvals, business review and admin screens later. Resolve compatible Node/TypeScript versions from Angular's matrix. |
 | Java | OpenJDK 25 LTS baseline | Stable baseline. Latest-GA Java remains a separate compatibility experiment; the request for newest Java is not considered fulfilled by merely choosing LTS. |
 | Backend | Spring Boot 4.0.x plus Spring Security | Initially align with Spring AI 2.0.x and verify latest supported patch. Boot 4.1.x is an upgrade candidate after combined tests. |
-| AI integration | Spring AI 2.0.1 candidate | Chat, embeddings, tool calling and retrieval adapters; optional MCP boundary. |
+| AI integration | Spring AI 2.0.1 candidate | Boot 4.0.8 / Java 25 verified only for an isolated Ollama HTTP-fixture round trip; model inference, embeddings, tool calling, combined Akka compatibility and application integration remain open. |
 | Actor runtime | Akka Typed | Two-agent local communication; Akka Persistence Typed in Phase 2. Exact runtime version and persistence plugin remain to select/test. |
 | Local inference | Ollama | Local chat and embedding endpoints. Pick actual models after measuring GPU/RAM, tool reliability and weight licenses. |
 | Identity | Keycloak and Spring Security OIDC | Browser login, MFA and local token-exchange proof. Real-source delegation stays source-specific. |

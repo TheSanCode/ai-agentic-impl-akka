@@ -72,7 +72,7 @@ Start with the [Windows backend scaffold guide](docs/implementation/backend-scaf
 
 ## Implementation instructions
 
-Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold is tested; agents, identity, sources, frontend and full lab acceptance remain pending. See the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions and unresolved Spring AI/Akka compatibility.
+Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold is tested; agents, identity, sources, frontend and full lab acceptance remain pending. See the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for limited Spring AI evidence and unresolved Akka access, runtime and licensing gates.
 
 ## Roadmap
 
