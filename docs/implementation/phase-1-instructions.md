@@ -12,6 +12,8 @@ Keep pod restart execution, Jira patch writes, real enterprise connectors, busin
 
 ## 2 Bootstrap decisions
 
+Complete the [Windows local prerequisite checks](../local-prerequisites.md) before starting the build. Record actual tool versions and compatibility decisions; installation alone does not satisfy application acceptance.
+
 Use the technical design's proposed Java 25 baseline, Spring Boot 4 and Spring AI stable candidate. Resolve current compatible patched versions and record exact build/container/model versions in a dependency decision record before adding dependencies. A latest-GA Java profile is a compatibility experiment, not a substitute for tested support.
 
 Prefer one Maven application with wrapper and packages rather than premature service decomposition. Use Akka Typed in the local runtime if Java/dependency/licensing checks pass; otherwise retain a documented in-process adapter behind AgentRuntime and leave the Akka-specific work open. Do not hide a runtime substitution. A non-Akka bootstrap is not an Akka demonstration. The intended lab completion evidence shall include typed request/reply, asynchronous results, deadlines and cancellation on the selected Akka adapter; otherwise record that objective as outstanding. Durable actors remain Phase 2.
