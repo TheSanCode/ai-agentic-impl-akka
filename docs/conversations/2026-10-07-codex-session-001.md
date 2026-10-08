@@ -655,3 +655,14 @@ license_path=dev-only-now, key_policy=secret-store
 ## 77. Assistant — final response
 
 Recorded in decision 0002 gate 2 and ROADMAP: Akka is approved for development/non-production use only; the production license decision is deferred and remains a release blocker; `akka.license-key` must be injected from a secret store or environment variable and never committed. Combined Spring AI + Akka probe passed on Java 25 (commit `66a6dbb`). Remaining: cache-isolated vendor-repository proof, deferred production license, then replaceable ports before agent workflows.
+
+## 78. User
+
+The combined test ran offline using Akka files already on this machine. Those files are tagged as downloaded from  akka-repository , but a fresh download hasn't been tested.
+
+## 79. Assistant — work performed and final response
+
+- Removed a duplicated `Invoke-NativeCapture` definition in `scripts/Test-AkkaCompatibility.ps1` (left by the earlier fix's string replace).
+- Added `-IsolatedCache`: runs `verify` with an empty temporary `maven.repo.local`, then asserts the Akka jar exists there with `_remote.repositories` origin `akka-repository`, prints `VERIFIED: ...`, and deletes the temporary repository. The user's `~/.m2` is not modified.
+- Validation: Windows PowerShell parser 0 errors; `-Probe combined -ValidateOnly -IsolatedCache` exit 0 with `akka-repository` profile active; no temporary repository left. Full isolated run not executed — it requires the user's authorized URL.
+- User action: `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` and enter the URL at the secure prompt.

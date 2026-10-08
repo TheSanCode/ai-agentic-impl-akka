@@ -2,18 +2,12 @@ param(
     [ValidateSet('akka', 'combined')]
     [string]$Probe = 'akka',
     [string]$JavaHome,
-    [switch]$ValidateOnly
+    [switch]$ValidateOnly,
+    # Resolve into an empty temporary local repository to prove vendor-repository download.
+    [switch]$IsolatedCache
 )
 
 $ErrorActionPreference = 'Stop'
-
-# Windows PowerShell 5.1 turns native stderr (e.g. JDK 25 sun.misc.Unsafe
-# warnings from Maven) into terminating errors under 'Stop'; capture it as text.
-function Invoke-NativeCapture {
-    param([string]$FilePath, [string[]]$Arguments)
-    $ErrorActionPreference = 'Continue'
-    & $FilePath @Arguments 2>&1 | ForEach-Object { $_.ToString() }
-}
 
 # Windows PowerShell 5.1 turns native stderr (e.g. JDK 25 sun.misc.Unsafe
 # warnings from Maven) into terminating errors under 'Stop'; capture it as text.
@@ -122,6 +116,14 @@ try {
         '-f', $pom,
         'verify'
     )
+    if ($IsolatedCache) {
+        $isolatedRepository = Join-Path ([IO.Path]::GetTempPath()) (
+            'agentica-m2-{0}' -f [guid]::NewGuid().ToString('N')
+        )
+        New-Item -ItemType Directory -Path $isolatedRepository | Out-Null
+        $arguments = @("-Dmaven.repo.local=$isolatedRepository") + $arguments
+        Write-Output 'Using an empty temporary Maven repository; all dependencies will be downloaded.'
+    }
     $output = Invoke-NativeCapture $mavenWrapper $arguments
     $exitCode = $LASTEXITCODE
     foreach ($line in $output) {
@@ -133,6 +135,16 @@ try {
     if ($exitCode -ne 0) {
         throw "Akka compatibility probe failed with exit code $exitCode. See redacted Maven output above."
     }
+
+    if ($IsolatedCache) {
+        $akkaJar = Join-Path $isolatedRepository 'com\typesafe\akka\akka-actor-typed_2.13\2.10.23\akka-actor-typed_2.13-2.10.23.jar'
+        $origin = Join-Path (Split-Path $akkaJar) '_remote.repositories'
+        if (-not (Test-Path -LiteralPath $akkaJar) -or -not (Test-Path -LiteralPath $origin) -or
+            -not (Select-String -LiteralPath $origin -Pattern '\.jar>akka-repository=' -Quiet)) {
+            throw 'Akka was not downloaded from repository ID akka-repository into the isolated cache.'
+        }
+        Write-Output 'VERIFIED: akka-actor-typed_2.13-2.10.23.jar freshly downloaded from repository ID akka-repository.'
+    }
 }
 finally {
     if ($promptedForRepositoryUrl) {
@@ -140,5 +152,8 @@ finally {
     }
     if ($tempSettings -and (Test-Path -LiteralPath $tempSettings)) {
         Remove-Item -LiteralPath $tempSettings
+    }
+    if ($isolatedRepository -and (Test-Path -LiteralPath $isolatedRepository)) {
+        Remove-Item -LiteralPath $isolatedRepository -Recurse -Force
     }
 }
