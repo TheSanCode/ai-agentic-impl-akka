@@ -9,16 +9,18 @@ This guide installs/checks development tools. Application code, Compose configur
 
 ## Current Installation Status
 
-| Tool | Status / Version |
-| --- | --- |
-| WinGet | v1.29.380 |
-| Git | 2.55.0.windows.4 |
-| Java JDK | 21.0.8 |
-| Node.js | v24.10.0 (npm 11.6.1) |
-| VS Code | 1.138.0 |
-| Docker Desktop | Not installed |
-| Ollama | 0.35.1 (service not running) |
-| WSL2 | Not installed |
+| Tool | Status / Version | Expected state / Next action |
+| --- | --- | --- |
+| WinGet | v1.29.380 | Available; run `winget source update` successfully. No specific upgrade is required just to start the checks. |
+| Git | 2.55.0.windows.4 | Available; verify repository access and checkout `feature/agentic`. |
+| Java JDK | 21.0.8 | Add the latest available JDK 25 patch alongside Java 21 for the proposed baseline. Confirm project/IDE and `java -version` / `javac -version` select 25; final stack compatibility remains to test. |
+| Node.js | v24.10.0 (npm 11.6.1) | Installed; compare with the selected Angular version's supported Node range and update within a supported line if needed. Verify `node --version` and `npm --version`; do not assume this exact version is compatible. |
+| VS Code | 1.138.0 | Available; verify `code --version`. Configure Java/Angular development support when the project is scaffolded. |
+| Docker Desktop | Not installed | Install after WSL2 setup, start Docker Desktop with its WSL2 backend and verify `docker info` plus `docker compose version`. |
+| Ollama | 0.35.1 (service not running) | Start Ollama from the Start menu, or run `ollama serve` if no server is running. Verify `ollama list`; download selected chat/embedding models later. |
+| WSL2 | Not installed | Run `wsl --install` in Administrator PowerShell, restart if prompted and complete distribution setup. Verify `wsl --status` and `wsl --list --verbose` show the intended distribution using version 2. |
+
+Installation versions above are user-reported. Expected states are setup targets, not evidence of passed checks. Recommended order: **WSL2 → Docker Desktop → JDK 25 selection → Ollama server → final toolchain/model checks**.
 
 ## 1 Check WinGet and refresh its catalog
 
