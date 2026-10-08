@@ -465,3 +465,29 @@ The retry still sees the repository URL placeholder, so dependency resolution fa
 - Ran the documented command on Temurin 25: `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify`.
 - Maven activated/resolved the `akka-repository` profile but still attempted the placeholder repository URL and failed to transfer the artifact POM before compilation. URL output was redacted. No test ran.
 - Updated decision 0002 to record that the profile is active but the URL remains a placeholder. No settings contents or credentials were inspected; no scaffold tests or deployment.
+
+## 51. User
+
+[INFO] BUILD FAILURE
+-----------------------------------------------------------------------
+[INFO] Total time:  18.058 s
+[INFO] Finished at: 2026-10-07T23:59:48-04:00
+-----------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:testCompile (default-testCompile) on project akka-probe: Fatal error compiling: error: release version 25 not supported -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+
+## 52. Assistant
+
+The compiler error means Maven was using a JDK whose `javac` does not support `--release 25`. In this workspace, a fresh `mvnw --version` check defaulted to Microsoft JDK 21. I explicitly selected installed Temurin 25 and reran the isolated Akka probe: compilation and its typed request/reply/termination test passed (1 test). Maven warned the `akka-repository` profile was inactive, so the artifacts came from the local Maven cache; this verifies the limited Java 25 runtime path, not fresh vendor repository access. I updated probe documentation and the roadmap while leaving combined compatibility, remote access, and licensing open.
+
+## Tool evidence through entry 52
+
+- Before setting `JAVA_HOME`, `.\mvnw.cmd --version` reported Maven 3.9.11 on Microsoft JDK 21.0.8. Temurin 25.0.4.1+1 and its `javac` were present.
+- With `JAVA_HOME` and PATH explicitly pointed to Temurin 25.0.4.1+1, `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` compiled the test and passed: 1 test, 0 failures/errors/skips. Output warned that `akka-repository` could not be activated; remote repository access therefore remains unverified.
+- Dependency tree listed `akka-actor-typed_2.13`, `akka-actor_2.13`, and `akka-slf4j_2.13` at 2.10.23. These were available in the local Maven cache.
+- Updated `compatibility/README.md`, decision 0002 and the roadmap to distinguish cache-backed Java 25 runtime success from fresh authorized repository resolution. No combined Spring AI/Akka test, scaffold rerun, deployment, or license decision.

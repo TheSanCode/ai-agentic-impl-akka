@@ -7,19 +7,19 @@ Date: 7 October 2026. Follows scaffold commit `d10a02d` on `feature/agentic`. Sc
 | Probe | Resolution | Java 25 runtime result | Decision |
 | --- | --- | --- | --- |
 | Spring AI 2.0.1 Ollama starter with Boot 4.0.8 | Passed using Maven Central | 1 test passed on Temurin 25.0.4.1+1; actual Boot auto-configuration, ChatClient, Ollama HTTP adapter and JSON round trip against a loopback fixture | This narrow combination is verified. Keep application integration pending contracts and real-model acceptance. |
-| Akka Typed 2.10.23 (`_2.13`) with Boot 4.0.8 dependency management | Failed: artifact absent from configured Maven Central | Test could not compile/run; Java 25 compatibility remains vendor-certified only | Blocked on authorized Akka repository access. Do not substitute an older public release or claim the test passed. |
+| Akka Typed 2.10.23 (`_2.13`) with Boot 4.0.8 dependency management | Resolved from the local Maven cache; a fresh authorized repository resolution is not verified | 1 test passed on Temurin 25.0.4.1+1; Spring-managed typed ActorSystem, bounded ask/reply, and termination | This narrow runtime combination passed. Authorized repository access and profile activation remain unverified; licensing and production runtime-key decisions remain open. |
 
 The independent POMs and test sources live in [compatibility](../../compatibility/README.md). The root application POM and source are unchanged. These are not combined Spring AI/Akka tests and do not demonstrate agent communication, cancellation, persistence or recovery.
 
 Spring AI build completed at 23:15:48 America/Toronto; dependency tree completed at 23:16:13. Resolved versions inspected: Boot starters 4.0.8, Spring AI modules 2.0.1, Spring Framework 7.0.9, Jackson databind/core 3.1.5, Reactor Core 3.8.7, JUnit 6.0.3. The Boot parent manages shared dependencies; no Boot 4.1 starter was selected. Surefire: 1 test, 0 failures, 0 errors, 0 skipped. The test asserts Java feature version 25, a configured synthetic model ID, non-streaming request content and the parsed fixture response. No real inference was attempted.
 
-Akka build failed at 23:16:34 America/Toronto with:
+The initial Akka build failed at 23:16:34 America/Toronto with:
 
 ```text
 Could not find artifact com.typesafe.akka:akka-actor-typed_2.13:jar:2.10.23 in central (https://repo.maven.apache.org/maven2)
 ```
 
-No user Maven settings file or `AKKA_REPOSITORY_URL` / `AKKA_LICENSE_KEY` environment value was present in the checked execution environment. Only presence booleans were printed, not credential values. No authorized tokenized endpoint was tested. The missing Central artifact is an access/configuration blocker, not proof of Java incompatibility or proof that the vendor repository is unavailable.
+No user Maven settings file or `AKKA_REPOSITORY_URL` / `AKKA_LICENSE_KEY` environment value was present in the initial execution environment. Only presence booleans were printed, not credential values. The missing Central artifact is an access/configuration blocker, not proof of Java incompatibility or proof that the vendor repository is unavailable.
 
 After the user indicated repository access was configured, the isolated Akka probe was retried on Temurin 25 both normally and with `-U` to bypass Maven's cached not-found result. Both attempts still resolved only against Maven Central and failed before compilation; no Akka test ran. A post-retry presence check still found no `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, or `AKKA_LICENSE_KEY` in this execution environment. The user may have configured access outside the environment visible to this Maven process; active vendor-repository access is not established. No credential values or settings contents were inspected.
 
@@ -27,9 +27,9 @@ On the next retry the user confirmed configuration and the default Maven setting
 
 The user then confirmed an active profile. Maven Help Plugin `help:active-profiles` nevertheless reported no active profiles for the probe project; an explicit retry with `-P akka-repository` warned that this profile does not exist and again resolved only against Central. No settings data was read. The active profile ID and repository declaration need to be verified locally; the Akka compatibility test remains uncompiled/unrun.
 
-The non-secret profile ID was provided as `akka-repository`. Passing both the user settings file explicitly and `-P akka-repository` made Maven activate the external profile. Dependency resolution then reached that profile's repository declaration but failed before compilation because the configured repository URL is still an unconfigured placeholder (the URL is intentionally not reproduced here). Replace it locally with the authorized URL obtained through Akka's official process, then rerun the command in [compatibility instructions](../../compatibility/README.md). This confirms only profile activation, not artifact access or Java 25 runtime compatibility.
+The non-secret profile ID was provided as `akka-repository`. Passing the settings file explicitly and `-P akka-repository` activated the external profile in one Maven Help Plugin check. A subsequent build still reported the profile missing/inactive and initially failed at repository resolution; the URL is not reproduced. Therefore, the later successful test below must not be taken as proof that the vendor repository was contacted successfully.
 
-After the user indicated the local URL was ready, the documented retry command was run again with `-s`, `-P akka-repository`, and `-U`. Maven still reported the placeholder URL and failed to transfer the Akka POM before compilation. The value visible to this process therefore remains unchanged; no Akka test ran.
+On 8 October 2026, following the user's compiler failure report, the Akka probe was rerun with Temurin 25 explicitly selected (`JAVA_HOME` and PATH), the local settings file, `-P akka-repository`, and `-U`. Maven warned that the requested profile could not be activated, but used Akka 2.10.23 artifacts present in the local Maven cache; `AkkaCompatibilityTest` passed (1 test, 0 failures/errors/skips). It created a Spring-managed typed ActorSystem, performed bounded asynchronous ask/reply, and verified termination. `dependency:tree` confirmed `akka-actor-typed_2.13`, `akka-actor_2.13`, and `akka-slf4j_2.13` at 2.10.23. This establishes a limited Java 25 runtime result using locally available artifacts, not a clean-cache or authorized remote-repository resolution.
 
 ## Repository and licensing requirements
 
