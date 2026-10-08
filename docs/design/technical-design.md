@@ -1,10 +1,10 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.4 | 7 October 2026 | Proposed implementation design
+Version 0.5 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
-Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.5](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
+Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.6](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
 
 Source baseline on feature/agentic: requirements blob `58fb239de256814832cb65481c9ab5f01f60c797`, agentic design blob `a4ba17ad415cb9583d0d01267d09cd6463e0f83d`. Requirements remain authoritative if this design conflicts with them.
 
@@ -184,3 +184,13 @@ Enroll users through application login and a short-lived channel ownership chall
 Send redacted execution summaries and expiring authenticated links by default. Require login to view protected details. Disallow group initiation until an explicit conversation policy is approved. Use a delivery outbox, retry/backoff and provider receipts where available; keep delivery status independent of workflow status. Do not assume a delivery receipt proves a user reviewed or approved anything.
 
 Provider APIs, approval steps, session/message rules, SMS registration, pricing and outbound consent constraints require current official-provider verification during adapter selection. No provider or chat-native approval mechanism is selected here. Local development uses mock channel events first, followed by real sandbox accounts; no real messages are sent as part of this documentation update.
+
+## 18 Browser application architecture
+
+A browser interface is required, not an API-only optional deliverable. Select the frontend framework through a decision record; Angular is a candidate, not a binding selection. Use a replaceable frontend consuming the same project-scoped application APIs as channel adapters.
+
+Phase 1 screens: sign-in, authorized project selection, new investigation, execution list, progress/results and cancellation. Use bounded authenticated status polling first; SSE may be added through a capability adapter. Browser navigation or closure does not cancel server work. Prevent duplicate submission using request identifiers and disable/handle repeated submission safely.
+
+Later screens: exact-action approval in Phase 4, technical verification/business review and complete admin overview in Phase 5, channel account linking and secure messaging deep links in Phase 6. Local fake UI controls do not count as implemented protected workflows.
+
+Prefer same-origin frontend/API with the backend OIDC session design described above. If separate origins are chosen, explicitly design CORS, CSRF, cookies, token handling and redirects. Display source/model content as text or sanitized markup, never trusted executable HTML. Reauthorize every server request and render safe loading/denied/expired/partial states. Choose and test a browser support matrix and accessibility target before acceptance.
