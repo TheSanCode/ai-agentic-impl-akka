@@ -23,6 +23,8 @@ No user Maven settings file or `AKKA_REPOSITORY_URL` / `AKKA_LICENSE_KEY` enviro
 
 After the user indicated repository access was configured, the isolated Akka probe was retried on Temurin 25 both normally and with `-U` to bypass Maven's cached not-found result. Both attempts still resolved only against Maven Central and failed before compilation; no Akka test ran. A post-retry presence check still found no `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, or `AKKA_LICENSE_KEY` in this execution environment. The user may have configured access outside the environment visible to this Maven process; active vendor-repository access is not established. No credential values or settings contents were inspected.
 
+On the next retry the user confirmed configuration and the default Maven settings file existed, but `mvn -U ... verify` still failed before compilation and named only Maven Central. The probe POM declares no `<repositories>` entry, and the previously supplied settings fragment contained only `<servers>`, not an active profile with a repository URL. Thus Maven still does not see the authorized Akka repository. Settings contents and credentials were not inspected or printed.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).

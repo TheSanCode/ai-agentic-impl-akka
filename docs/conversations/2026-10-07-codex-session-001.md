@@ -407,3 +407,18 @@ That XML contains placeholders, not usable credentials, and it only defines a Ma
 - Treated the submitted username/password strings as placeholders, not credentials. Did not copy them to a config file or run Maven.
 - Existing Akka POM declares the artifact dependency but no repository URL or server ID; the probe documentation requires authorized repository access in user-local Maven settings. The supplied fragment alone cannot redirect Maven from Central.
 - No files were changed other than this conversation record. No tests or deployment.
+
+## 43. User — clarification response
+
+configured
+
+## 44. Assistant
+
+The Maven settings file is now present, but the forced retry still reports the artifact only missing from Maven Central. The supplied fragment is a server entry; Maven also needs an authorized Akka repository URL in an active Maven profile or a securely provided repository configuration. The probe POM currently has no repository entry, and I did not inspect the settings contents. I will not put the tokenized URL in source or request it in chat.
+
+## Tool evidence through entry 44
+
+- Presence check confirmed `$HOME\.m2\settings.xml` exists; `AKKA_REPOSITORY_URL` remains unset. No settings content or credential was read or printed.
+- Ran the isolated Akka probe with Temurin 25 and Maven `-U`. Dependency resolution still failed before compilation, reporting Maven Central only. URLs were redacted from output.
+- Official setup guidance, documented in decision 0002, requires the tokenized Akka repository URL. The Akka probe POM currently contains no `<repositories>` entry, and the submitted XML fragment contains only `<servers>`.
+- Updated decision 0002 with this precise blocker. No tests passed for Akka, no scaffold checks repeated, and no deployment.
