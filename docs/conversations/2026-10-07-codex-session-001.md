@@ -422,3 +422,18 @@ The Maven settings file is now present, but the forced retry still reports the a
 - Ran the isolated Akka probe with Temurin 25 and Maven `-U`. Dependency resolution still failed before compilation, reporting Maven Central only. URLs were redacted from output.
 - Official setup guidance, documented in decision 0002, requires the tokenized Akka repository URL. The Akka probe POM currently contains no `<repositories>` entry, and the submitted XML fragment contains only `<servers>`.
 - Updated decision 0002 with this precise blocker. No tests passed for Akka, no scaffold checks repeated, and no deployment.
+
+## 45. User — clarification response
+
+active-profile
+
+## 46. Assistant
+
+Maven still does not see the profile: `help:active-profiles` reported no active profiles, and retrying with `-P akka-repository` warned that this profile does not exist. Dependency resolution still used Central only. I did not inspect settings contents. Please provide the non-secret Maven settings profile ID you configured, and ensure it contains the authorized Akka repository entry and is active; do not share its URL or credentials. If the profile ID is not `akka-repository`, I can retry with that ID.
+
+## Tool evidence through entry 46
+
+- Ran Maven Help Plugin `help:active-profiles`; it reported no active profiles for the Akka probe project.
+- Ran `.\mvnw.cmd -U -P akka-repository -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Maven warned that profile `akka-repository` does not exist, then failed to resolve the Akka artifact from Central before compilation. URLs were redacted.
+- No Maven settings content or credential was inspected or printed. Updated decision 0002 to record that user-reported configuration is not visible as an active Maven profile.
+- Akka test remains blocked/unrun; no scaffold checks or deployment.

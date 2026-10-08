@@ -25,6 +25,8 @@ After the user indicated repository access was configured, the isolated Akka pro
 
 On the next retry the user confirmed configuration and the default Maven settings file existed, but `mvn -U ... verify` still failed before compilation and named only Maven Central. The probe POM declares no `<repositories>` entry, and the previously supplied settings fragment contained only `<servers>`, not an active profile with a repository URL. Thus Maven still does not see the authorized Akka repository. Settings contents and credentials were not inspected or printed.
 
+The user then confirmed an active profile. Maven Help Plugin `help:active-profiles` nevertheless reported no active profiles for the probe project; an explicit retry with `-P akka-repository` warned that this profile does not exist and again resolved only against Central. No settings data was read. The active profile ID and repository declaration need to be verified locally; the Akka compatibility test remains uncompiled/unrun.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).
