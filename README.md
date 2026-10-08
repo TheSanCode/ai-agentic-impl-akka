@@ -6,7 +6,7 @@ A platform for experimenting with agents, reusable skills, controlled tools, kno
 
 Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for the proposed scope, functional behavior, security controls, operational targets and acceptance scenarios.
 
-The requirements are version 0.1 and remain a draft for review. Technology choices are replaceable and will be recorded in the technical design.
+The requirements are version 0.2 and remain a draft for review. Technology choices are replaceable and will be recorded in the technical design.
 
 ## Delivery sequence
 
@@ -24,6 +24,9 @@ The requirements are version 0.1 and remain a draft for review. Technology choic
 - Delegated user access to supported platform sources.
 - Human approval for protected actions.
 - Durable execution, audit trails and operational observability.
+- Approval-gated pod restarts with target validation, bounded attempts and recovery checks.
+- Jira-linked code-change proposals with reviewable patches and test evidence.
+- An admin eagle view of issue impact, timelines, evidence, agent work, approvals and outcomes within authorized access.
 
 ## Current status
 
