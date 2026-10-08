@@ -5,9 +5,20 @@ Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
 ## Current setup context
 
-The intended development laptop is an ASUS TUF Gaming A15 FA507UV_FA507UV with Ryzen 7 8845HS and 32 GB RAM. WinGet was reported as 1.29.380. These are user-reported details, not an automated hardware or compatibility check. Choose model size after measuring available RAM, GPU memory and inference performance.
-
 This guide installs/checks development tools. Application code, Compose configuration and a runnable setup guide remain to be implemented. AKS and an Azure subscription are not needed for the initial synthetic local lab.
+
+## Current Installation Status
+
+| Tool | Status / Version |
+| --- | --- |
+| WinGet | v1.29.380 |
+| Git | 2.55.0.windows.4 |
+| Java JDK | 21.0.8 |
+| Node.js | v24.10.0 (npm 11.6.1) |
+| VS Code | 1.138.0 |
+| Docker Desktop | Not installed |
+| Ollama | 0.35.1 (service not running) |
+| WSL2 | Not installed |
 
 ## 1 Check WinGet and refresh its catalog
 
