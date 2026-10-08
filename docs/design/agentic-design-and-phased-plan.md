@@ -1,10 +1,10 @@
 # AgenticaWithAkka Agentic Design and Phased Delivery Plan
 
-Version 0.1 | 7 October 2026 | Proposed design for review
+Version 0.2 | 7 October 2026 | Proposed design for review
 
 ## 1 Purpose and requirements baseline
 
-This document explains how agents, skills, tools and platform services work together, and how to deliver the application in manageable phases. It is based on [production requirements version 0.3](../requirements/agenticawithakka-production-requirements.md), repository blob `97db05215bd6bb2b9e59776d60cb0cf6dbfc23bb` on `feature/agentic`.
+This document explains how agents, skills, tools and platform services work together, and how to deliver the application in manageable phases. It is based on [production requirements version 0.4](../requirements/agenticawithakka-production-requirements.md), repository blob `58fb239de256814832cb65481c9ab5f01f60c797` on `feature/agentic`.
 
 The recommendation is six logical AI agent roles at full scope, starting with two in the first working lab. These are responsibility boundaries, not a requirement for six models, processes or deployments. A role may have many concurrent execution instances. Technology selection and exact framework APIs belong in the later technical design.
 
@@ -137,3 +137,13 @@ Minimum end-to-end scenarios are an authorized investigation; a cross-project de
 Confirm the first knowledge, logs, Jira and repository sources; Java baseline and latest-version test profile; Spring AI/runtime compatibility; whether Akka licensing is acceptable or an alternative runtime is needed; open-source identity/search/vector choices; model hosting and data policy; allowed restart environments; business approvers; verification windows; source permission freshness; load and quality targets.
 
 The technical design shall turn this proposal into exact interfaces, persistence schemas, actor topology if applicable, token flows, UI states, deployment boundaries and failure handling. Implementation instructions shall then define ordered tasks and completion checks. Six logical agents remain a recommendation; evidence from the first phases may justify combining or splitting roles without weakening the requirements.
+
+## 11 Background execution and loop responsibilities
+
+Coordinator owns the investigation's bounded loop and delegates scoped specialist loops. Every iteration validates budgets and identity, chooses a permitted tool or delegation, records the outcome and decides to continue, wait or finish. A single task shares cumulative budgets across nested work; delegation cannot create unlimited subtask budgets.
+
+Accept background work independently of browser connectivity and expose progress by execution ID. Phase 1 demonstrates browser-independent processing while the application remains alive. Phase 2 adds durable acceptance, checkpoints, persisted waits, scheduled wake-ups and crash recovery. A Phase 1 process restart may fail interrupted tasks explicitly; it must not claim recoverability.
+
+Akka actors coordinate state transitions. Persisted state and a durable queue/scheduler support recovery; ordinary actor timers or mailboxes alone do not. Approval and business review arrive as authenticated commands to resume a waiting workflow. Token acquisition and authorization remain outside model prompts.
+
+Map BKG-01, BKG-04, BKG-05 and BKG-06 to Phase 1 behavior; implement production-complete BKG-02, BKG-03, BKG-07 and BKG-08 in Phase 2 before enabling protected writes. Later phases add approval/business waits and polling to those proven contracts. BKG-09 does not authorize new recurring automations.
