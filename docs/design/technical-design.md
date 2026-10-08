@@ -1,10 +1,10 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.3 | 7 October 2026 | Proposed implementation design
+Version 0.4 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
-Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.4](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
+Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.5](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
 
 Source baseline on feature/agentic: requirements blob `58fb239de256814832cb65481c9ab5f01f60c797`, agentic design blob `a4ba17ad415cb9583d0d01267d09cd6463e0f83d`. Requirements remain authoritative if this design conflicts with them.
 
@@ -172,3 +172,15 @@ Active-time budgets exclude human waits; the absolute deadline includes them unl
 Polling runs as scheduled bounded observations, not an always-running AI loop. Model interpretation is invoked only when needed. Use per-project admission, bounded queues, backoff and terminal/manual-review handling. Progress API and admin view show last update/checkpoint, active step, usage, pending wait and next wake-up without protected content.
 
 Phase 2 fault tests include crash around durable admission/checkpoints, restart while waiting, repeated wake-ups, two competing workers, cumulative budget exhaustion, revocation and cancellation. Do not call actor persistence alone an end-to-end exactly-once guarantee.
+
+## 17 WhatsApp Telegram and SMS adapters
+
+Use a shared ChannelGateway and separate provider adapters. Normalize a validated inbound event into channel, providerEventId, conversationId, verifiedSenderRef and request text; resolve linked application identity server-side. The channel adapter calls the existing investigation application service, not a parallel agent workflow.
+
+Expose provider-specific authenticated webhook endpoints with bounded payloads, deduplication and rate limits. Acknowledge provider receipt promptly, then dispatch normalized work through the background execution path. Phase 2 durable admission is a prerequisite for reliable provider retry handling.
+
+Enroll users through application login and a short-lived channel ownership challenge. Record linked subject/project entitlements separately from transport identifiers; phone ownership is not enterprise identity. Reject unlinked or revoked mappings and recheck access at each request. Source token acquisition continues through source-specific delegated flows; never substitute channel credentials for source credentials.
+
+Send redacted execution summaries and expiring authenticated links by default. Require login to view protected details. Disallow group initiation until an explicit conversation policy is approved. Use a delivery outbox, retry/backoff and provider receipts where available; keep delivery status independent of workflow status. Do not assume a delivery receipt proves a user reviewed or approved anything.
+
+Provider APIs, approval steps, session/message rules, SMS registration, pricing and outbound consent constraints require current official-provider verification during adapter selection. No provider or chat-native approval mechanism is selected here. Local development uses mock channel events first, followed by real sandbox accounts; no real messages are sent as part of this documentation update.
