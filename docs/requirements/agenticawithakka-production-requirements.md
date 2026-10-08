@@ -1,6 +1,6 @@
 # agenticawithakka Agent Platform Production Requirements
 
-Version 0.5 | 7 October 2026 | Status: Requirements draft for review
+Version 0.6 | 7 October 2026 | Status: Requirements draft for review
 
 ## Sections added in version 0.3
 
@@ -224,7 +224,7 @@ Passing the local proof demonstrates behavior in a lab. Production readiness req
 | Model execution | Local, private enterprise or approved hosted provider; choose independently of agent runtime. |
 | Permission freshness | Agree source-specific revocation limits and fail-closed behavior. |
 | Capacity and quality | Confirm load profile, SLOs, evaluation thresholds and budget limits. |
-| User experience | Confirm browser interface, API-only lab or both; additional channels follow later. |
+| User experience | Browser web application is required; messaging channels complement it. |
 
 These decisions remain open. No particular library, framework, protocol implementation or vendor is selected by this requirements draft.
 
@@ -341,3 +341,16 @@ Support WhatsApp, Telegram and SMS as replaceable channel adapters for interacti
 | CHN-08 | Audit channel, verified sender mapping, event ID, execution and delivery outcome with redacted payloads. Define message retention, unlinking and account-reassignment behavior. | Operators can trace a request while minimizing provider-side and application-side sensitive content. |
 
 Acceptance includes all three channels, duplicate webhook events, failed delivery, unlinked sender, revoked identity, denied project, required reauthentication and safe protected-action handoff. Open decisions include providers, account ownership, group-chat policy, outbound consent, retention and permissible notification content.
+
+## 22 Browser web application
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| WEB-01 | Provide an authenticated browser web application as the primary interactive interface, with responsive desktop and mobile layouts. | Users can complete the investigation workflow in supported browsers without direct API commands. |
+| WEB-02 | Provide project selection, investigation submission, task list, background progress, evidence/results and authorized cancellation. Preserve server-side work across navigation or browser closure. | Returning users can locate their execution and see current status without triggering duplicate work. |
+| WEB-03 | Provide exact-action approval and manual business-validation screens with current permissions, version binding and expiry checks. | Unauthorized or stale approval/review submissions fail; business acceptance requires an explicit human decision. |
+| WEB-04 | Provide an admin issue overview with authorized impact, timelines, agent tasks, source evidence, proposals and verification gates. | The overview respects project/source restrictions and clearly marks missing or stale evidence. |
+| WEB-05 | Handle login, logout, MFA, session expiry, consent and source reauthentication; support secure deep links from messaging channels. | Redirects cannot bypass access checks or disclose protected results before authentication. |
+| WEB-06 | Use accessible navigation/forms, keyboard operation and clear loading, failure, empty and partial-result states. Render source/model text safely and protect browser sessions against injection and CSRF as applicable. | Accessibility and security checks cover primary flows; retrieved text cannot execute script. |
+
+Define supported browsers and accessibility target before acceptance. Frontend technology remains replaceable. Phase 1 includes a minimal functioning browser investigation interface; approval and admin/business features arrive with their corresponding workflow phases.
