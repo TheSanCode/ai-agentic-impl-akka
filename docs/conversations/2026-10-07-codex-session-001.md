@@ -594,3 +594,13 @@ Answered with the documented check sequence (no commands run, no files besides t
 2. Full check: set `$env:AKKA_REPOSITORY_URL` locally (tokenized URL from account.akka.io; never commit it) or enter it at the secure prompt, then run `.\scripts\Test-AkkaCompatibility.ps1`. Expect `BUILD SUCCESS` and `Tests run: 1, Failures: 0`.
 3. To prove remote resolution rather than cached artifacts, temporarily move `~\.m2\repository\com\typesafe\akka` aside and rerun; the artifacts must download again.
 4. The `Dev use only` log line is expected without `akka.license-key`; production needs a license-key decision.
+
+## 65. User
+
+Reported `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` output: Maven 3.9.11 on Temurin 25.0.4.1, then a `NativeCommandError` at script line 64 for `mvnw.cmd : WARNING: A terminally deprecated method in sun.misc.Unsafe has been called`.
+
+## 66. Assistant — final response
+
+Cause: Windows PowerShell 5.1 converts native stderr into error records, and the script's `$ErrorActionPreference = 'Stop'` made Maven's harmless JDK 25 `sun.misc.Unsafe` warning terminate the script. Added an `Invoke-NativeCapture` helper that captures native stdout/stderr as text with a local `Continue` preference, used for `javac`, `mvnw --version`, the profile check and `verify`; exit codes are still checked via `$LASTEXITCODE`.
+
+Tool evidence: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` exited 0, showed `akka-repository` active and `BUILD SUCCESS`. Full probe (remote Akka resolution) not run; needs the authorized URL.

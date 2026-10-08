@@ -5,6 +5,22 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Windows PowerShell 5.1 turns native stderr (e.g. JDK 25 sun.misc.Unsafe
+# warnings from Maven) into terminating errors under 'Stop'; capture it as text.
+function Invoke-NativeCapture {
+    param([string]$FilePath, [string[]]$Arguments)
+    $ErrorActionPreference = 'Continue'
+    & $FilePath @Arguments 2>&1 | ForEach-Object { $_.ToString() }
+}
+
+# Windows PowerShell 5.1 turns native stderr (e.g. JDK 25 sun.misc.Unsafe
+# warnings from Maven) into terminating errors under 'Stop'; capture it as text.
+function Invoke-NativeCapture {
+    param([string]$FilePath, [string[]]$Arguments)
+    $ErrorActionPreference = 'Continue'
+    & $FilePath @Arguments 2>&1 | ForEach-Object { $_.ToString() }
+}
+
 if (-not $JavaHome) {
     $JavaHome = $env:JAVA_HOME
 }
@@ -19,7 +35,7 @@ $selectedJavaHome = $null
 foreach ($candidate in $javaHomes | Select-Object -Unique) {
     $javac = Join-Path $candidate 'bin\javac.exe'
     if (Test-Path $javac) {
-        $version = (& $javac -version 2>&1 | Out-String)
+        $version = (Invoke-NativeCapture $javac @('-version') | Out-String)
         if ($version -match '\b25\.') {
             $selectedJavaHome = $candidate
             break
@@ -38,7 +54,7 @@ $mavenWrapper = Join-Path $repoRoot 'mvnw.cmd'
 $pom = Join-Path $repoRoot 'compatibility\akka\pom.xml'
 $promptedForRepositoryUrl = $false
 
-$mavenVersion = (& $mavenWrapper --version 2>&1 | Out-String)
+$mavenVersion = (Invoke-NativeCapture $mavenWrapper @('--version') | Out-String)
 Write-Output $mavenVersion.TrimEnd()
 if ($mavenVersion -notmatch 'Java version:\s+25(?:\.|,)') {
     throw 'Maven did not start on Java 25; refusing to compile the Java 25 probe.'
@@ -61,7 +77,7 @@ try {
         '-f', $pom,
         'help:active-profiles'
     )
-    $profileOutput = & $mavenWrapper @profileArguments 2>&1
+    $profileOutput = Invoke-NativeCapture $mavenWrapper $profileArguments
     $profileExitCode = $LASTEXITCODE
     foreach ($line in $profileOutput) {
         $safeLine = $line.ToString() -replace '(?i)https?://\S+', '[repository URL redacted]'
@@ -104,7 +120,7 @@ try {
         '-f', $pom,
         'verify'
     )
-    $output = & $mavenWrapper @arguments 2>&1
+    $output = Invoke-NativeCapture $mavenWrapper $arguments
     $exitCode = $LASTEXITCODE
     foreach ($line in $output) {
         $safeLine = $line.ToString() -replace '(?i)https?://\S+', '[repository URL redacted]'
