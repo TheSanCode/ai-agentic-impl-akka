@@ -69,7 +69,8 @@ Deliverables:
 - [x] P1-01 partial evidence: resolve Spring AI 2.0.1 and pass an isolated Boot 4.0.8 / Temurin 25 Ollama HTTP-fixture integration test; [results and limits](decisions/0002-integration-probes.md).
 - [x] P1-01 partial evidence: isolated Akka Typed 2.10.23 request/reply and shutdown test passed on Temurin 25 from locally cached artifacts, including a user-run full hardened script with the repository profile active; cache-isolated vendor-repository resolution, combined-stack test and licensing remain open; [results and limits](decisions/0002-integration-probes.md).
 - [x] P1-01 partial evidence: combined Spring AI 2.0.1 + Akka Typed 2.10.23 probe passed on Temurin 25 in one Boot 4.0.8 context (actor delegates a ChatClient call to a bounded executor; loopback model fixture); [results and limits](decisions/0002-integration-probes.md).
-- [ ] Finish P1-01 repository-access proof (cache-isolated run) and the deferred Akka production-license decision (current policy: dev/non-production only; key injected from a secret store); artifact availability is not runtime compatibility.
+- [x] P1-01 partial evidence: fresh Akka 2.10.23 resolution from the authorized `akka-repository` into an empty isolated Maven cache, with the combined probe passing on Temurin 25 (user-run, 8 October 2026); [results and limits](decisions/0002-integration-probes.md).
+- [ ] Finish P1-01 with the deferred Akka production-license decision (current policy: dev/non-production only; key injected from a secret store); artifact availability is not runtime compatibility.
 - [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens

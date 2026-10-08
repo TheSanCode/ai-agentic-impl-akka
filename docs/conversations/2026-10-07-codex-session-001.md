@@ -685,3 +685,11 @@ Pasted `-Probe combined -IsolatedCache` output ending at "Using an empty tempora
 - Changed `scripts/Test-AkkaCompatibility.ps1` to stream redacted Maven lines as they arrive; with `-IsolatedCache` it now keeps transfer logs (no `-ntp`, URLs redacted) as download-source evidence and warns the run can take minutes.
 - Validation: Windows PowerShell 5.1 parser 0 errors; a stand-in native command confirmed incremental output, stderr tolerated, URL redaction and exit code (3) preserved. Isolated-cache verify itself still unrun by the assistant (needs the user's URL).
 - User action: let the running command finish (or Ctrl+C and rerun with the updated script) and look for `Downloaded from akka-repository`, `Tests run: 1, Failures: 0`, `BUILD SUCCESS`, `VERIFIED: ...`.
+
+## 84. User
+
+Pasted end of `-Probe combined -IsolatedCache` run: `BUILD SUCCESS`, total time 01:30 min, finished 2026-10-08T00:43:26-04:00, and `VERIFIED: akka-actor-typed_2.13-2.10.23.jar freshly downloaded from repository ID akka-repository.`
+
+## 85. Assistant — final response
+
+Recorded the closed repository-access gate: decision 0002 (table row, new "Fresh repository resolution verified" paragraph, gate 1 done), ROADMAP (new checked P1-01 evidence item; remaining item is only the deferred production-license decision) and compatibility README. No URL recorded. P1-01 technical compatibility evidence is complete for development use; production licensing stays deferred. Next: define replaceable ports and message/tool/verification contracts.
