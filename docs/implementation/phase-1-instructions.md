@@ -1,12 +1,12 @@
 # AgenticaWithAkka Phase 1 Implementation Instructions
 
-Version 0.1 | 7 October 2026 | Implementation handoff
+Version 0.2 | 7 October 2026 | Implementation handoff
 
 ## 1 Scope and source authority
 
 Build a read-only local investigation lab with two logical roles: Coordinator and Investigation. Investigation initially combines knowledge retrieval and log analysis. Follow the [production requirements](../requirements/agenticawithakka-production-requirements.md), [technical design](../design/technical-design.md), [agentic design](../design/agentic-design-and-phased-plan.md) and [roadmap](../ROADMAP.md).
 
-Technical design baseline: blob `6328fd8e5ee96536dc5bc15ad390b7f2f3ee26e7`. This document specifies tasks; it does not claim they have been implemented. Read applicable AGENTS.md instructions and current files before work. Do not overwrite unrelated changes.
+Technical design baseline after document review: blob `094265a1818ccf1a8845a343c6f7bb75055d0127` (version 0.2). This document specifies tasks; it does not claim they have been implemented. Read applicable AGENTS.md instructions and current files before work. Do not overwrite unrelated changes.
 
 Keep pod restart execution, Jira patch writes, real enterprise connectors, business review and production deployment out of this slice. Their contracts may be reserved without exposing executable write tools. Do not mark later phases complete because placeholder interfaces exist.
 
@@ -14,7 +14,7 @@ Keep pod restart execution, Jira patch writes, real enterprise connectors, busin
 
 Use the technical design's proposed Java 25 baseline, Spring Boot 4 and Spring AI stable candidate. Resolve current compatible patched versions and record exact build/container/model versions in a dependency decision record before adding dependencies. A latest-GA Java profile is a compatibility experiment, not a substitute for tested support.
 
-Prefer one Maven application with wrapper and packages rather than premature service decomposition. Use Akka Typed in the local runtime if Java/dependency/licensing checks pass; otherwise retain a documented in-process adapter behind AgentRuntime and leave the Akka-specific work open. Do not hide a runtime substitution. Durable actors remain Phase 2.
+Prefer one Maven application with wrapper and packages rather than premature service decomposition. Use Akka Typed in the local runtime if Java/dependency/licensing checks pass; otherwise retain a documented in-process adapter behind AgentRuntime and leave the Akka-specific work open. Do not hide a runtime substitution. A non-Akka bootstrap is not an Akka demonstration. The intended lab completion evidence shall include typed request/reply, asynchronous results, deadlines and cancellation on the selected Akka adapter; otherwise record that objective as outstanding. Durable actors remain Phase 2.
 
 Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources. Pin dependency and image versions. Keep model weights/digests and hardware requirements explicit. An installation blocked by unavailable dependencies should produce a clear blocker rather than invented test success.
 
@@ -66,7 +66,7 @@ Use illustrative typed contracts such as StartInvestigation, InvestigateEvidence
 
 Register only searchKnowledge, queryMockLogs and inspectMockHealth as read operations. Validate arguments, allowed time ranges, source IDs, output size and deadlines. The policy service decides access before the tool adapter runs. Unknown or forbidden tools fail explicitly.
 
-Represent Queued, Running, Succeeded, Failed and Cancelled states. Later approval/authentication/business-review states may exist in contracts but are not implemented workflows in this phase. Persist execution summaries if appropriate; do not claim restart-safe continuation until Phase 2 recovery tests pass.
+Represent Queued, Running, AwaitingAuthentication, Succeeded, Failed and Cancelled states. Expired delegated access stops new calls and requires reauthentication by the same subject/project before continuing within the original deadline. Approval and business-review states may exist in contracts but are not implemented workflows in this phase. Persist execution summaries if appropriate; do not claim restart-safe continuation until Phase 2 recovery tests pass.
 
 Set configurable step, time, token, concurrency and output limits. Budget values are lab settings documented with the selected model. Cancellation prevents new operations; late results cannot change a terminal cancelled state.
 
@@ -82,7 +82,7 @@ Use a mock model for deterministic workflow tests, then a real local model to as
 
 Propose POST /api/projects/{projectId}/investigations to create an execution, GET on its execution resource for results and POST on its cancel subresource. Return a server-generated execution ID; use consistent Denied, InvalidInput, Unsupported, Conflict, RateLimited and DependencyUnavailable errors.
 
-All read/cancel operations recheck identity and ownership/project permissions. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A browser interface can follow after the API flow works; no dashboard or seven-agent deployment is required to pass this slice.
+All read/cancel operations recheck identity and ownership/project permissions. Recheck current source access before returning stored evidence, summaries or citations; withhold protected content if its permission currency cannot be established. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A browser interface can follow after the API flow works; no dashboard or seven-agent deployment is required to pass this slice.
 
 ## 10 Acceptance suite
 
@@ -92,7 +92,7 @@ All read/cancel operations recheck identity and ownership/project permissions. P
 | Other project or restricted document | Denied or filtered before model exposure; no protected snippets. | IAM-03, RAG-05 |
 | Application admin without source access | Source restrictions still apply. | IAM-04 |
 | Invalid/expired/wrong-audience token | Request or downstream operation rejected. | IAM-01, DEL-02 |
-| Forged user field | Cannot change effective identity. | DEL-06 |
+| Expiration during a task | AwaitingAuthentication; no shared-identity fallback; resume only with valid same-user access and deadline. | DEL-04, DEL-07 |\n| Revocation after completion | Stored results and citations no longer expose revoked content. | IAM-05, RAG-05 |\n| Forged user field | Cannot change effective identity. | DEL-06 |
 | Prompt-injected runbook | Cannot add tools, override policy or leak data. | TOL-05 |
 | Missing runbook/log source | Explicit gap or partial failure; no invented evidence. | TOL-03, AGT-07 |
 | Unknown tool or invalid arguments | Rejected before execution. | AGT-06, TOL-01 |
@@ -101,7 +101,11 @@ All read/cancel operations recheck identity and ownership/project permissions. P
 
 Record commands and actual test outputs. Do not report unrun tests as passed. Model evaluation thresholds are agreed before declaring quality acceptance. Verify schema/migrations and negative access cases before broadening tests.
 
-## 11 Handoff and roadmap updates
+## 11 Lab policy decisions before acceptance
+
+Record the provisional role/tool matrix, model and image versions, source scopes, MFA enforcement test, lab reset/retention policy, concurrency limits and evaluation thresholds. Demonstrate that default configuration cannot call production sources. Keep unresolved lab acceptance decisions visible; do not substitute production approval with lab defaults.
+
+## 12 Handoff and roadmap updates
 
 Provide a local setup guide with exact prerequisites, start/seed/demo/stop procedures, ports, resource needs, model installation, expected output and known limitations. Verify commands against the implemented files; do not publish speculative runnable commands.
 
