@@ -325,3 +325,143 @@ Committed the remaining `AGENTS.md` guidance and this conversation update on `fe
 ## 31. Assistant — commit outcome
 
 The remaining files were committed as `62286ea` (`ai-agentic-testing: docs: add conversation recording guidance`) on `feature/agentic`. The commit contains only `AGENTS.md` and the conversation record; the worktree was clean after the commit. The final response follows; its transcript entry is pending the next turn per the recording instructions.
+
+## 32. User
+
+what is the next step?
+
+## 33. Assistant
+
+The immediate next step is to configure authorized Akka repository access in user-local Maven settings (not in the repository or chat), then run the isolated Akka compatibility probe on Temurin 25. After it resolves and passes, decide Akka's BSL eligibility/runtime-key requirements and run a combined Spring AI/Akka compatibility test before adding agent workflows. The Akka probe is currently blocked before compilation; no code/workflow implementation is the next gate.
+
+## Tool evidence through entry 33
+
+- Confirmed `feature/agentic` at `fbbacf1` and a clean worktree before recording this exchange.
+- Answered from the recorded probe result and remaining gates; no commands or tests were run in this informational turn.
+
+## 34. User
+
+proceed with next step
+
+## 35. Assistant
+
+I checked the current environment before retrying Akka. Authorized repository access is still not configured here: there is no user Maven settings file, `AKKA_REPOSITORY_URL`, or `AKKA_LICENSE_KEY`. I cannot obtain or invent vendor credentials, and repeating dependency resolution against Maven Central would reproduce the known blocker. Please configure authorized Akka repository access in your local Maven settings outside the repository; do not paste credentials here. Once configured, I can rerun the isolated probe.
+
+## Tool evidence through entry 35
+
+- Confirmed branch `feature/agentic`; working tree was clean before recording this request.
+- Checked only presence, not contents or values: `$HOME\.m2\settings.xml` absent; `AKKA_REPOSITORY_URL` absent; `AKKA_LICENSE_KEY` absent. No secrets were accessed or printed.
+- Read decision 0002, which documents Akka's authorized tokenized repository requirement and existing resolution failure. No Akka build was retried because the required authorized configuration remains absent. No scaffold checks were repeated and no deployment occurred.
+- No source, build, dependency, or roadmap files changed in this turn; only this conversation record is updated.
+
+## 36. User — clarification response
+
+configured
+
+## 37. Assistant
+
+The probe still resolved only from Maven Central after your confirmation. I retried with `-U` to bypass Maven's cached not-found response, but dependency resolution again failed before compilation. This execution environment still has no `$HOME\.m2\settings.xml` or Akka repository/license environment variables, so the vendor repository configuration is not active for this Maven process. No Akka test ran; Java 25 compatibility remains unverified locally.
+
+## Tool evidence through entry 37
+
+- Ran `.\mvnw.cmd -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. It failed during dependency resolution; the reported source was Maven Central. Repository URLs in output were redacted.
+- Retried `.\mvnw.cmd -U -B -ntp -f compatibility/akka/pom.xml verify` to force resolution after the cached miss. It again failed to find `com.typesafe.akka:akka-actor-typed_2.13:2.10.23` in Central before compilation/tests. URL output was redacted.
+- Checked settings/configuration presence only after those attempts: `$HOME\.m2\settings.xml`, `AKKA_REPOSITORY_URL`, and `AKKA_LICENSE_KEY` are still absent. Did not inspect settings content or read any credential.
+- Updated decision 0002 to record the retry outcome and distinguish the user's confirmation from repository access actually visible to Maven. No application code, scaffold checks, deployment, or unrelated changes.
+
+## 38. Assistant
+
+To proceed, the authorized Akka repository configuration must be available to this process. Please ensure the vendor-directed Maven settings/profile is installed at `$HOME\.m2\settings.xml`, or provide the path to an alternate local settings file to use with Maven `-s`. Do not share the settings content, token, or tokenized URL.
+
+## 39. User — clarification response
+
+I will configure `$HOME\.m2\settings.xml`.
+
+## 40. Assistant
+
+Waiting for the authorized Maven settings to be configured locally. Once they are available to this execution environment, rerun only the isolated Akka probe with `-U` and keep URL/credential output redacted.
+
+## Tool evidence through entry 40
+
+- User selected the option to configure the default user-local Maven settings path. No settings contents or secrets were provided.
+- Akka retry remains blocked; no further dependency command was run while the user configures access. Probe result and current blocker are recorded in decision 0002. No deployment or scaffold checks.
+
+## 41. User
+
+<settings>
+  <servers>
+    <server>
+      <id>akka-repository</id> <!-- Must match the repository id in pom.xml -->
+      <username>YOUR_TOKEN_OR_USER</username>
+      <password>YOUR_TOKEN_SECRET</password>
+    </server>
+  </servers>
+</settings>
+
+## 42. Assistant
+
+That XML contains placeholders, not usable credentials, and it only defines a Maven server entry; it does not configure the authorized Akka repository URL. Do not replace the placeholders or paste secrets here. The probe POM has no repository declaration with this ID, so the vendor-prescribed repository/profile must also be configured locally (or use the vendor's exact documented settings); its server ID must match. After configuring that outside the repository, let me know so I can rerun the isolated probe.
+
+## Tool evidence through entry 42
+
+- Treated the submitted username/password strings as placeholders, not credentials. Did not copy them to a config file or run Maven.
+- Existing Akka POM declares the artifact dependency but no repository URL or server ID; the probe documentation requires authorized repository access in user-local Maven settings. The supplied fragment alone cannot redirect Maven from Central.
+- No files were changed other than this conversation record. No tests or deployment.
+
+## 43. User — clarification response
+
+configured
+
+## 44. Assistant
+
+The Maven settings file is now present, but the forced retry still reports the artifact only missing from Maven Central. The supplied fragment is a server entry; Maven also needs an authorized Akka repository URL in an active Maven profile or a securely provided repository configuration. The probe POM currently has no repository entry, and I did not inspect the settings contents. I will not put the tokenized URL in source or request it in chat.
+
+## Tool evidence through entry 44
+
+- Presence check confirmed `$HOME\.m2\settings.xml` exists; `AKKA_REPOSITORY_URL` remains unset. No settings content or credential was read or printed.
+- Ran the isolated Akka probe with Temurin 25 and Maven `-U`. Dependency resolution still failed before compilation, reporting Maven Central only. URLs were redacted from output.
+- Official setup guidance, documented in decision 0002, requires the tokenized Akka repository URL. The Akka probe POM currently contains no `<repositories>` entry, and the submitted XML fragment contains only `<servers>`.
+- Updated decision 0002 with this precise blocker. No tests passed for Akka, no scaffold checks repeated, and no deployment.
+
+## 45. User — clarification response
+
+active-profile
+
+## 46. Assistant
+
+Maven still does not see the profile: `help:active-profiles` reported no active profiles, and retrying with `-P akka-repository` warned that this profile does not exist. Dependency resolution still used Central only. I did not inspect settings contents. Please provide the non-secret Maven settings profile ID you configured, and ensure it contains the authorized Akka repository entry and is active; do not share its URL or credentials. If the profile ID is not `akka-repository`, I can retry with that ID.
+
+## Tool evidence through entry 46
+
+- Ran Maven Help Plugin `help:active-profiles`; it reported no active profiles for the Akka probe project.
+- Ran `.\mvnw.cmd -U -P akka-repository -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Maven warned that profile `akka-repository` does not exist, then failed to resolve the Akka artifact from Central before compilation. URLs were redacted.
+- No Maven settings content or credential was inspected or printed. Updated decision 0002 to record that user-reported configuration is not visible as an active Maven profile.
+- Akka test remains blocked/unrun; no scaffold checks or deployment.
+
+## 47. User — clarification response
+
+akka-repository
+
+## 48. Assistant
+
+Explicitly selecting `$HOME\.m2\settings.xml` and profile `akka-repository` made Maven activate the profile. Dependency resolution then reached the profile's repository declaration but failed before compilation because its configured URL is still a placeholder, not the authorized Akka repository URL. I have not inspected settings contents or printed the URL. Please replace it locally with the vendor-issued tokenized URL; do not share it here. Then I can rerun the probe with the same command.
+
+## Tool evidence through entry 48
+
+- Ran `.\mvnw.cmd -s $settings -P akka-repository -B -ntp -f compatibility/akka/pom.xml help:active-profiles`; Maven reported the external `akka-repository` profile active.
+- Ran `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Dependency collection failed before compilation while trying to access the profile repository. The configured URL was a placeholder; exact URL output was redacted.
+- Updated `compatibility/README.md` with the command selecting the settings file/profile and updated decision 0002 with the accurate resolution state. No Akka test ran, no scaffold checks repeated, no deployment.
+
+## 49. User — clarification response
+
+ready
+
+## 50. Assistant
+
+The retry still sees the repository URL placeholder, so dependency resolution fails before compilation. It appears the local settings used by this process were not updated with the authorized Akka URL. No Akka test ran. Please update the URL in `$HOME\.m2\settings.xml` to the value obtained through Akka's official account process, without sharing it in chat; then tell me when that local file has actually been saved.
+
+## Tool evidence through entry 50
+
+- Ran the documented command on Temurin 25: `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify`.
+- Maven activated/resolved the `akka-repository` profile but still attempted the placeholder repository URL and failed to transfer the artifact POM before compilation. URL output was redacted. No test ran.
+- Updated decision 0002 to record that the profile is active but the URL remains a placeholder. No settings contents or credentials were inspected; no scaffold tests or deployment.
