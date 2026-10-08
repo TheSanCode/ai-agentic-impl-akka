@@ -385,3 +385,25 @@ Waiting for the authorized Maven settings to be configured locally. Once they ar
 
 - User selected the option to configure the default user-local Maven settings path. No settings contents or secrets were provided.
 - Akka retry remains blocked; no further dependency command was run while the user configures access. Probe result and current blocker are recorded in decision 0002. No deployment or scaffold checks.
+
+## 41. User
+
+<settings>
+  <servers>
+    <server>
+      <id>akka-repository</id> <!-- Must match the repository id in pom.xml -->
+      <username>YOUR_TOKEN_OR_USER</username>
+      <password>YOUR_TOKEN_SECRET</password>
+    </server>
+  </servers>
+</settings>
+
+## 42. Assistant
+
+That XML contains placeholders, not usable credentials, and it only defines a Maven server entry; it does not configure the authorized Akka repository URL. Do not replace the placeholders or paste secrets here. The probe POM has no repository declaration with this ID, so the vendor-prescribed repository/profile must also be configured locally (or use the vendor's exact documented settings); its server ID must match. After configuring that outside the repository, let me know so I can rerun the isolated probe.
+
+## Tool evidence through entry 42
+
+- Treated the submitted username/password strings as placeholders, not credentials. Did not copy them to a config file or run Maven.
+- Existing Akka POM declares the artifact dependency but no repository URL or server ID; the probe documentation requires authorized repository access in user-local Maven settings. The supplied fragment alone cannot redirect Maven from Central.
+- No files were changed other than this conversation record. No tests or deployment.
