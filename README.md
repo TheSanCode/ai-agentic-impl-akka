@@ -42,7 +42,7 @@ Phase 1 demonstrates this while the application stays running. Phase 2 adds pers
 
 ## Production requirements
 
-Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.6**, a draft for review.
+Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.7**, a draft for review.
 
 Section 16 covers pod restarts and Jira code proposals. Section 17 covers the admin eagle view. Section 19 covers technical verification and manual business acceptance.
 
@@ -55,6 +55,12 @@ The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Ob
 ## Technical design
 
 Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; implementation instructions are linked below.
+
+## AKS deployment layout
+
+AKS is the target hosting platform. UI and API use separate Deployments and internal Services; durable workers are separated from Phase 2. Messaging adapters initially run with the API and use controlled webhook routes. No separate pod is required for every access channel or logical agent.
+
+All custom images use approved base images, multi-stage builds and pinned release digests. Exact base-image catalog, ingress/gateway, registry and cluster settings remain to confirm. Browser traffic routes to UI and API under one application origin; workers and data stores remain internal. See technical design Section 19. No AKS resources have been deployed.
 
 ## Technology stack
 
