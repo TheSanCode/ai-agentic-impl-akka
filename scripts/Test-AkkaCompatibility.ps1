@@ -121,16 +121,16 @@ try {
             'agentica-m2-{0}' -f [guid]::NewGuid().ToString('N')
         )
         New-Item -ItemType Directory -Path $isolatedRepository | Out-Null
-        $arguments = @("-Dmaven.repo.local=$isolatedRepository") + $arguments
-        Write-Output 'Using an empty temporary Maven repository; all dependencies will be downloaded.'
+        # Keep transfer logs (URLs redacted below) as evidence of the download source.
+        $arguments = @("-Dmaven.repo.local=$isolatedRepository") + ($arguments | Where-Object { $_ -ne '-ntp' })
+        Write-Output 'Using an empty temporary Maven repository; all dependencies will be downloaded (this can take several minutes).'
     }
-    $output = Invoke-NativeCapture $mavenWrapper $arguments
+    # Stream redacted lines as Maven produces them instead of buffering until exit.
+    Invoke-NativeCapture $mavenWrapper $arguments | ForEach-Object {
+        $safeLine = $_ -replace '(?i)https?://\S+', '[repository URL redacted]'
+        $safeLine -replace '(?i)(password|token|credential)\s*[=:]\s*\S+', '$1=[REDACTED]'
+    }
     $exitCode = $LASTEXITCODE
-    foreach ($line in $output) {
-        $safeLine = $line.ToString() -replace '(?i)https?://\S+', '[repository URL redacted]'
-        $safeLine = $safeLine -replace '(?i)(password|token|credential)\s*[=:]\s*\S+', '$1=[REDACTED]'
-        Write-Output $safeLine
-    }
 
     if ($exitCode -ne 0) {
         throw "Akka compatibility probe failed with exit code $exitCode. See redacted Maven output above."

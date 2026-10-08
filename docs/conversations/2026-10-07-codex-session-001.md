@@ -674,3 +674,14 @@ what is the next step
 ## 81. Assistant — final response
 
 Next steps: (1) user runs `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` with the authorized URL to close the repository-access proof; (2) define replaceable ports and the message/tool/verification contracts (ROADMAP Phase 0 item, line 48) in the application module before any agent code; (3) then "Implement two agents with bounded execution" (ROADMAP line 78). Phase 0 approvals (requirements, capability matrices, AKS target) remain open and are user decisions. Production Akka license stays deferred.
+
+## 82. User
+
+Pasted `-Probe combined -IsolatedCache` output ending at "Using an empty temporary Maven repository; all dependencies will be downloaded." (profile active, BUILD SUCCESS for the profile check; no verify output yet).
+
+## 83. Assistant — work performed and final response
+
+- Diagnosis: not a failure. The script buffered all Maven `verify` output until exit, so the long fresh download looked like a hang.
+- Changed `scripts/Test-AkkaCompatibility.ps1` to stream redacted Maven lines as they arrive; with `-IsolatedCache` it now keeps transfer logs (no `-ntp`, URLs redacted) as download-source evidence and warns the run can take minutes.
+- Validation: Windows PowerShell 5.1 parser 0 errors; a stand-in native command confirmed incremental output, stderr tolerated, URL redaction and exit code (3) preserved. Isolated-cache verify itself still unrun by the assistant (needs the user's URL).
+- User action: let the running command finish (or Ctrl+C and rerun with the updated script) and look for `Downloaded from akka-repository`, `Tests run: 1, Failures: 0`, `BUILD SUCCESS`, `VERIFIED: ...`.
