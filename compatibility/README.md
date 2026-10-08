@@ -6,14 +6,21 @@ From the repository root in PowerShell:
 
 ```powershell
 $env:JAVA_HOME = Join-Path $env:LOCALAPPDATA 'Programs/Eclipse Adoptium/jdk-25.0.4.1+1'
-$env:Path = "$env:JAVA_HOME/bin;$env:Path"
-.\mvnw.cmd -B -ntp -f compatibility/spring-ai/pom.xml verify
-.\mvnw.cmd -B -ntp -f compatibility/spring-ai/pom.xml dependency:tree '-DoutputFile=target/dependency-tree.txt'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$mavenVersion = .\mvnw.cmd --version
+$mavenVersion
+if (($mavenVersion -join "`n") -notmatch 'Java version:\s+25(?:\.|,)') {
+    throw 'Maven is not running on Java 25; check JAVA_HOME and PATH in this same PowerShell session.'
+}
+.\mvnw.cmd -B -ntp -f compatibility\spring-ai\pom.xml verify
+.\mvnw.cmd -B -ntp -f compatibility\spring-ai\pom.xml dependency:tree '-DoutputFile=target/dependency-tree.txt'
 $settings = Join-Path $HOME '.m2\settings.xml'
-.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify
+.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility\akka\pom.xml verify
 ```
 
-Spring AI passed **1 test** and dependency-tree generation passed. The Akka probe later passed **1 test on Temurin 25**, using Akka 2.10.23 available in the local Maven cache; its typed ask/reply and termination path ran successfully. However, Maven warned that the requested `akka-repository` profile was not active. A fresh vendor-repository resolution is therefore not verified; see the [decision record](../docs/decisions/0002-integration-probes.md).
+Run the entire block in the same PowerShell session; the wrapper selects its JVM from that session's `JAVA_HOME`/`PATH`. The guard stops before builds if Maven does not report Java 25. A Java 21 `release version 25 not supported` error means this setup block was not effective for that Maven process.
+
+Spring AI passed **1 test** and dependency-tree generation passed. The Akka probe passed **1 test on Temurin 25**, using Akka 2.10.23 available in the local Maven cache; its typed ask/reply and termination path ran successfully. Maven warned that the requested `akka-repository` profile was not active in the successful run, so a fresh vendor-repository resolution is not verified. If the warning appears, treat the result as cache-backed only; see the [decision record](../docs/decisions/0002-integration-probes.md).
 
 Spring AI uses the real Ollama adapter and Boot auto-configuration with a synthetic loopback HTTP server. No Ollama daemon, model weights, credentials or remote inference are needed. The test verifies request serialization, response parsing and the configured model name; it does not establish actual-model behavior, streaming, embeddings or tool calling.
 

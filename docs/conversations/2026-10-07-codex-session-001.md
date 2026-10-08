@@ -504,3 +504,30 @@ $settings = Join-Path $HOME '.m2\settings.xml'
 ```
 
 Maven warned that the `akka-repository` profile was inactive in the successful run, so this verifies Java 25 runtime compatibility against locally cached artifacts, **not fresh authorized repository access**. That, the combined Spring AI/Akka test, and Akka licensing/runtime-key decisions remain open. Documentation and roadmap evidence are committed as `28ab9bc` on `feature/agentic`; scaffold checks were not repeated.
+
+## 54. User
+
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.217 s
+[INFO] Finished at: 2026-10-08T00:05:03-04:00
+[INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "akka-repository" could not be activated because it does not exist.
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:testCompile (default-testCompile) on project akka-probe: Fatal error compiling: error: release version 25 not supported -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+
+## 55. Assistant
+
+This is the same JDK selection issue: a current default `mvnw --version` again reports Microsoft JDK 21, while Temurin 25 is installed. Maven must be launched from the same PowerShell session after setting `JAVA_HOME` and prepending its `bin` to `PATH`. I added a guard to the compatibility instructions so they stop unless the wrapper confirms Java 25. I reran the guarded Akka command; it passed one typed request/reply/termination test on Temurin 25. The `akka-repository` profile warning is separate: dependencies came from the local Maven cache, so fresh vendor-repository access remains unresolved.
+
+## Tool evidence through entry 55
+
+- Rechecked: default wrapper used Microsoft JDK 21.0.8; installed Temurin `javac` is 25.0.4.1. The repository was `feature/agentic` with a clean worktree before edits.
+- Updated `compatibility/README.md` with a same-session Maven Java 25 version guard and Windows-style paths; clarified that an inactive-profile warning means cache-backed resolution only.
+- Ran the guarded command with `JAVA_HOME` and PATH explicitly set to Temurin 25.0.4.1+1. Wrapper reported Java 25 / Eclipse Adoptium; Akka compatibility test passed (1 test, 0 failures/errors/skips). It still warned that profile `akka-repository` could not be activated. URLs were redacted from output.
+- Updated decision 0002 with the repeated result and blocker. Scaffold checks were not repeated; no combined-stack test or deployment.
