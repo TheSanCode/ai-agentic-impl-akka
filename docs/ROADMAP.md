@@ -41,6 +41,7 @@ Depends on: None. Independent connector proofs may run earlier without bypassing
 Deliverables:
 
 - [x] Document production requirements v0.3 and proposed phased design.
+- [x] Draft the [technical design](design/technical-design.md), with unconfirmed choices marked proposed.
 - [ ] Approve requirements and open decisions
 - [ ] Define role and source/OBO capability matrices
 - [ ] Define message, tool and verification contracts
