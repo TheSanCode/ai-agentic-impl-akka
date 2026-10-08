@@ -53,6 +53,8 @@ Open decisions: first real sources, runtime and licensing, identity strategy, bu
 
 ## Phase 1 Read only local lab
 
+Implementation guide: [Phase 1 instructions](implementation/phase-1-instructions.md). This is a documentation artifact; runtime deliverables below remain unchecked.
+
 Status: Planned
 
 Goal: Start with Coordinator and combined Investigation agents.
