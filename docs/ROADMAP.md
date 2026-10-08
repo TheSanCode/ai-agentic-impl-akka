@@ -4,7 +4,7 @@ Last reviewed: 7 October 2026
 
 ## Current position
 
-Requirements v0.6 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -40,13 +40,14 @@ Depends on: None. Independent connector proofs may run earlier without bypassing
 
 Deliverables:
 
-- [x] Document production requirements v0.6 and proposed phased design.
+- [x] Document production requirements v0.7 and proposed phased design.
 - [x] Draft the [technical design](design/technical-design.md), with unconfirmed choices marked proposed.
 - [x] Perform [documentation consistency review](reviews/documentation-review.md) and correct identified wording gaps.
 - [ ] Approve requirements and open decisions
 - [ ] Define role and source/OBO capability matrices
 - [ ] Define message, tool and verification contracts
 - [ ] Select compatible components and review licenses
+- [ ] Confirm AKS target, approved base images, registry, access routes and stateful hosting decisions
 
 Exit criteria: Initial scenarios have agreed inputs, expected outcomes and tests; unsupported source delegation is explicit.
 
@@ -64,6 +65,7 @@ Depends on: Phase 0. Independent connector proofs may run earlier without bypass
 
 Deliverables:
 
+- [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
 - [ ] Test browser reconnect, safe rendering and primary keyboard navigation
 - [ ] Seed synthetic runbooks and mock logs
@@ -171,6 +173,7 @@ Deliverables:
 - [ ] Test actual delegated authentication, consent and revocation
 - [ ] Validate ingestion permissions and freshness
 - [ ] Run capacity, security and model-quality evaluations
+- [ ] Validate AKS manifests, probes, resource limits, private services and approved external webhook routes
 - [ ] Test backup restoration, release and rollback
 - [ ] Obtain operational acceptance against agreed production gates
 
