@@ -4,7 +4,7 @@ Last reviewed: 7 October 2026
 
 ## Current position
 
-Requirements v0.5 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.6 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -40,7 +40,7 @@ Depends on: None. Independent connector proofs may run earlier without bypassing
 
 Deliverables:
 
-- [x] Document production requirements v0.5 and proposed phased design.
+- [x] Document production requirements v0.6 and proposed phased design.
 - [x] Draft the [technical design](design/technical-design.md), with unconfirmed choices marked proposed.
 - [x] Perform [documentation consistency review](reviews/documentation-review.md) and correct identified wording gaps.
 - [ ] Approve requirements and open decisions
@@ -64,6 +64,8 @@ Depends on: Phase 0. Independent connector proofs may run earlier without bypass
 
 Deliverables:
 
+- [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
+- [ ] Test browser reconnect, safe rendering and primary keyboard navigation
 - [ ] Seed synthetic runbooks and mock logs
 - [ ] Implement two agents with bounded execution
 - [ ] Return background execution IDs and support authorized disconnect/reconnect progress
@@ -126,7 +128,7 @@ Depends on: Phase 3. Independent connector proofs may run earlier without bypass
 Deliverables:
 
 - [ ] Create disposable local workloads
-- [ ] Build exact-target approval and restart execution
+- [ ] Build exact-target browser approval and restart execution
 - [ ] Enforce safety checks, expiry, cooldown and access revalidation
 - [ ] Record readiness and reconcile uncertain outcomes
 
@@ -147,7 +149,7 @@ Deliverables:
 - [ ] Create runbook-based verification plans
 - [ ] Poll logs, metrics and health against deployed versions
 - [ ] Record technical pass, fail or inconclusive outcomes
-- [ ] Require manual business acceptance for functionality changes
+- [ ] Provide browser business-validation screens and require manual acceptance for functionality changes
 - [ ] Enforce closure gates and complete the admin eagle view
 
 Exit criteria: Startup alone cannot prove a fix; business changes remain open until required human acceptance.
