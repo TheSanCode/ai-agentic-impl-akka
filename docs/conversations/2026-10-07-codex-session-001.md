@@ -284,3 +284,21 @@ Spring AI 2.0.1 resolved successfully, and its isolated Boot 4.0.8 integration t
 **Commits:** The backend scaffold and verified Windows setup guide are already committed on `feature/agentic` as `d10a02d`. I committed the separate integration probes and documentation as `9fd53c1`; that includes accurate roadmap evidence and does not stage your `AGENTS.md` change, secrets, local config, or ignored `target/` output.
 
 **Results:** Spring AI 2.0.1 resolved and its Boot 4.0.8 / Temurin 25 Ollama-fixture integration test passed (1 test); dependency-tree inspection passed. Akka 2.10.23 resolution failed because it was unavailable from configured Maven Central, so its typed runtime test did not compile/run and Java 25 compatibility is not locally verified. Akka requires authorized vendor repository configuration; BSL licensing and runtime license-key decisions remain open. The roadmap marks only the Spring AI partial evidence; combined compatibility remains unchecked. I did not rerun the scaffold checks or deploy. `AGENTS.md` remains modified and uncommitted; next step is configure authorized Akka access locally and rerun its probe.
+
+## 25. User
+
+replace commit title / description GCM-16403 Clara AI: with ai-agentic-testing:
+
+## 26. Assistant
+
+I’ll replace the old prefix on the two recent local commits that use it, preserve their contents and authors, and leave the scaffold commit and unrelated `AGENTS.md` change untouched.
+
+## Tool evidence through entry 26
+
+- Confirmed branch `feature/agentic`; only the two newest commits used the old prefix. The scaffold and earlier conversation commits did not.
+- Rewrote the probe commit subject to `ai-agentic-testing: test: record Spring AI and Akka integration probes` and the conversation commit subject to `ai-agentic-testing: docs: record integration probe session`. Their trees and original authors were preserved; commit hashes changed from `9fd53c1` / `4a79d9a` to `d237e93` / `4b5e855`. Co-author trailers were retained.
+- Verified the rewritten commit order and subjects. `AGENTS.md` remains the only unrelated uncommitted change. No tests were rerun because only commit metadata changed.
+
+## 27. Assistant — final response
+
+Updated both recent commit titles on `feature/agentic` to use `ai-agentic-testing:`. The rewritten commits are `d237e93` (integration probes) and `4b5e855` (conversation record); their contents were preserved. The scaffold commit was unchanged, `AGENTS.md` remains untouched, and no tests were rerun because only commit metadata changed.
