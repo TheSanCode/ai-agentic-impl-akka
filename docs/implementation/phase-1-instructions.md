@@ -1,12 +1,12 @@
 # AgenticaWithAkka Phase 1 Implementation Instructions
 
-Version 0.2 | 7 October 2026 | Implementation handoff
+Version 0.3 | 7 October 2026 | Implementation handoff
 
 ## 1 Scope and source authority
 
 Build a read-only local investigation lab with two logical roles: Coordinator and Investigation. Investigation initially combines knowledge retrieval and log analysis. Follow the [production requirements](../requirements/agenticawithakka-production-requirements.md), [technical design](../design/technical-design.md), [agentic design](../design/agentic-design-and-phased-plan.md) and [roadmap](../ROADMAP.md).
 
-Technical design baseline after document review: blob `094265a1818ccf1a8845a343c6f7bb75055d0127` (version 0.2). This document specifies tasks; it does not claim they have been implemented. Read applicable AGENTS.md instructions and current files before work. Do not overwrite unrelated changes.
+Technical design baseline: blob `7da85686b20ca73c149f45acec78537b92655b9c` (version 0.3). This document specifies tasks; it does not claim they have been implemented. Read applicable AGENTS.md instructions and current files before work. Do not overwrite unrelated changes.
 
 Keep pod restart execution, Jira patch writes, real enterprise connectors, business review and production deployment out of this slice. Their contracts may be reserved without exposing executable write tools. Do not mark later phases complete because placeholder interfaces exist.
 
@@ -112,3 +112,11 @@ Provide a local setup guide with exact prerequisites, start/seed/demo/stop proce
 Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 remains Planned until implementation begins, and Complete only after mandatory exit criteria pass. This instructions document alone completes neither phase.
 
 The next action is P1-01 followed by repository scaffolding. Keep production OBO, actor recovery, operational writes and business review pending until their later implementation and acceptance evidence exist.
+
+## 13 Phase 1 background execution additions
+
+Create investigation work asynchronously and return HTTP 202 with a server execution ID and authorized status URL. Do not tie cancellation to browser disconnect. An authorized reconnect shall obtain progress and final results while the process remains running.
+
+Implement a loop checkpoint record containing current step, cumulative budget, status, last update and wait reason. AwaitingAuthentication must stop source calls; resume only with valid same-user/project access and an unexpired deadline. Add bounds for active processing and absolute elapsed time; document wait accounting. No raw access tokens belong in progress records.
+
+Add tests for disconnect/reconnect, status authorization, loop termination, expiration mid-loop and explicit cancellation. For process restart, document the Phase 1 limitation and mark interrupted tasks failed if persisted; do not leave them falsely running. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
