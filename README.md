@@ -1,4 +1,4 @@
-# agenticawithakka
+# AgenticaWithAkka
 
 A platform for experimenting with agents, reusable skills, controlled tools, knowledge retrieval and delegated access to platform sources, with a path from local development to production operation.
 

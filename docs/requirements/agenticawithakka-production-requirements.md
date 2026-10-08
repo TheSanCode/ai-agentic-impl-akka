@@ -1,6 +1,15 @@
 # agenticawithakka Agent Platform Production Requirements
 
-Version 0.1 | 7 October 2026 | Status: Requirements draft for review
+Version 0.3 | 7 October 2026 | Status: Requirements draft for review
+
+## Sections added in version 0.3
+
+The following sections are included in this document after Section 15:
+
+- Section 16 Operational remediation and code proposals: REM-01 through REM-05 cover pod restart safety and recovery; COD-01 through COD-05 cover Jira-linked code proposals.
+- Section 17 Admin issue overview: ADM-01 through ADM-05 cover the admin eagle view, evidence, timelines and access controls.
+- Section 18 Additional production acceptance scenarios: restart, code proposal and admin access tests.
+- Section 19 Post change verification and business acceptance: VER-01 through VER-12 cover runbook-based planning, post-deployment log polling, technical checks and mandatory manual business validation for functionality changes.
 
 ## 1 Purpose and decision boundary
 
@@ -23,7 +32,7 @@ Candidate source categories are knowledge repositories, incident systems, logs, 
 | SCP-03 | Separate read, draft and write capabilities. Enable external writes only through explicit policy. | A read-only installation cannot perform a write through any agent or tool. |
 | SCP-04 | Preserve the same behavioral contracts between local and production implementations. | Contract tests pass against mock and real adapters; provider-specific differences are documented. |
 
-Autonomous infrastructure remediation, unrestricted terminal execution, model training and scheduled unattended source operations are outside the initial release unless separately approved as scope.
+Unapproved autonomous infrastructure remediation, unrestricted terminal execution, model training and scheduled unattended source operations are outside the initial release unless separately approved as scope. Approval-gated workload restarts and Jira-linked code proposals are in scope.
 
 ## 3 Users and access boundaries
 
@@ -218,3 +227,80 @@ Passing the local proof demonstrates behavior in a lab. Production readiness req
 | User experience | Confirm browser interface, API-only lab or both; additional channels follow later. |
 
 These decisions remain open. No particular library, framework, protocol implementation or vendor is selected by this requirements draft.
+
+
+## 16 Operational remediation and code proposals
+
+The platform shall extend investigation into approval-gated pod restart execution and Jira-linked code-change proposals. These capabilities remain subject to delegated source access, source permissions, project isolation and action governance.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| REM-01 | Inspect workload health and diagnostic evidence before proposing a restart. Identify cluster, namespace, workload owner, target pod and resource identity. | The proposal shows the exact target and supporting evidence. |
+| REM-02 | Distinguish deleting a managed pod for replacement from restarting a deployment or another workload. Validate the chosen operation against workload type, available capacity, disruption policy and configured safety limits. | Unsafe or unsupported targets are blocked; a pod action does not silently become a deployment-wide restart. |
+| REM-03 | Require explicit approval and revalidate delegated permissions, target identity and safety conditions immediately before execution. | Revoked permissions, a changed target or an expired approval blocks the restart. |
+| REM-04 | Bound restart attempts, enforce cooldowns and reconcile uncertain outcomes before retrying. | Repeated requests cannot create a restart loop or duplicate an uncertain operation. |
+| REM-05 | Observe replacement or restarted workload readiness and relevant service health within a configured timeout. Record verified recovery, failure or unresolved outcome and escalate where appropriate. | Issuing a restart request alone is not reported as successful recovery. |
+| COD-01 | Read an authorized Jira ticket, its acceptance criteria and relevant repository context to propose a code change. | The proposal links the ticket, repository, base branch and exact commit used for analysis. |
+| COD-02 | Produce a reviewable patch with rationale, affected files, expected behavior, risks and proposed tests. Distinguish tests executed from tests merely recommended. | Reviewers can inspect the actual diff and validation evidence without relying on a narrative claim. |
+| COD-03 | Treat ticket text and repository content as untrusted inputs; protect secrets and execute validation only within a restricted environment. | Malicious ticket or code content cannot trigger arbitrary privileged execution or credential disclosure. |
+| COD-04 | Recheck repository state before applying a proposal. Creating a branch, pushing changes, opening a draft PR or updating Jira requires explicit policy authorization and an audit trail. Merging and deployment require separately defined authorization. | A stale patch is rejected or regenerated; the agent cannot infer merge permission from permission to suggest code. |
+| COD-05 | Link approved code proposals and optional draft PRs to the originating issue and investigation record. | Users can trace a proposal from Jira to evidence, patch and review status. |
+
+## 17 Admin issue overview
+
+The admin eagle view shall present a consolidated view of an issue across authorized sources. It shall distinguish observed facts, agent hypotheses, proposed actions and verified outcomes.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| ADM-01 | Show issue summary, severity, impact, affected services and dependencies, investigation owner and current status. | An administrator can identify the scope and current state from one issue view. |
+| ADM-02 | Correlate a timestamped timeline of logs, metrics, alerts, incidents, Jira tickets, deployments and repository changes with source links. Mark uncertain correlations and distinguish event time from ingestion time. | The view shows provenance and does not present temporal correlation as proven causation. |
+| ADM-03 | Show agent tasks, findings, evidence, failures, pending approvals, restart attempts, code proposals and action outcomes. | The issue view reconstructs the investigation and identifies blocked or unresolved work. |
+| ADM-04 | Apply project and source authorization to every view, export and drill-down. Admin status alone shall not grant source access or remediation authority. | Protected details remain unavailable to an admin without source permission; restricted source content is not exposed through summaries. |
+| ADM-05 | Display data freshness, unavailable sources and partial coverage. Support authorized filtering and drill-down by issue, service and time range. | Missing source evidence is distinguishable from absence of incidents or errors. |
+
+## 18 Additional production acceptance scenarios
+
+| Scenario | Required result | Principal requirements |
+| --- | --- | --- |
+| Approved managed pod restart | Exact target is restarted, readiness checked and outcome recorded. | REM-01 through REM-05 |
+| Unsafe restart or changed target | Operation is blocked with an actionable explanation. | REM-02, REM-03 |
+| Timeout and duplicate restart request | Existing outcome is reconciled; cooldown and attempt limits are enforced. | REM-04, REM-05 |
+| Jira code proposal | Ticket-linked diff includes commit context, rationale and accurate test status. | COD-01, COD-02, COD-05 |
+| Stale patch or unauthorized repository write | Proposal is refreshed or blocked; no unauthorized push or merge occurs. | COD-04 |
+| Admin with limited source access | Overview contains only authorized evidence and clearly identifies coverage limitations. | ADM-04, ADM-05 |
+
+Additional decisions before technical design: supported workload kinds and environments; restart safety thresholds, cooldowns and verification windows; Jira/repository mapping; permitted code-validation environment; draft PR authorization; and issue-correlation rules. Approval-gated operational writes are now in scope; unrestricted autonomous remediation remains excluded.
+
+
+## 19 Post change verification and business acceptance
+
+A code or operational change shall remain open until its required verification gates pass. Planning a change, generating a patch, merging code, deploying code, restarting the application and verifying outcomes are separate events. Verification shall be tied to the change actually deployed; generating a proposal alone shall not start post-deployment verification.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| VER-01 | Build a reviewable verification plan from the applicable runbook, Jira acceptance criteria, recent change logs and deployment history. Identify expected technical outcomes, affected services, required restart behavior, observation window and business impact. Resolve conflicting or stale instructions before execution. | The plan references exact source versions and states measurable success and failure criteria. |
+| VER-02 | Capture relevant pre-change health, logs, metrics and behavior as a baseline. Correlate the deployed artifact or commit, environment, service, deployment time and any restart with the verification execution. | Evidence identifies the actual running version; unrelated deployments and old logs cannot satisfy the checks. |
+| VER-03 | After confirmed deployment and any required restart, poll authorized logs, metrics and health endpoints at configured intervals. Apply an initial readiness period, bounded observation window, source rate limits, cancellation and controlled retries. | Polling stops on completion, timeout or cancellation; missing or delayed telemetry is surfaced. |
+| VER-04 | Check positive expected behavior and relevant regression signals, including startup readiness and runbook-specific log events where applicable. Absence of errors or a successful restart alone shall not establish technical success. | A healthy process with a missing expected outcome fails or remains inconclusive under the plan. |
+| VER-05 | Record technical verification as pending, running, passed, failed or inconclusive, with timestamped evidence and criteria results. Distinguish application failures from inaccessible or insufficient telemetry. | Reviewers can reproduce the conclusion from recorded checks; telemetry access failure cannot produce a pass. |
+| VER-06 | Classify whether a change affects business functionality during planning. Require business validation for affected functionality; uncertain classification shall await human review rather than bypass the gate. | A functionality change cannot be closed using technical verification alone. |
+| VER-07 | Obtain manual validation from an authorized business reviewer against documented business acceptance criteria. Record reviewer identity, tested scenarios, result, comments, time and affected deployed version. | The reviewer explicitly approves or rejects; an agent cannot submit business approval on the reviewer's behalf. |
+| VER-08 | Track business validation as not required, pending, approved or rejected. Record the authorized rationale for not required. Bind approval to the deployed version and agreed validation scope; relevant subsequent changes invalidate it. | A new behavior-changing deployment requires renewed validation. |
+| VER-09 | Mark the change verified and permit closure only after technical verification passes and business validation is approved or validly not required. Jira closure or other source updates require the existing connector authorization and action policy. | Pending, failed, inconclusive or rejected gates prevent automatic successful closure. |
+| VER-10 | Escalate failed or inconclusive technical checks, business rejection and overdue business validation to the designated owner. Propose rollback or remediation under the approved policy; any rollback requires its own authorization and subsequent verification. | A failure does not trigger an unapproved rollback or restart loop. |
+| VER-11 | Persist verification progress and resume safely after interruption. Display the plan, baseline, polling progress, evidence, technical outcome and business gate in the admin issue overview. | Restarting the platform preserves pending business validation and does not duplicate source actions. |
+| VER-12 | Revalidate user and source access during continued or resumed verification. Stop unauthorized polling and restrict evidence visibility under current policy. | Revoked access cannot continue retrieving protected logs or reveal them through the admin view. |
+
+Additional acceptance scenarios:
+
+| Scenario | Required result | Principal requirements |
+| --- | --- | --- |
+| Technical fix deployed and restarted | Polling verifies planned positive behavior against the deployed version and records supporting logs and health evidence. | VER-01 through VER-05 |
+| Application ready but expected behavior absent | Change is failed or inconclusive rather than passed solely because startup succeeded. | VER-04, VER-05 |
+| Logs delayed or unavailable | Bounded polling identifies the evidence gap and prevents unsupported technical success. | VER-03, VER-05 |
+| Business functionality change | Technical pass leaves change awaiting explicit business acceptance. | VER-06 through VER-09 |
+| Business rejection or pending review | Change remains open; designated owner receives escalation and proposed next steps. | VER-09, VER-10 |
+| New version deployed after business approval | Relevant prior approval is invalidated and required checks are repeated. | VER-02, VER-08 |
+| Platform restart during verification | Execution resumes safely with business review and polling state preserved. | VER-11 |
+
+Additional decisions before technical design: log polling intervals and observation windows by change type; positive technical signals and regression thresholds; business-impact classification ownership; business approver roles, separation of duties and review deadlines; approval invalidation rules; and Jira closure and rollback policies. Numerical values remain configurable proposals until agreed.
