@@ -491,3 +491,16 @@ The compiler error means Maven was using a JDK whose `javac` does not support `-
 - With `JAVA_HOME` and PATH explicitly pointed to Temurin 25.0.4.1+1, `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` compiled the test and passed: 1 test, 0 failures/errors/skips. Output warned that `akka-repository` could not be activated; remote repository access therefore remains unverified.
 - Dependency tree listed `akka-actor-typed_2.13`, `akka-actor_2.13`, and `akka-slf4j_2.13` at 2.10.23. These were available in the local Maven cache.
 - Updated `compatibility/README.md`, decision 0002 and the roadmap to distinguish cache-backed Java 25 runtime success from fresh authorized repository resolution. No combined Spring AI/Akka test, scaffold rerun, deployment, or license decision.
+
+## 53. Assistant — final response
+
+Your error is consistent with Maven running under JDK 21, which cannot compile with `--release 25`. In this shell, `mvnw --version` defaulted to Microsoft JDK 21.0.8. With `JAVA_HOME` and `PATH` set to Temurin 25.0.4.1+1, the Akka probe compiled and passed **1 typed request/reply and termination test**; the resolved dependency tree showed Akka 2.10.23. The command I used was:
+
+```powershell
+$env:JAVA_HOME = Join-Path $env:LOCALAPPDATA 'Programs\Eclipse Adoptium\jdk-25.0.4.1+1'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$settings = Join-Path $HOME '.m2\settings.xml'
+.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility\akka\pom.xml verify
+```
+
+Maven warned that the `akka-repository` profile was inactive in the successful run, so this verifies Java 25 runtime compatibility against locally cached artifacts, **not fresh authorized repository access**. That, the combined Spring AI/Akka test, and Akka licensing/runtime-key decisions remain open. Documentation and roadmap evidence are committed as `28ab9bc` on `feature/agentic`; scaffold checks were not repeated.
