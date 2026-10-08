@@ -581,3 +581,16 @@ I’ll address both repeat failures with a dedicated Akka probe command: it will
 Fixed the repeatable Java/profile invocation problems in the probe setup. The new `scripts/Test-AkkaCompatibility.ps1` selects JDK 25, verifies the Maven JVM, activates the probe POM's repository profile, and isolates Maven from stale user-settings profiles with a temporary settings file. It takes the authorized URL from a non-echoing secure prompt or local `AKKA_REPOSITORY_URL`, redacts URL output, and cleans up temporary settings.
 
 PowerShell parsing, POM XML checks, and `-ValidateOnly` passed: Maven reported Temurin 25 and the expected profile active without the missing-profile warning. That validation-only mode does not run Akka tests. Fresh repository resolution is still unverified because the authorized URL was unavailable to this process; the previous local-cache Akka runtime test had passed.
+
+## 63. User
+
+how to check akka is setup properly
+
+## 64. Assistant — final response
+
+Answered with the documented check sequence (no commands run, no files besides this log changed):
+
+1. Use JDK 25 for Maven: `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` must report Java 25 and the `akka-repository` profile active with no missing-profile warning.
+2. Full check: set `$env:AKKA_REPOSITORY_URL` locally (tokenized URL from account.akka.io; never commit it) or enter it at the secure prompt, then run `.\scripts\Test-AkkaCompatibility.ps1`. Expect `BUILD SUCCESS` and `Tests run: 1, Failures: 0`.
+3. To prove remote resolution rather than cached artifacts, temporarily move `~\.m2\repository\com\typesafe\akka` aside and rerun; the artifacts must download again.
+4. The `Dev use only` log line is expected without `akka.license-key`; production needs a license-key decision.
