@@ -1,6 +1,6 @@
 # AgenticaWithAkka Technology Stack
 
-Version 0.1 | 7 October 2026 | Recommended baseline pending compatibility tests
+Version 0.2 | 7 October 2026 | Recommended baseline pending compatibility tests
 
 ## Selection policy
 
@@ -63,3 +63,11 @@ Mock all messaging locally before configuring real accounts. Do not register pro
 - [Akka licensing](https://akka.io/bsl-license-faq)
 
 Remaining bootstrap decisions: exact versions and licenses; actual models and laptop resource budgets; persistence plugin/state ownership; channel provider/consent policy; and real-source delegated authentication feasibility.
+
+## AKS and base image requirements
+
+AKS is the target platform. Use separate UI and API Deployments/Services; add internal durable-worker deployment in Phase 2. Keep messaging adapters as API modules initially. Use approved multi-stage Node/static-server images for UI and JDK-builder/Java-runtime images for API/workers, pinned by digest. Exact corporate base-image names are not supplied and must be confirmed.
+
+Recommended additions: approved ACR registry, versioned Helm charts, approved TLS gateway, Azure Workload Identity for infrastructure permissions, approved secrets store and network policies. UI/API image builds begin locally; AKS provisioning/deployment awaits explicit readiness and authorization. Read [technical design Section 19](technical-design.md) for routes, replicas, sessions, stateful hosting and channel callback access.
+
+Do not assume a workload managed identity satisfies OBO or that all data/model services fit inside a single application pod. Confirm node/GPU budgets, durable storage and production dependency availability.
