@@ -56,6 +56,10 @@ The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Ob
 
 Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; implementation instructions are linked below.
 
+## Technology stack
+
+See the [recommended technology stack](docs/design/technology-stack.md): Angular browser UI, Java/Spring Boot/Spring AI, Akka, Keycloak, PostgreSQL/pgvector, local inference, durable scheduling and replaceable Telegram/WhatsApp/SMS adapters. Exact versions and provider choices require validation; no service purchase or deployment is implied.
+
 ## Implementation instructions
 
 Start with the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md): ordered tasks for the two-agent local lab, identity and tool controls, synthetic fixtures, APIs and acceptance tests. The instructions are documented; implementation remains pending.
