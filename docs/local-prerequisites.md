@@ -6,7 +6,7 @@ Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
 ## Current setup context
 
-This guide checks development tools; application code, Compose configuration and a runnable setup guide remain to be implemented. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git, Ollama and Podman. VS Code is optional; VSCodium is an open-source alternative.
+This guide checks development tools for the full lab. The [backend scaffold guide](implementation/backend-scaffold.md) now provides verified JDK 25 build and health-check commands without containers or models; Compose and full lab setup remain pending. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git, Ollama and Podman. VS Code is optional; VSCodium is an open-source alternative.
 
 ## Current Installation Status
 

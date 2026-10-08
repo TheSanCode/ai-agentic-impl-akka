@@ -68,11 +68,11 @@ See the [recommended technology stack](docs/design/technology-stack.md): Angular
 
 ## Local installation prerequisites
 
-Start with the [Windows local prerequisites](docs/local-prerequisites.md) for WinGet checks/install commands, WSL2, the open-source Podman container engine, Java, Node.js and Ollama verification. The guide distinguishes installed tools from runnable application setup; Compose and application files remain pending.
+Start with the [Windows backend scaffold guide](docs/implementation/backend-scaffold.md) for verified JDK 25 build and health-check commands. The scaffold needs no containers or models. The [Windows local prerequisites](docs/local-prerequisites.md) cover tools for the later full lab; Compose remains pending.
 
 ## Implementation instructions
 
-Start with the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md): ordered tasks for the two-agent local lab, identity and tool controls, synthetic fixtures, APIs and acceptance tests. The instructions are documented; implementation remains pending.
+Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold is tested; agents, identity, sources, frontend and full lab acceptance remain pending. See the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions and unresolved Spring AI/Akka compatibility.
 
 ## Roadmap
 
@@ -107,4 +107,4 @@ Example request:
 
 ## Current status
 
-Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phase 0 remains In progress; implementation and deployment have not started.
+Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold builds on Temurin 25 with 9 passing tests and a verified packaged-JAR health check. No deployment has occurred; the full investigation lab remains pending.

@@ -4,7 +4,7 @@ Last reviewed: 7 October 2026
 
 ## Current position
 
-Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phases 1–6 are **Planned**. Documentation does not establish implementation or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold only; Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -13,7 +13,7 @@ Sources: [production requirements](requirements/agenticawithakka-production-requ
 | Phase | Goal | Status | Dependency |
 | --- | --- | --- | --- |
 | 0 | Requirements and contracts | In progress | None |
-| 1 | Read only local lab | Planned | Phase 0 |
+| 1 | Read only local lab | In progress | Phase 0 |
 | 2 | Specialists and recovery | Planned | Phase 1 |
 | 3 | Jira and code proposals | Planned | Phase 2 |
 | 4 | Safe operational actions | Planned | Phase 3 |
@@ -55,9 +55,9 @@ Open decisions: first real sources, runtime and licensing, identity strategy, bu
 
 ## Phase 1 Read only local lab
 
-Implementation guide: [Phase 1 instructions](implementation/phase-1-instructions.md). This is a documentation artifact; runtime deliverables below remain unchecked.
+Implementation guide: [Phase 1 instructions](implementation/phase-1-instructions.md). Scaffold evidence: [Windows backend guide](implementation/backend-scaffold.md) and [dependency decision](decisions/0001-backend-scaffold.md).
 
-Status: Planned
+Status: In progress
 
 Goal: Start with Coordinator and combined Investigation agents.
 
@@ -65,6 +65,9 @@ Depends on: Phase 0. Independent connector proofs may run earlier without bypass
 
 Deliverables:
 
+- [x] P1-02 backend scaffold: Maven Wrapper, package boundaries, configuration validation and local health endpoint; JDK 25 build, 9 tests and packaged-JAR HTTP check passed, including a fresh source-only copy.
+- [ ] Finish P1-01 combined Spring AI/Akka compatibility, repository access and license decisions; artifact availability is not runtime compatibility.
+- [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
 - [ ] Test browser reconnect, safe rendering and primary keyboard navigation
