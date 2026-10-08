@@ -666,3 +666,11 @@ The combined test ran offline using Akka files already on this machine. Those fi
 - Added `-IsolatedCache`: runs `verify` with an empty temporary `maven.repo.local`, then asserts the Akka jar exists there with `_remote.repositories` origin `akka-repository`, prints `VERIFIED: ...`, and deletes the temporary repository. The user's `~/.m2` is not modified.
 - Validation: Windows PowerShell parser 0 errors; `-Probe combined -ValidateOnly -IsolatedCache` exit 0 with `akka-repository` profile active; no temporary repository left. Full isolated run not executed — it requires the user's authorized URL.
 - User action: `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` and enter the URL at the secure prompt.
+
+## 80. User
+
+what is the next step
+
+## 81. Assistant — final response
+
+Next steps: (1) user runs `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` with the authorized URL to close the repository-access proof; (2) define replaceable ports and the message/tool/verification contracts (ROADMAP Phase 0 item, line 48) in the application module before any agent code; (3) then "Implement two agents with bounded execution" (ROADMAP line 78). Phase 0 approvals (requirements, capability matrices, AKS target) remain open and are user decisions. Production Akka license stays deferred.
