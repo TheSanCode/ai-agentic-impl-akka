@@ -1,6 +1,6 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.5 | 7 October 2026 | Proposed implementation design
+Version 0.6 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
@@ -10,8 +10,12 @@ Source baseline on feature/agentic: requirements blob `58fb239de256814832cb65481
 
 ## 2 Proposed technology baseline
 
+See the [technology stack](technology-stack.md) for the complete web, messaging, background execution, testing and operations selections. These remain compatibility-tested candidates, with exact dependencies pending bootstrap validation.
+
 | Concern | Proposal | Replacement boundary and unresolved checks |
 | --- | --- | --- |
+| Browser UI | Angular 22, TypeScript and Angular Material | Frontend/API contract; resolve matching Node/TypeScript versions. |
+| Messaging | Telegram Bot API; Twilio WhatsApp/SMS candidates | ChannelGateway, secure account linking and provider-specific webhook validation. |
 | Java | Java 25 LTS baseline plus a latest-GA Java compatibility profile | Do not call Java 25 the latest release. Resolve the latest GA toolchain and test Boot, AI and actor dependencies before enabling that profile. |
 | API and composition | Spring Boot 4; initial compatibility candidate 4.0.8 | Use current supported patched release at implementation; verify with Spring AI BOM rather than mix untested versions. |
 | Model integration | Spring AI 2.0.1 stable candidate | ModelGateway isolates framework/provider types. Milestone versions are optional experiments. |
@@ -187,7 +191,7 @@ Provider APIs, approval steps, session/message rules, SMS registration, pricing 
 
 ## 18 Browser application architecture
 
-A browser interface is required, not an API-only optional deliverable. Select the frontend framework through a decision record; Angular is a candidate, not a binding selection. Use a replaceable frontend consuming the same project-scoped application APIs as channel adapters.
+A browser interface is required, not an API-only optional deliverable. Select the frontend framework through a decision record; Angular 22 with Angular Material is the recommended candidate recorded in the technology-stack document; exact compatible frontend dependencies remain to verify. Use a replaceable frontend consuming the same project-scoped application APIs as channel adapters.
 
 Phase 1 screens: sign-in, authorized project selection, new investigation, execution list, progress/results and cancellation. Use bounded authenticated status polling first; SSE may be added through a capability adapter. Browser navigation or closure does not cancel server work. Prevent duplicate submission using request identifiers and disable/handle repeated submission safely.
 
