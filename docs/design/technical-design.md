@@ -1,6 +1,6 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.1 | 7 October 2026 | Proposed implementation design
+Version 0.2 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
@@ -125,7 +125,29 @@ Create implementation instructions after reviewing this design. First tasks: res
 
 Open decisions: latest-Java compatibility target; exact Akka version and production license; model weights/hardware; external source OBO feasibility; unattended ingestion identity; actor persistence plugin; business roles; polling windows; disruption policies; sandbox isolation; performance/quality targets; production hosting and residency. Phase 0 cannot be marked Complete until its mandatory decisions and contracts are agreed.
 
-## 14 Primary references
+## 14 Review clarifications and implementation gates
+
+### Execution result and change result
+
+TaskResult status uses Completed, Failed or Cancelled, plus an explicit coverage field Complete or Partial. Completed means the requested task finished; it does not assert that a hypothesis is correct, a write succeeded or a business change is verified. Execution Succeeded is reserved for meeting that execution's declared task criteria.
+
+A change record has its own status: Proposed, AwaitingApproval, Approved, Executing, AwaitingTechnicalVerification, AwaitingBusinessValidation, Verified, Failed or Cancelled. Verification outcomes retain the technical and business states defined above. Failed or inconclusive technical verification cannot reach Verified. Deployment and restart observations are evidence events, not change acceptance.
+
+### Expired access and protected historical evidence
+
+Phase 1 shall support AwaitingAuthentication as well as queued/running/terminal states. If delegated access expires, stop new source calls and show an authentication-required result. Resume only after the same authenticated subject/project establishes valid access and the task deadline remains valid. Never convert expiration into a successful empty result.
+
+Reauthorize stored evidence at result rendering, admin viewing and export, not only at initial retrieval. Evidence visibility may change after a run completes. Filter or withhold content when current source authorization cannot be established under the agreed policy. Do not expose protected content through historic summaries, citations, caches or inferred titles. Preserve restricted audit evidence under its own access policy.
+
+### Phase 1 and runtime evidence
+
+A non-Akka adapter may support a clearly labeled bootstrap experiment while compatibility is resolved; it cannot satisfy the Akka communication learning objective. Before claiming the intended Akka lab complete, demonstrate typed request/reply, asynchronous completion, deadline handling and cancellation using the selected Akka adapter. Durable recovery remains Phase 2.
+
+Define provisional lab policy/configuration values in decision records: role-to-operation matrix, source audience/scopes, MFA test case, retention/reset behavior, queue/concurrency limits, retrieval ranking configuration and model-quality acceptance criteria. Provisional lab choices do not approve production SLOs, source delegation or licenses.
+
+Before production implementation, complete the role/source matrix, API schemas and transition table, source revocation strategy, persistence/plugin decision, deletion/audit retention policy, verified dependency inventory, restart approval separation and technical/business verification thresholds. This document review is not acceptance of those unresolved decisions.
+
+## 15 Primary references
 
 Checked 7 October 2026; mutable documentation must be rechecked when pinning versions.
 
