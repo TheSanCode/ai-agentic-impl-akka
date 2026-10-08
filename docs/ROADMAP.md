@@ -42,6 +42,7 @@ Deliverables:
 
 - [x] Document production requirements v0.3 and proposed phased design.
 - [x] Draft the [technical design](design/technical-design.md), with unconfirmed choices marked proposed.
+- [x] Perform [documentation consistency review](reviews/documentation-review.md) and correct identified wording gaps.
 - [ ] Approve requirements and open decisions
 - [ ] Define role and source/OBO capability matrices
 - [ ] Define message, tool and verification contracts
