@@ -38,6 +38,25 @@ The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Ob
 
 See the [project roadmap](docs/ROADMAP.md) for phase status, deliverables, dependencies and completion criteria. Maintain it with the reusable `project-roadmap` skill using verified progress.
 
+## Roadmap update instructions for agents
+
+Use the `project-roadmap` skill when it is available. If it is unavailable, follow the steps below directly. Treat this as a documentation workflow; it does not authorize deployment, issue closure or business approval.
+
+1. **Confirm the target branch.** Use the branch specified by the user; for this workstream, use `feature/agentic`. Read applicable `AGENTS.md` instructions and check for existing changes before editing.
+2. **Read current sources.** Read this README, [production requirements](docs/requirements/agenticawithakka-production-requirements.md), [agentic design](docs/design/agentic-design-and-phased-plan.md) and [roadmap](docs/ROADMAP.md). Use current files rather than remembered versions.
+3. **Gather progress evidence.** Inspect relevant code, commits, pull requests, test results, deployment records and review decisions. Link actual evidence where available. A code commit alone does not prove tests passed, deployment succeeded or business acceptance occurred.
+4. **Update task checkboxes.** Check a task only when its deliverable is demonstrably complete. Preserve existing phase IDs, dependencies and valid evidence. Record missing evidence, blockers and unresolved decisions explicitly.
+5. **Update phase status.** Use Planned, In progress, Blocked or Complete. Mark a phase Complete only after all mandatory deliverables and exit criteria are met. Record material regressions or reopened work instead of retaining unsupported completion.
+6. **Respect validation gates.** Keep technical verification and manual business acceptance separate. Never infer business approval from logs, health checks or a restart. Keep protected actions, rollback and source access subject to their existing authorization rules.
+7. **Keep the document consistent.** Update the last-reviewed date using the project/user timezone. Keep the phase table, detailed phases and Mermaid diagram aligned. Do not invent owners, dates, issues, completion percentages or estimates.
+8. **Check the result.** Verify relative links, Markdown checkboxes, Mermaid syntax, dependencies and status consistency. Preserve unrelated README content. If requirements and design conflict, report the conflict rather than silently changing scope.
+9. **Save through the authorized workflow.** Read current file versions or SHAs before replacing files. Commit to the authorized branch or prepare the requested pull request. Do not merge, deploy, assign people or create issues merely to update the roadmap.
+10. **Report the update.** State which phases or tasks changed, the supporting evidence, remaining blockers and the saved roadmap location. If nothing is verified complete, leave the relevant tasks unchecked.
+
+Example request:
+
+> Use project-roadmap to update docs/ROADMAP.md on feature/agentic from current code and validation evidence. Preserve incomplete technical and business validation gates and summarize the changes.
+
 ## Delivery sequence
 
 1. Agree requirements and open decisions.
