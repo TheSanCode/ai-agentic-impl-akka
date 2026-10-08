@@ -1,6 +1,6 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.6 | 7 October 2026 | Proposed implementation design
+Version 0.7 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
@@ -198,3 +198,33 @@ Phase 1 screens: sign-in, authorized project selection, new investigation, execu
 Later screens: exact-action approval in Phase 4, technical verification/business review and complete admin overview in Phase 5, channel account linking and secure messaging deep links in Phase 6. Local fake UI controls do not count as implemented protected workflows.
 
 Prefer same-origin frontend/API with the backend OIDC session design described above. If separate origins are chosen, explicitly design CORS, CSRF, cookies, token handling and redirects. Display source/model content as text or sanitized markup, never trusted executable HTML. Reauthorize every server request and render safe loading/denied/expired/partial states. Choose and test a browser support matrix and accessibility target before acceptance.
+
+## 19 AKS workload and access topology
+
+AKS is the target runtime; local Compose and kind remain development profiles. Deploy separate UI and API Deployments with ClusterIP Services. A Deployment manages one or more replica pods, so “separate pods” means independent workload boundaries rather than exactly one pod per component.
+
+| Workload | Container/base image | Exposure |
+| --- | --- | --- |
+| UI | Build Angular with approved Node builder; serve compiled static assets with approved non-root web-server base image | Application gateway routes / to UI Service. Node is not required in the final static-serving image. |
+| API | Build with approved JDK/Maven builder; run on approved compatible Java runtime base | Same application origin routes /api and login callbacks to API Service. |
+| Agent workers | Java runtime base, potentially the same application image in worker mode | Internal only; separate Deployment from Phase 2 durable processing onward. |
+| Channel adapters | Initially API modules, later optional dedicated gateway Deployment | Only validated webhook paths exposed through controlled external ingress. |
+| Code-validation jobs | Approved disposable build/test images | Isolated Jobs with no public routes, production credentials or host socket. |
+| Inference | Approved model-serving image and versioned models, or approved external/private endpoint | Internal endpoint; GPU node pool only if measured requirements justify it. |
+| Identity/data | Supported hardened service images or separately approved hosted equivalents | Controlled identity endpoints; databases/internal stores stay private with durable storage and backup. |
+
+Separate UI/API deployment is recommended for independent releases, scaling and smaller privileges. A combined container is possible for a throwaway demo but is not the recommended AKS layout. Do not create one pod per agent or one pod per messaging channel merely because it is a logical role.
+
+Browser downloads Angular assets, then calls the API through the same-origin gateway. Browser users never call agent pods or databases directly. Provider webhooks enter narrowly exposed API/channel endpoints and invoke the same workflow service. Private browser access and external-provider callback reachability are separate decisions; a private-only application needs a permitted external relay/gateway or alternative provider delivery model.
+
+Use TLS, approved gateway implementation, route/auth policies, size/rate limits and private internal Services. Specific ingress product is unresolved; verify AKS support/lifecycle before selection. Keycloak callbacks and public identity endpoints need explicit routing. Shared backend sessions or a documented stateless session strategy are required before scaling API replicas; do not rely on per-pod browser sessions.
+
+Approve base images separately for Node build, Java build/runtime, web serving and validation jobs. Use multi-stage builds, no secrets in layers, non-root execution, read-only filesystems where feasible and narrow capabilities. Store images in approved registry/ACR with immutable release digests, SBOM, scans and rebuild pipelines. ACR is the recommended Azure registry candidate, not provisioned infrastructure.
+
+Workload Identity supports infrastructure access such as approved secrets retrieval; kubelet registry pulls use their configured identity. Neither is a user-delegated source token. Use scoped credentials and policies for user-authorized Kubernetes remediation.
+
+Version Helm charts/manifests with environment values, requests/limits, readiness/liveness/startup probes, shutdown grace, autoscaling and disruption settings. Actor workers need explicit ownership/persistence and drain behavior before multiple replicas; API HPA cannot by itself make actor state safe. Keep durable records outside ephemeral pods.
+
+Local PostgreSQL/Keycloak/pgvector containers do not establish production high availability. Decide stateful hosting, backup/restore, encryption and availability separately; managed replacements need review against the open-source requirements. Model weights and vector storage require deliberate persistence and resource sizing.
+
+References: [AKS baseline](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/containers/aks/baseline-aks), [AKS best practices](https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-kubernetes-service), [ACR base-image updates](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-tasks-base-images).
