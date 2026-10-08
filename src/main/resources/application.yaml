@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: agenticawithakka
+server:
+  address: 127.0.0.1
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+app:
+  service-name: agenticawithakka
