@@ -14,8 +14,8 @@ if (($mavenVersion -join "`n") -notmatch 'Java version:\s+25(?:\.|,)') {
 }
 .\mvnw.cmd -B -ntp -f compatibility\spring-ai\pom.xml verify
 .\mvnw.cmd -B -ntp -f compatibility\spring-ai\pom.xml dependency:tree '-DoutputFile=target/dependency-tree.txt'
-$settings = Join-Path $HOME '.m2\settings.xml'
-.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility\akka\pom.xml verify
+.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly
+.\scripts\Test-AkkaCompatibility.ps1
 ```
 
 Run the entire block in the same PowerShell session; the wrapper selects its JVM from that session's `JAVA_HOME`/`PATH`. The guard stops before builds if Maven does not report Java 25. A Java 21 `release version 25 not supported` error means this setup block was not effective for that Maven process.
@@ -24,6 +24,6 @@ Spring AI passed **1 test** and dependency-tree generation passed. The Akka prob
 
 Spring AI uses the real Ollama adapter and Boot auto-configuration with a synthetic loopback HTTP server. No Ollama daemon, model weights, credentials or remote inference are needed. The test verifies request serialization, response parsing and the configured model name; it does not establish actual-model behavior, streaming, embeddings or tool calling.
 
-Akka's test verifies a Spring-managed typed ActorSystem, bounded asynchronous request/reply and shutdown when the dependencies are locally available. To verify fresh dependency access, configure the vendor-authorized tokenized repository URL in an active profile in user-local Maven settings (outside this repository), with repository ID `akka-repository`; confirm Maven reports that profile active. The command above selects that profile and settings file and forces retry after cached resolution. Do not put the tokenized URL or license key in a POM, command argument, committed file or chat. Maven output may contain credential-bearing repository URLs; redact them before sharing.
+Akka's dedicated script selects JDK 25, verifies the Maven JVM, and activates the POM's `akka-repository` profile. It uses a temporary empty Maven settings file so stale or misnamed profiles in user settings cannot override the probe configuration; the temporary file is removed afterward. `-ValidateOnly` checks Java and profile selection without repository access. For the actual test, the script securely prompts for the vendor-authorized HTTPS URL if `AKKA_REPOSITORY_URL` is not already set; the secure prompt does not echo input. The URL is not stored in the repository or passed as a command argument, and script output redacts URLs. A user-settings repository profile is not needed by this probe.
 
 Surefire reports, dependency trees and empty test-only JARs are generated beneath each project's ignored `target/`. The application scaffold checks were not repeated. The known sandbox execution-helper failure required approved outside-sandbox commands for these runs; no Administrator shell is an application requirement.

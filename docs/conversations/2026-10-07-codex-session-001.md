@@ -535,3 +535,47 @@ This is the same JDK selection issue: a current default `mvnw --version` again r
 ## 56. Assistant — final response
 
 The compiler failure recurs because this shell's default Maven JVM is Microsoft JDK 21. Set `JAVA_HOME` and prepend its `bin` to `PATH`, then run the wrapper in the same PowerShell session. I added a Java 25 guard to `compatibility/README.md` and reran the Akka probe with it: **1 test passed** on Temurin 25.0.4.1+1. The profile warning is separate; Akka dependencies were available from the local cache, so authorized remote resolution remains unverified. Commit `9503e73` records the guard and probe result on `feature/agentic`.
+
+## 57. User
+
+could you try to fix
+
+## 58. Assistant
+
+I’ll address both repeat failures with a dedicated Akka probe command: it will select and verify JDK 25 in-process, and the probe POM will recognize the `akka-repository` profile without relying on a profile hidden in Maven settings. The tokenized repository URL will be read only from a local environment variable and redacted from output.
+
+## Tool evidence through entry 58
+
+- Confirmed branch `feature/agentic`; working tree was clean before edits. Rechecked the Akka POM, compatibility guide, `.gitignore`, AGENTS.md and earlier probe evidence.
+- Added `scripts/Test-AkkaCompatibility.ps1`. It selects a valid JDK 25 (explicit `-JavaHome`, existing JAVA_HOME, or the documented Temurin installation), checks `mvnw --version`, supports `-ValidateOnly`, activates the POM-local `akka-repository` profile, invokes Maven with a temporary empty settings file (to avoid stale external profiles), securely prompts for the tokenized repository URL when needed, redacts URLs, and deletes its temporary settings file.
+- Updated `compatibility/akka/pom.xml` with a repository profile whose URL comes only from `AKKA_REPOSITORY_URL`; no token or endpoint was added to source. Updated `compatibility/README.md` with use and credential handling.
+- PowerShell parser check passed. XML parsing confirmed the POM's `akka-repository` ID and `${env.AKKA_REPOSITORY_URL}` source. `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` passed: Maven reported Temurin 25.0.4.1+1 and the POM-local profile active, with no missing-profile warning. This does not resolve dependencies or run Akka's test.
+- Full Akka probe was not rerun: the authorized URL is not available to this process, and no credential was requested or printed. Existing cache-backed Java 25 test result remains valid but fresh repository resolution is still open.
+
+## 59. Assistant — final response
+
+I fixed the repeatable setup errors in the probe path. `scripts/Test-AkkaCompatibility.ps1` now selects and verifies JDK 25, activates the `akka-repository` profile defined by the probe POM, and uses a clean temporary Maven settings file so stale user profiles cannot trigger “profile does not exist.” The repository URL comes from a secure local prompt or `AKKA_REPOSITORY_URL`, never source control or command-line arguments; Maven output URLs are redacted.
+
+Validation: the script parsed successfully, and `-ValidateOnly` passed, confirming Maven uses Temurin 25 and sees the POM profile without warning. That mode does not resolve Akka or run its test. Fresh repository access and Akka licensing remain unresolved because the authorized URL is not available to this process. The previous cache-backed Akka runtime test passed.
+
+## 60. User
+
+could you try to fix
+
+## 61. Assistant
+
+I’ll address both repeat failures with a dedicated Akka probe command: it will select and verify JDK 25 in-process, and the probe POM will recognize the `akka-repository` profile without relying on a profile hidden in Maven settings. The tokenized repository URL will be read only from a local environment variable and redacted from output.
+
+## Tool evidence through entry 61
+
+- Confirmed `feature/agentic` and a clean worktree before changes.
+- Added `scripts/Test-AkkaCompatibility.ps1`, which selects JDK 25, checks Maven's JVM, checks the POM-local profile, uses a temporary isolated Maven settings file, prompts securely for the URL if needed, redacts output URLs, and cleans up the temporary settings file and prompted URL environment variable.
+- Added the `akka-repository` profile to `compatibility/akka/pom.xml`; its URL is sourced from `AKKA_REPOSITORY_URL`, with no credential or URL committed. Updated the Windows probe instructions.
+- PowerShell parser check and POM XML validation passed. `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` passed: Maven used Temurin 25.0.4.1+1 and showed the POM-local profile active with no missing-profile warning. Temporary settings cleanup was verified. This validation mode does not resolve Akka dependencies or execute tests.
+- The full probe was not run because the authorized URL is not available in this process. No scaffold checks were repeated; no application behavior or deployment changed.
+
+## 62. Assistant — final response
+
+Fixed the repeatable Java/profile invocation problems in the probe setup. The new `scripts/Test-AkkaCompatibility.ps1` selects JDK 25, verifies the Maven JVM, activates the probe POM's repository profile, and isolates Maven from stale user-settings profiles with a temporary settings file. It takes the authorized URL from a non-echoing secure prompt or local `AKKA_REPOSITORY_URL`, redacts URL output, and cleans up temporary settings.
+
+PowerShell parsing, POM XML checks, and `-ValidateOnly` passed: Maven reported Temurin 25 and the expected profile active without the missing-profile warning. That validation-only mode does not run Akka tests. Fresh repository resolution is still unverified because the authorized URL was unavailable to this process; the previous local-cache Akka runtime test had passed.

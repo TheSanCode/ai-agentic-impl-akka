@@ -12,7 +12,17 @@
     <artifactId>akka-probe</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <properties><java.version>25</java.version></properties>
-    <!-- Configure authorized Akka repository access in user Maven settings, never in this POM. -->
+    <profiles>
+        <profile>
+            <id>akka-repository</id>
+            <repositories>
+                <repository>
+                    <id>akka-repository</id>
+                    <url>${env.AKKA_REPOSITORY_URL}</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>com.typesafe.akka</groupId>

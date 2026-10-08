@@ -33,6 +33,12 @@ On 8 October 2026, following the user's compiler failure report, the Akka probe 
 
 After the user reported the same `release version 25 not supported` error again, the command in [compatibility instructions](../../compatibility/README.md) was rerun with its Java-version guard. Maven reported Java 25.0.4.1 / Eclipse Adoptium and the Akka test again passed (1 test, 0 failures/errors/skips). The inactive-profile warning remained; dependencies were locally cached. This confirms the compiler failure is avoided when the environment setup and wrapper run in the same PowerShell session, but does not resolve repository access.
 
+## Probe invocation hardening
+
+To prevent repeat JDK/profile selection mistakes, `scripts/Test-AkkaCompatibility.ps1` now selects a detected JDK 25, verifies the Maven JVM before compilation, and activates the repository profile defined by the isolated Akka POM. It isolates the Maven invocation with a temporary empty settings file, avoiding the user's stale/misnamed external profile. The authorized tokenized HTTPS URL is supplied locally through a secure PowerShell prompt or `AKKA_REPOSITORY_URL`; it is not committed, passed as a command argument or printed. Maven output URLs are redacted. The script removes its temporary settings file on exit.
+
+Validated with `-ValidateOnly` on 8 October 2026: Maven reported Temurin 25.0.4.1+1, and the Akka POM's `akka-repository` profile was active with no warning; this mode does not require repository access or run tests. The Akka runtime test has previously passed from the local cache, but this invocation hardening has not yet been used for a fresh vendor-repository download because the authorized URL is not available to this process. Do not treat `-ValidateOnly` as a dependency or integration test.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).

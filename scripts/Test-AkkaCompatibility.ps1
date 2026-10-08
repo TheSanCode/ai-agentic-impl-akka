@@ -1,0 +1,126 @@
+param(
+    [string]$JavaHome,
+    [switch]$ValidateOnly
+)
+
+$ErrorActionPreference = 'Stop'
+
+if (-not $JavaHome) {
+    $JavaHome = $env:JAVA_HOME
+}
+
+$javaHomes = @()
+if ($JavaHome) {
+    $javaHomes += $JavaHome
+}
+$javaHomes += Join-Path $env:LOCALAPPDATA 'Programs\Eclipse Adoptium\jdk-25.0.4.1+1'
+
+$selectedJavaHome = $null
+foreach ($candidate in $javaHomes | Select-Object -Unique) {
+    $javac = Join-Path $candidate 'bin\javac.exe'
+    if (Test-Path $javac) {
+        $version = (& $javac -version 2>&1 | Out-String)
+        if ($version -match '\b25\.') {
+            $selectedJavaHome = $candidate
+            break
+        }
+    }
+}
+
+if (-not $selectedJavaHome) {
+    throw 'JDK 25 was not found. Pass -JavaHome <JDK-25-path> or install Temurin 25 at the documented default path.'
+}
+
+$env:JAVA_HOME = $selectedJavaHome
+$env:Path = "$(Join-Path $selectedJavaHome 'bin');$env:Path"
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$mavenWrapper = Join-Path $repoRoot 'mvnw.cmd'
+$pom = Join-Path $repoRoot 'compatibility\akka\pom.xml'
+$promptedForRepositoryUrl = $false
+
+$mavenVersion = (& $mavenWrapper --version 2>&1 | Out-String)
+Write-Output $mavenVersion.TrimEnd()
+if ($mavenVersion -notmatch 'Java version:\s+25(?:\.|,)') {
+    throw 'Maven did not start on Java 25; refusing to compile the Java 25 probe.'
+}
+
+try {
+    $tempSettings = Join-Path ([IO.Path]::GetTempPath()) (
+        'agentica-maven-settings-{0}.xml' -f [guid]::NewGuid().ToString('N')
+    )
+    [IO.File]::WriteAllText(
+        $tempSettings,
+        '<?xml version="1.0" encoding="UTF-8"?><settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"></settings>',
+        [Text.UTF8Encoding]::new($false)
+    )
+
+    $profileArguments = @(
+        '-s', $tempSettings,
+        '-P', 'akka-repository',
+        '-B', '-ntp',
+        '-f', $pom,
+        'help:active-profiles'
+    )
+    $profileOutput = & $mavenWrapper @profileArguments 2>&1
+    $profileExitCode = $LASTEXITCODE
+    foreach ($line in $profileOutput) {
+        $safeLine = $line.ToString() -replace '(?i)https?://\S+', '[repository URL redacted]'
+        Write-Output $safeLine
+    }
+    if ($profileExitCode -ne 0) {
+        throw "Could not verify the Akka Maven profile (exit code $profileExitCode)."
+    }
+    if (($profileOutput -join "`n") -notmatch 'akka-repository \(source:') {
+        throw 'The Akka Maven profile was not active; refusing to run the probe.'
+    }
+
+    if ($ValidateOnly) {
+        return
+    }
+
+    if (-not $env:AKKA_REPOSITORY_URL) {
+        $secureUrl = Read-Host 'Enter the authorized Akka HTTPS repository URL' -AsSecureString
+        $urlPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureUrl)
+        try {
+            $env:AKKA_REPOSITORY_URL = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($urlPointer)
+            $promptedForRepositoryUrl = $true
+        }
+        finally {
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($urlPointer)
+            Remove-Variable secureUrl -ErrorAction SilentlyContinue
+        }
+    }
+
+    $repositoryUri = $null
+    if (-not [Uri]::TryCreate($env:AKKA_REPOSITORY_URL, [UriKind]::Absolute, [ref]$repositoryUri) -or
+        $repositoryUri.Scheme -ne 'https') {
+        throw 'AKKA_REPOSITORY_URL must be an absolute HTTPS URL.'
+    }
+
+    $arguments = @(
+        '-s', $tempSettings,
+        '-P', 'akka-repository',
+        '-U', '-B', '-ntp',
+        '-f', $pom,
+        'verify'
+    )
+    $output = & $mavenWrapper @arguments 2>&1
+    $exitCode = $LASTEXITCODE
+    foreach ($line in $output) {
+        $safeLine = $line.ToString() -replace '(?i)https?://\S+', '[repository URL redacted]'
+        $safeLine = $safeLine -replace '(?i)(password|token|credential)\s*[=:]\s*\S+', '$1=[REDACTED]'
+        Write-Output $safeLine
+    }
+
+    if ($exitCode -ne 0) {
+        throw "Akka compatibility probe failed with exit code $exitCode. See redacted Maven output above."
+    }
+}
+finally {
+    if ($promptedForRepositoryUrl) {
+        Remove-Item Env:AKKA_REPOSITORY_URL -ErrorAction SilentlyContinue
+    }
+    if ($tempSettings -and (Test-Path -LiteralPath $tempSettings)) {
+        Remove-Item -LiteralPath $tempSettings
+    }
+}
