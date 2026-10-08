@@ -27,6 +27,8 @@ On the next retry the user confirmed configuration and the default Maven setting
 
 The user then confirmed an active profile. Maven Help Plugin `help:active-profiles` nevertheless reported no active profiles for the probe project; an explicit retry with `-P akka-repository` warned that this profile does not exist and again resolved only against Central. No settings data was read. The active profile ID and repository declaration need to be verified locally; the Akka compatibility test remains uncompiled/unrun.
 
+The non-secret profile ID was provided as `akka-repository`. Passing both the user settings file explicitly and `-P akka-repository` made Maven activate the external profile. Dependency resolution then reached that profile's repository declaration but failed before compilation because the configured repository URL is still an unconfigured placeholder (the URL is intentionally not reproduced here). Replace it locally with the authorized URL obtained through Akka's official process, then rerun the command in [compatibility instructions](../../compatibility/README.md). This confirms only profile activation, not artifact access or Java 25 runtime compatibility.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).

@@ -437,3 +437,17 @@ Maven still does not see the profile: `help:active-profiles` reported no active 
 - Ran `.\mvnw.cmd -U -P akka-repository -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Maven warned that profile `akka-repository` does not exist, then failed to resolve the Akka artifact from Central before compilation. URLs were redacted.
 - No Maven settings content or credential was inspected or printed. Updated decision 0002 to record that user-reported configuration is not visible as an active Maven profile.
 - Akka test remains blocked/unrun; no scaffold checks or deployment.
+
+## 47. User — clarification response
+
+akka-repository
+
+## 48. Assistant
+
+Explicitly selecting `$HOME\.m2\settings.xml` and profile `akka-repository` made Maven activate the profile. Dependency resolution then reached the profile's repository declaration but failed before compilation because its configured URL is still a placeholder, not the authorized Akka repository URL. I have not inspected settings contents or printed the URL. Please replace it locally with the vendor-issued tokenized URL; do not share it here. Then I can rerun the probe with the same command.
+
+## Tool evidence through entry 48
+
+- Ran `.\mvnw.cmd -s $settings -P akka-repository -B -ntp -f compatibility/akka/pom.xml help:active-profiles`; Maven reported the external `akka-repository` profile active.
+- Ran `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Dependency collection failed before compilation while trying to access the profile repository. The configured URL was a placeholder; exact URL output was redacted.
+- Updated `compatibility/README.md` with the command selecting the settings file/profile and updated decision 0002 with the accurate resolution state. No Akka test ran, no scaffold checks repeated, no deployment.
