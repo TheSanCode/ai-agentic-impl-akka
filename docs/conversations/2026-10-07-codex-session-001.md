@@ -737,3 +737,10 @@ what is tool registry and how its implemented in this project
 ## 93. Assistant — final response
 
 Explained the tool registry concept and its implementation in `src/main/java/io/agenticawithakka/tools` (definitions, registry gate, read tools, delegated access, tests). No code changes.
+## 94. User
+
+will continue tomorrow
+
+## 95. Assistant — final response
+
+Session paused. State: branch `feature/agentic`, worktree clean, nothing pushed. Latest work: P1-06 tool part (`c707ea2`), 114 tests passing. Resume options: P1-04 (identity, project policy, mock delegated connectors; recommended) or the P1-06 skill registry. Open decisions are listed in decisions 0003 and 0004.
