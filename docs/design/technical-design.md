@@ -1,12 +1,12 @@
 # AgenticaWithAkka Technical Design
 
-Version 0.2 | 7 October 2026 | Proposed implementation design
+Version 0.3 | 7 October 2026 | Proposed implementation design
 
 ## 1 Scope and source baseline
 
-Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.3](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
+Implement a local-first modular application with replaceable adapters, initially using Coordinator and Investigation agents. Expand to the six roles defined in the [agentic design](agentic-design-and-phased-plan.md). Follow [requirements v0.4](../requirements/agenticawithakka-production-requirements.md) and the [roadmap](../ROADMAP.md). This is a proposed design, not evidence that Phase 0 is complete.
 
-Source baseline on feature/agentic: requirements blob `97db05215bd6bb2b9e59776d60cb0cf6dbfc23bb`, agentic design blob `516e326ff548c4fe9a51e3ac02ef6dc5c956cb45`. Requirements remain authoritative if this design conflicts with them.
+Source baseline on feature/agentic: requirements blob `58fb239de256814832cb65481c9ab5f01f60c797`, agentic design blob `a4ba17ad415cb9583d0d01267d09cd6463e0f83d`. Requirements remain authoritative if this design conflicts with them.
 
 ## 2 Proposed technology baseline
 
@@ -158,3 +158,17 @@ Checked 7 October 2026; mutable documentation must be rechecked when pinning ver
 - [Akka BSL FAQ](https://akka.io/bsl-license-faq): development and production licensing distinction.
 - [pgvector](https://github.com/pgvector/pgvector): vector storage and indexing.
 - [Kubernetes API initiated eviction](https://kubernetes.io/docs/concepts/scheduling-eviction/api-eviction/): disruption-aware eviction behavior.
+
+## 16 Durable background execution design
+
+Return HTTP 202 for accepted asynchronous work with executionId and a status URL. Disconnecting the caller does not cancel execution. Capture trusted identity/project references; do not persist browser cookies or raw bearer tokens as task identity. Logout policy remains explicit and revocation always prevents unauthorized source calls.
+
+Phase 1 can retain in-process execution with recorded terminal failure for work interrupted by application restart. Phase 2 must commit durable acceptance before acknowledging durable work and use a recoverable dispatch mechanism. Persist loop position, cumulative budget, completed operation references, wait reason, absolute deadline, nextWakeAt and execution version. Revalidate access and source credentials on wake-up.
+
+Use a durable scheduler for nextWakeAt, with ownership leases and fencing or equivalent exclusive execution. An expired lease does not prove an external write stopped: the action executor must still enforce idempotency/reconcile receipts and reject stale ownership where enforceable. Persist timer intentions; transient actor timers only deliver wake-up signals.
+
+Active-time budgets exclude human waits; the absolute deadline includes them unless an authorized extension is recorded. Steps/tokens/cost/retry usage never reset on recovery. Define cancellation as preventing new actions; reconcile in-flight outcomes and do not imply automatic rollback. Wait expiration produces a documented terminal or escalation outcome.
+
+Polling runs as scheduled bounded observations, not an always-running AI loop. Model interpretation is invoked only when needed. Use per-project admission, bounded queues, backoff and terminal/manual-review handling. Progress API and admin view show last update/checkpoint, active step, usage, pending wait and next wake-up without protected content.
+
+Phase 2 fault tests include crash around durable admission/checkpoints, restart while waiting, repeated wake-ups, two competing workers, cumulative budget exhaustion, revocation and cancellation. Do not call actor persistence alone an end-to-end exactly-once guarantee.
