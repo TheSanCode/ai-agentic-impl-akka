@@ -53,7 +53,7 @@ On 8 October 2026 the user ran the full hardened script locally and pasted its r
 ## Remaining gates
 
 1. Prove authorized Akka repository resolution with a cache-isolated rerun of `scripts/Test-AkkaCompatibility.ps1` and inspect its resolved graph. The isolated test source compiles and passes on Java 25 with locally available artifacts.
-2. Resolve Akka licensing/eligibility and runtime key policy before sustained lab or production use. Do not infer permission from artifact availability.
+2. Akka licensing — user decision, 8 October 2026: **development/non-production use only for now; the production license decision is deferred** and remains a release blocker. Runtime key policy: when a key is used, inject `akka.license-key` from a secret store or environment variable; never commit it or place it in prompts, logs or task messages. No license purchase or account enrollment occurred. Do not infer production permission from artifact availability.
 3. Combined co-existence probe passed (8 October 2026). Next, define replaceable ports before workflows; full-stack claims still need the application build, not only isolated probes.
 4. Select and license actual model weights, measure hardware fit, and test actual Ollama chat/structured output, streaming and embeddings separately.
 

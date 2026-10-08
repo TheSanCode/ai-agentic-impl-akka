@@ -643,3 +643,15 @@ Testing Spring AI and Akka together.
 - `-Probe combined -ValidateOnly` passed under Windows PowerShell 5.1.
 - Updated compatibility README, decision 0002 (table row, scope note, gate 3) and ROADMAP (new checked combined-probe item; remaining item narrowed to repository-access proof and licensing).
 - Licensing/runtime-key decision requires the user's authorization; asked rather than decided.
+
+## 75. Assistant — question (ask_user)
+
+Asked for the Akka licensing path and runtime-key handling.
+
+## 76. User — answer
+
+license_path=dev-only-now, key_policy=secret-store
+
+## 77. Assistant — final response
+
+Recorded in decision 0002 gate 2 and ROADMAP: Akka is approved for development/non-production use only; the production license decision is deferred and remains a release blocker; `akka.license-key` must be injected from a secret store or environment variable and never committed. Combined Spring AI + Akka probe passed on Java 25 (commit `66a6dbb`). Remaining: cache-isolated vendor-repository proof, deferred production license, then replaceable ports before agent workflows.
