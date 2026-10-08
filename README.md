@@ -66,6 +66,10 @@ All custom images use approved base images, multi-stage builds and pinned releas
 
 See the [recommended technology stack](docs/design/technology-stack.md): Angular browser UI, Java/Spring Boot/Spring AI, Akka, Keycloak, PostgreSQL/pgvector, local inference, durable scheduling and replaceable Telegram/WhatsApp/SMS adapters. Exact versions and provider choices require validation; no service purchase or deployment is implied.
 
+## Local installation prerequisites
+
+Start with the [Windows local prerequisites](docs/local-prerequisites.md) for WinGet checks/install commands, WSL2, Docker, Java, Node.js and Ollama verification. The guide distinguishes installed tools from runnable application setup; Compose and application files remain pending.
+
 ## Implementation instructions
 
 Start with the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md): ordered tasks for the two-agent local lab, identity and tool controls, synthetic fixtures, APIs and acceptance tests. The instructions are documented; implementation remains pending.
