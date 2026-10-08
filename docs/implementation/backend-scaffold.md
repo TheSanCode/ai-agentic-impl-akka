@@ -35,7 +35,7 @@ Smoke-check application process stopped.
 
 `GET /api/health` reports process status and the service identifier only, not database, model, agent, source or production readiness. It is public and local. Business endpoints do not exist; identity and project authorization must precede their implementation.
 
-The single Maven application uses `io.agenticawithakka`. `config` owns configuration/composition; `api` owns HTTP. Since 8 October 2026, `domain/contracts` and `application/ports` contain versioned contracts and port interfaces ([decision 0003](../decisions/0003-domain-contracts-and-ports.md)). Remaining reserved boundaries are `agents`, `skills`, `tools`, `security`, `connectors/mock`, `retrieval`, `persistence` and `observability`. They contain only package documentation, not implementations. Domain types must remain independent of Spring AI, Akka, HTTP and vendor credentials.
+The single Maven application uses `io.agenticawithakka`. `config` owns configuration/composition; `api` owns HTTP. Since 8 October 2026, `domain/contracts` and `application/ports` contain versioned contracts and port interfaces ([decision 0003](../decisions/0003-domain-contracts-and-ports.md)), and `tools` contains the policy-gated read-only tool registry and the three Phase 1 read tools ([decision 0004](../decisions/0004-tool-registry-and-permissions.md)). Remaining reserved boundaries are `agents`, `skills`, `security`, `connectors/mock`, `retrieval`, `persistence` and `observability`. They contain only package documentation, not implementations. Domain types must remain independent of Spring AI, Akka, HTTP and vendor credentials.
 
 ## Verification evidence
 

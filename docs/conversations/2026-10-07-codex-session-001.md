@@ -708,3 +708,21 @@ proceed
 - Mutation check: injecting an `org.springframework` reference into a domain file made `ArchitectureBoundaryTest` fail; reverted.
 - Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
 - Docs: new decision 0003; ROADMAP P1-05 item checked with limits; backend-scaffold package-boundary text updated.
+
+## 88. Assistant — final response (pending entry from the previous turn)
+
+P1-05 is committed as `35b4420`. The full build passes on Java 25 with 59 tests (9 existing, 50 new) and BUILD SUCCESS. Added: contracts in `domain/contracts` (task envelope/result, tool request, evidence references and findings, budgets, execution states; fields validated on creation, errors never repeat rejected values; no Spring, Akka, HTTP or JSON-library types) and interfaces in `application/ports` (agent runtime, model, search, source connectors, delegated tokens, policy checks; asynchronous, capability-declaring, delegated tokens fail rather than fall back to shared credentials). The tests cover invalid-input rejection, JSON round-trips, credential redaction and a framework-reference check, which was shown to catch an injected Spring reference. Not done: approval and verification contracts (the Phase 0 item stays open), the budget cost unit and concrete limits. P1-05 was done ahead of P1-03/P1-04 (recorded in decision 0003). Nothing pushed. Next: P1-06 tool registry and permission checks.
+
+## 89. User
+
+proceed next
+
+## 90. Assistant — work performed
+
+- Read Phase 1 instructions §3/§6–7 and requirements SCP-03, SKL-01, TOL-01..05; identified the next task as P1-06.
+- Added a framework-free `tools` package: `ToolDefinition`, `ArgumentSpec`, `ArgumentType`, `TimeWindow`, `ToolRisk`, `ToolInvocationContext` (built from `TaskEnvelope`), `ToolHandler`, `ToolOutcome`/`ToolOutcomeStatus`, `ToolRegistry`, `DelegationTarget`, `DelegatedSourceAccess`, `SearchKnowledgeTool`, `QueryMockLogsTool`, `InspectMockHealthTool` and `PhaseOneReadTools` (READ-only, exactly three tools).
+- Tests: `ToolDefinitionTest` (24), `ToolRegistryTest` (21) and `ReadToolsTest` (9); `ArchitectureBoundaryTest` now also covers `tools` (+1).
+- First `clean verify`: test compile error (a helper named `capabilities(String)` was shadowed by the fakes' `capabilities()`); renamed it. Second `clean verify`: Tests run: 114, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS on Temurin 25.
+- Mutation check: bypassing the invocation policy gate made 4 tests fail (`ToolRegistryTest` and `ReadToolsTest`); the source was restored.
+- Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
+- Docs: new decision 0004; ROADMAP P1-06 tool part checked, skill registry and real-adapter wiring left open; backend-scaffold package text updated.

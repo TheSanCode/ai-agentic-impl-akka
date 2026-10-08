@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-/** Domain contracts and ports must not depend on frameworks, transports or vendor SDKs (ARC-01). */
+/** Domain contracts, ports and tools must not depend on frameworks, transports or vendor SDKs (ARC-01). */
 class ArchitectureBoundaryTest {
     // Matches imports and fully qualified references alike.
     private static final Pattern FORBIDDEN = Pattern.compile(
@@ -19,7 +19,7 @@ class ArchitectureBoundaryTest {
                     + "|io\\.agenticawithakka\\.(api|config|agents|connectors|persistence))\\.[a-z]");
 
     @ParameterizedTest
-    @ValueSource(strings = {"domain", "application/ports"})
+    @ValueSource(strings = {"domain", "application/ports", "tools"})
     void boundaryPackagesImportNoFrameworkOrAdapterTypes(String packagePath) throws IOException {
         var root = Path.of("src/main/java/io/agenticawithakka", packagePath);
         List<Path> sources;
