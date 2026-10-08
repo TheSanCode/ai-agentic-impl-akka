@@ -1,6 +1,6 @@
 # AgenticaWithAkka Phase 1 Implementation Instructions
 
-Version 0.3 | 7 October 2026 | Implementation handoff
+Version 0.4 | 7 October 2026 | Implementation handoff
 
 ## 1 Scope and source authority
 
@@ -82,7 +82,7 @@ Use a mock model for deterministic workflow tests, then a real local model to as
 
 Propose POST /api/projects/{projectId}/investigations to create an execution, GET on its execution resource for results and POST on its cancel subresource. Return a server-generated execution ID; use consistent Denied, InvalidInput, Unsupported, Conflict, RateLimited and DependencyUnavailable errors.
 
-All read/cancel operations recheck identity and ownership/project permissions. Recheck current source access before returning stored evidence, summaries or citations; withhold protected content if its permission currency cannot be established. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A browser interface can follow after the API flow works; no dashboard or seven-agent deployment is required to pass this slice.
+All read/cancel operations recheck identity and ownership/project permissions. Recheck current source access before returning stored evidence, summaries or citations; withhold protected content if its permission currency cannot be established. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A minimal browser interface is mandatory for this slice after the API flow works; the complete admin dashboard and six-role topology arrive in later phases.
 
 ## 10 Acceptance suite
 
@@ -120,3 +120,9 @@ Create investigation work asynchronously and return HTTP 202 with a server execu
 Implement a loop checkpoint record containing current step, cumulative budget, status, last update and wait reason. AwaitingAuthentication must stop source calls; resume only with valid same-user/project access and an unexpired deadline. Add bounds for active processing and absolute elapsed time; document wait accounting. No raw access tokens belong in progress records.
 
 Add tests for disconnect/reconnect, status authorization, loop termination, expiration mid-loop and explicit cancellation. For process restart, document the Phase 1 limitation and mark interrupted tasks failed if persisted; do not leave them falsely running. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
+
+## 14 Required Phase 1 browser deliverable
+
+Add P1-09A after the API task: implement login, authorized project selection, investigation submission, execution list, progress/results and cancellation screens. Record the selected frontend stack and browser support matrix. Use safe rendering and authenticated bounded polling; navigation/reconnect must retrieve existing work rather than resubmit it.
+
+Acceptance: complete the synthetic investigation from a browser; reject another project's execution; display expired authentication and partial results clearly; cancel authorized work; reconnect to ongoing work; and verify keyboard-accessible primary controls. Later-phase approval, business review and admin screens remain pending. API tests alone cannot establish Phase 1 completion.
