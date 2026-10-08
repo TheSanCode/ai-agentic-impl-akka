@@ -14,6 +14,12 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 8. Keeps the change open until all required checks pass. Failures or unclear results require follow-up; rollback needs authorization.
 9. Gives admins an eagle view of issue impact, affected services, timelines, evidence, agent work, code proposals, approvals and validation results.
 
+## WhatsApp Telegram and SMS
+
+Linked users can start investigations, check progress and cancel permitted work through WhatsApp, Telegram or SMS. All channels use the same project permissions and delegated source access as the browser.
+
+Unlinked users must securely link their account first. Login, MFA, protected approvals and business acceptance use an authenticated browser handoff by default. Outgoing messages contain redacted summaries and secure result links. Real providers and channel policies remain to be selected; delivery is planned, not implemented.
+
 ## Background tasks and agent loops
 
 Investigations run asynchronously and return an execution ID, so users can close the browser and check progress later. Agents repeat reasoning, authorized tool calls and result evaluation within step, time, token and retry limits. They pause for authentication, approvals or business review rather than holding a thread open.
@@ -30,7 +36,7 @@ Phase 1 demonstrates this while the application stays running. Phase 2 adds pers
 
 ## Production requirements
 
-Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.4**, a draft for review.
+Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.5**, a draft for review.
 
 Section 16 covers pod restarts and Jira code proposals. Section 17 covers the admin eagle view. Section 19 covers technical verification and manual business acceptance.
 
