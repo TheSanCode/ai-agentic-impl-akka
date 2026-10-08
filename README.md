@@ -14,6 +14,12 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 8. Keeps the change open until all required checks pass. Failures or unclear results require follow-up; rollback needs authorization.
 9. Gives admins an eagle view of issue impact, affected services, timelines, evidence, agent work, code proposals, approvals and validation results.
 
+## Background tasks and agent loops
+
+Investigations run asynchronously and return an execution ID, so users can close the browser and check progress later. Agents repeat reasoning, authorized tool calls and result evaluation within step, time, token and retry limits. They pause for authentication, approvals or business review rather than holding a thread open.
+
+Phase 1 demonstrates this while the application stays running. Phase 2 adds persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery. Authorization is rechecked during execution; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
+
 ## Access and control
 
 - Agents use reusable skills and controlled tools.
@@ -24,7 +30,7 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 
 ## Production requirements
 
-Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.3**, a draft for review.
+Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.4**, a draft for review.
 
 Section 16 covers pod restarts and Jira code proposals. Section 17 covers the admin eagle view. Section 19 covers technical verification and manual business acceptance.
 
