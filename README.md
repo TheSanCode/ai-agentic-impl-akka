@@ -28,6 +28,12 @@ Read the [production requirements](docs/requirements/agenticawithakka-production
 
 Section 16 covers pod restarts and Jira code proposals. Section 17 covers the admin eagle view. Section 19 covers technical verification and manual business acceptance.
 
+## Agentic design and phased plan
+
+Read the [agentic design and phased delivery plan](docs/design/agentic-design-and-phased-plan.md) for agent responsibilities, communication, shared services, workflows and phase exit gates.
+
+The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Observability, Change Analysis, Operations and Verification. Start with two roles in the local lab and split them as capabilities grow. The admin eagle view is a platform feature built from execution records; business validation remains a human decision.
+
 ## Delivery sequence
 
 1. Agree requirements and open decisions.
