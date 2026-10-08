@@ -558,6 +558,8 @@ I fixed the repeatable setup errors in the probe path. `scripts/Test-AkkaCompati
 
 Validation: the script parsed successfully, and `-ValidateOnly` passed, confirming Maven uses Temurin 25 and sees the POM profile without warning. That mode does not resolve Akka or run its test. Fresh repository access and Akka licensing remain unresolved because the authorized URL is not available to this process. The previous cache-backed Akka runtime test passed.
 
+Commit outcome: `463f624` (`ai-agentic-testing: fix Akka probe invocation`) contains the script, POM profile, instructions, decision evidence, and this conversation update on `feature/agentic`. A follow-up conversation-only commit records this final handoff.
+
 ## 60. User
 
 could you try to fix
