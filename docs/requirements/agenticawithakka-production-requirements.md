@@ -1,6 +1,6 @@
 # agenticawithakka Agent Platform Production Requirements
 
-Version 0.3 | 7 October 2026 | Status: Requirements draft for review
+Version 0.4 | 7 October 2026 | Status: Requirements draft for review
 
 ## Sections added in version 0.3
 
@@ -304,3 +304,23 @@ Additional acceptance scenarios:
 | Platform restart during verification | Execution resumes safely with business review and polling state preserved. | VER-11 |
 
 Additional decisions before technical design: log polling intervals and observation windows by change type; positive technical signals and regression thresholds; business-impact classification ownership; business approver roles, separation of duties and review deadlines; approval invalidation rules; and Jira closure and rollback policies. Numerical values remain configurable proposals until agreed.
+
+## 20 Long running background tasks and agent loops
+
+Background tasks continue independently of an open browser, while remaining bound to an authenticated initiating subject and project. Browser disconnection is not cancellation, and session independence is not indefinite delegated access. Agent loops perform bounded reasoning and tool use; scheduled polling and durable wake-ups are platform services.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| BKG-01 | Accept authorized work asynchronously and return a task/execution identifier and status location without waiting for completion. | Closing the initiating browser does not cancel accepted work; a later authorized request retrieves its status. |
+| BKG-02 | Persist accepted durable work, checkpoints, pending waits and final outcomes; recover without repeating completed side effects. | Process failure before or after a checkpoint resumes or reconciles work safely. |
+| BKG-03 | Support approval, authentication and business-review waits plus scheduled wake-ups without keeping a request or worker thread open. | Waiting work releases execution capacity and survives recovery. |
+| BKG-04 | Bound loop steps, active processing time, absolute deadline, tokens, cost and retries. Define whether waits consume each budget; record cumulative usage across resumes. | Recovery or repeated waits cannot reset budgets or create unlimited execution. |
+| BKG-05 | Provide authorized status, progress, last checkpoint, next wake-up, blockers and cancellation controls. Include these in the admin view. | Unauthorized users cannot inspect or cancel another project's work. |
+| BKG-06 | Recheck subject, project and source access at resumed steps and before protected actions. Expired delegated access pauses for reauthentication; revocation blocks continued source access. | No shared-account fallback or new action under revoked access; logout handling follows explicit policy. |
+| BKG-07 | Prevent concurrent duplicate execution using task ownership, leases or equivalent fencing plus idempotent effects and reconciliation. | Worker failure and lease expiry cannot permit stale workers to perform duplicate writes. |
+| BKG-08 | Use bounded queues, concurrency limits, fair scheduling, retry backoff and dead-letter or manual-review handling for repeatedly failing tasks. | Overload is controlled and poisoned work cannot retry indefinitely. |
+| BKG-09 | Distinguish interactive background work from scheduled unattended operations. Recurring tasks require separately approved identity, schedule, scope and lifecycle policies. | A background task cannot implicitly become an unattended recurring service. |
+
+Additional acceptance scenarios: browser closure and reconnect; restart during a wait; budget exhaustion across resumes; duplicate worker recovery; cancellation during an in-flight action; expired/revoked credentials at wake-up; and overload with bounded admission.
+
+Open policies: maximum elapsed duration and retention; logout versus cancellation; wait expiry and notification channels; lease/heartbeat/fencing configuration; workload fairness and concurrency; and which recurring tasks, if any, are approved.
