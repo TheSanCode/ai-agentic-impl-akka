@@ -34,6 +34,10 @@ Read the [agentic design and phased delivery plan](docs/design/agentic-design-an
 
 The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Observability, Change Analysis, Operations and Verification. Start with two roles in the local lab and split them as capabilities grow. The admin eagle view is a platform feature built from execution records; business validation remains a human decision.
 
+## Technical design
+
+Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; the next artifact is implementation instructions.
+
 ## Roadmap
 
 See the [project roadmap](docs/ROADMAP.md) for phase status, deliverables, dependencies and completion criteria. Maintain it with the reusable `project-roadmap` skill using verified progress.
