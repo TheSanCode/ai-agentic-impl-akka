@@ -1,6 +1,6 @@
 # agenticawithakka Agent Platform Production Requirements
 
-Version 0.4 | 7 October 2026 | Status: Requirements draft for review
+Version 0.5 | 7 October 2026 | Status: Requirements draft for review
 
 ## Sections added in version 0.3
 
@@ -324,3 +324,20 @@ Background tasks continue independently of an open browser, while remaining boun
 Additional acceptance scenarios: browser closure and reconnect; restart during a wait; budget exhaustion across resumes; duplicate worker recovery; cancellation during an in-flight action; expired/revoked credentials at wake-up; and overload with bounded admission.
 
 Open policies: maximum elapsed duration and retention; logout versus cancellation; wait expiry and notification channels; lease/heartbeat/fencing configuration; workload fairness and concurrency; and which recurring tasks, if any, are approved.
+
+## 21 Messaging channels
+
+Support WhatsApp, Telegram and SMS as replaceable channel adapters for interactive requests. External transport providers need not be open source; their terms, cost, availability and data handling require separate evaluation. Messaging capabilities are production requirements, delivered after the core workflow.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| CHN-01 | Allow a linked authorized user to start an investigation, request status and cancel permitted work through each supported channel. | Each channel creates a traceable execution using the same workflow and policy as the browser. |
+| CHN-02 | Link a channel account to an authenticated application identity using a secure, expiring enrollment flow. Do not treat phone number, display name or message text alone as authenticated application identity. Support unlinking and re-enrollment. | Unlinked, spoofed or revoked accounts cannot start protected work. |
+| CHN-03 | Validate incoming webhook authenticity using the provider's supported mechanism; prevent duplicate processing, replay and abuse. | Duplicate/retried messages create at most one intended execution; forged events are rejected. |
+| CHN-04 | Route messages through the same trusted identity, project and delegated connector checks. If fresh login, source consent or MFA is needed, send an expiring authenticated browser handoff rather than collecting credentials in chat. | Messaging cannot bypass OBO, MFA or project policy. |
+| CHN-05 | Minimize outgoing content and apply channel-specific data classification, recipient and conversation policy. Default to redacted summaries and authenticated result links. Exclude secrets and sensitive source excerpts unless explicitly allowed. | No unauthorized data reaches a chat, group or recycled phone number. |
+| CHN-06 | Support acknowledgement with execution ID, status requests and configured completion/failure notifications. Handle delivery failures, message-size limits and provider rate limits without duplicating business work. | Notification failures do not restart an investigation or mark it failed when its execution succeeded. |
+| CHN-07 | Keep protected writes and business acceptance in an authenticated approval/review interface by default. Any future chat-native approval requires separately approved assurance and binding to exact action/version. | A text reply such as yes cannot approve a restart or business change under the default policy. |
+| CHN-08 | Audit channel, verified sender mapping, event ID, execution and delivery outcome with redacted payloads. Define message retention, unlinking and account-reassignment behavior. | Operators can trace a request while minimizing provider-side and application-side sensitive content. |
+
+Acceptance includes all three channels, duplicate webhook events, failed delivery, unlinked sender, revoked identity, denied project, required reauthentication and safe protected-action handoff. Open decisions include providers, account ownership, group-chat policy, outbound consent, retention and permissible notification content.
