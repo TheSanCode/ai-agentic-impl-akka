@@ -451,3 +451,17 @@ Explicitly selecting `$HOME\.m2\settings.xml` and profile `akka-repository` made
 - Ran `.\mvnw.cmd -s $settings -P akka-repository -B -ntp -f compatibility/akka/pom.xml help:active-profiles`; Maven reported the external `akka-repository` profile active.
 - Ran `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` on Temurin 25. Dependency collection failed before compilation while trying to access the profile repository. The configured URL was a placeholder; exact URL output was redacted.
 - Updated `compatibility/README.md` with the command selecting the settings file/profile and updated decision 0002 with the accurate resolution state. No Akka test ran, no scaffold checks repeated, no deployment.
+
+## 49. User — clarification response
+
+ready
+
+## 50. Assistant
+
+The retry still sees the repository URL placeholder, so dependency resolution fails before compilation. It appears the local settings used by this process were not updated with the authorized Akka URL. No Akka test ran. Please update the URL in `$HOME\.m2\settings.xml` to the value obtained through Akka's official account process, without sharing it in chat; then tell me when that local file has actually been saved.
+
+## Tool evidence through entry 50
+
+- Ran the documented command on Temurin 25: `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify`.
+- Maven activated/resolved the `akka-repository` profile but still attempted the placeholder repository URL and failed to transfer the artifact POM before compilation. URL output was redacted. No test ran.
+- Updated decision 0002 to record that the profile is active but the URL remains a placeholder. No settings contents or credentials were inspected; no scaffold tests or deployment.

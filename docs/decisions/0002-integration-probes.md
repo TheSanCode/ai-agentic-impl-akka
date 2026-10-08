@@ -29,6 +29,8 @@ The user then confirmed an active profile. Maven Help Plugin `help:active-profil
 
 The non-secret profile ID was provided as `akka-repository`. Passing both the user settings file explicitly and `-P akka-repository` made Maven activate the external profile. Dependency resolution then reached that profile's repository declaration but failed before compilation because the configured repository URL is still an unconfigured placeholder (the URL is intentionally not reproduced here). Replace it locally with the authorized URL obtained through Akka's official process, then rerun the command in [compatibility instructions](../../compatibility/README.md). This confirms only profile activation, not artifact access or Java 25 runtime compatibility.
 
+After the user indicated the local URL was ready, the documented retry command was run again with `-s`, `-P akka-repository`, and `-U`. Maven still reported the placeholder URL and failed to transfer the Akka POM before compilation. The value visible to this process therefore remains unchanged; no Akka test ran.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).
