@@ -372,3 +372,16 @@ The probe still resolved only from Maven Central after your confirmation. I retr
 ## 38. Assistant
 
 To proceed, the authorized Akka repository configuration must be available to this process. Please ensure the vendor-directed Maven settings/profile is installed at `$HOME\.m2\settings.xml`, or provide the path to an alternate local settings file to use with Maven `-s`. Do not share the settings content, token, or tokenized URL.
+
+## 39. User — clarification response
+
+I will configure `$HOME\.m2\settings.xml`.
+
+## 40. Assistant
+
+Waiting for the authorized Maven settings to be configured locally. Once they are available to this execution environment, rerun only the isolated Akka probe with `-U` and keep URL/credential output redacted.
+
+## Tool evidence through entry 40
+
+- User selected the option to configure the default user-local Maven settings path. No settings contents or secrets were provided.
+- Akka retry remains blocked; no further dependency command was run while the user configures access. Probe result and current blocker are recorded in decision 0002. No deployment or scaffold checks.
