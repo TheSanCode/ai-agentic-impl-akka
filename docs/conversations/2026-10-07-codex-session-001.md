@@ -531,3 +531,7 @@ This is the same JDK selection issue: a current default `mvnw --version` again r
 - Updated `compatibility/README.md` with a same-session Maven Java 25 version guard and Windows-style paths; clarified that an inactive-profile warning means cache-backed resolution only.
 - Ran the guarded command with `JAVA_HOME` and PATH explicitly set to Temurin 25.0.4.1+1. Wrapper reported Java 25 / Eclipse Adoptium; Akka compatibility test passed (1 test, 0 failures/errors/skips). It still warned that profile `akka-repository` could not be activated. URLs were redacted from output.
 - Updated decision 0002 with the repeated result and blocker. Scaffold checks were not repeated; no combined-stack test or deployment.
+
+## 56. Assistant — final response
+
+The compiler failure recurs because this shell's default Maven JVM is Microsoft JDK 21. Set `JAVA_HOME` and prepend its `bin` to `PATH`, then run the wrapper in the same PowerShell session. I added a Java 25 guard to `compatibility/README.md` and reran the Akka probe with it: **1 test passed** on Temurin 25.0.4.1+1. The profile warning is separate; Akka dependencies were available from the local cache, so authorized remote resolution remains unverified. Commit `9503e73` records the guard and probe result on `feature/agentic`.
