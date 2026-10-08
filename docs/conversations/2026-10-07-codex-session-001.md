@@ -612,3 +612,11 @@ Pasted `-ValidateOnly` output: Maven 3.9.11 on Temurin 25.0.4.1, JDK 25 `sun.mis
 ## 68. Assistant — final response
 
 Confirmed the user's local validation passed: Java 25 selected, POM-local `akka-repository` profile active, no missing-profile warning. The Unsafe warnings come from Maven 3.9.11's bundled Guice and are harmless. Validation does not resolve Akka or run tests; next is the full probe `.\scripts\Test-AkkaCompatibility.ps1` with the authorized URL at the secure prompt, expecting `Tests run: 1, Failures: 0` and `BUILD SUCCESS`.
+
+## 69. User
+
+Pasted full `.\scripts\Test-AkkaCompatibility.ps1` output: Java 25.0.4.1, `akka-repository` profile active, `AkkaCompatibilityTest` Tests run: 1, Failures: 0, Errors: 0, Skipped: 0; `Dev use only` license warning (URL redacted); `BUILD SUCCESS`.
+
+## 70. Assistant — final response
+
+Confirmed the full Akka probe passed on the user's machine under Java 25 with the repository profile active. Caveat recorded: Akka 2.10.23 was already cached and `-ntp` hides downloads, so vendor-repository resolution is still not proven; a cache-isolated rerun closes that gap. Updated decision 0002 (new evidence paragraph; stale "has not compiled" gate corrected) and the ROADMAP P1-01 partial-evidence line. Licensing/runtime-key decision and the combined Spring AI + Akka test remain open.

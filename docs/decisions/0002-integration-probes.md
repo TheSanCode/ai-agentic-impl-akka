@@ -39,6 +39,8 @@ To prevent repeat JDK/profile selection mistakes, `scripts/Test-AkkaCompatibilit
 
 Validated with `-ValidateOnly` on 8 October 2026: Maven reported Temurin 25.0.4.1+1, and the Akka POM's `akka-repository` profile was active with no warning; this mode does not require repository access or run tests. The Akka runtime test has previously passed from the local cache, but this invocation hardening has not yet been used for a fresh vendor-repository download because the authorized URL is not available to this process. Do not treat `-ValidateOnly` as a dependency or integration test.
 
+On 8 October 2026 the user ran the full hardened script locally and pasted its redacted output: Temurin 25.0.4.1, `akka-repository` profile active with no warning, `-U verify` → `AkkaCompatibilityTest` 1 test, 0 failures/errors/skips, `BUILD SUCCESS`; ActorSystem logged the expected `Dev use only` license warning. Because `-ntp` suppresses transfer logs and Akka 2.10.23 was already in the local cache, this run does not prove the artifacts were fetched from the vendor repository; a cache-isolated rerun (moved `com\typesafe\akka` cache or `-Dmaven.repo.local=<empty temp dir>`) is still needed for that.
+
 ## Repository and licensing requirements
 
 - Spring AI release artifacts are available from Maven Central without a vendor account or extra repository. The selected source release is Apache-2.0. Provider services and model weights carry separate terms; none was used in this fixture. [Repository/Boot guidance](https://docs.spring.io/spring-ai/reference/getting-started.html), [2.0.1 license](https://github.com/spring-projects/spring-ai/blob/v2.0.1/LICENSE.txt).
@@ -49,7 +51,7 @@ Validated with `-ValidateOnly` on 8 October 2026: Maven reported Temurin 25.0.4.
 
 ## Remaining gates
 
-1. Provide authorized Akka repository access locally; rerun the isolated test and inspect its resolved graph. Its current source has not compiled, so API corrections may still be needed.
+1. Prove authorized Akka repository resolution with a cache-isolated rerun of `scripts/Test-AkkaCompatibility.ps1` and inspect its resolved graph. The isolated test source compiles and passes on Java 25 with locally available artifacts.
 2. Resolve Akka licensing/eligibility and runtime key policy before sustained lab or production use. Do not infer permission from artifact availability.
 3. Test both integrations together before asserting full-stack compatibility; then define replaceable ports before workflows.
 4. Select and license actual model weights, measure hardware fit, and test actual Ollama chat/structured output, streaming and embeddings separately.
