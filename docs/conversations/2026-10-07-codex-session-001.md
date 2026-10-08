@@ -604,3 +604,11 @@ Reported `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` output: Maven 3.9.
 Cause: Windows PowerShell 5.1 converts native stderr into error records, and the script's `$ErrorActionPreference = 'Stop'` made Maven's harmless JDK 25 `sun.misc.Unsafe` warning terminate the script. Added an `Invoke-NativeCapture` helper that captures native stdout/stderr as text with a local `Continue` preference, used for `javac`, `mvnw --version`, the profile check and `verify`; exit codes are still checked via `$LASTEXITCODE`.
 
 Tool evidence: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` exited 0, showed `akka-repository` active and `BUILD SUCCESS`. Full probe (remote Akka resolution) not run; needs the authorized URL.
+
+## 67. User
+
+Pasted `-ValidateOnly` output: Maven 3.9.11 on Temurin 25.0.4.1, JDK 25 `sun.misc.Unsafe` warnings from Maven's Guice (non-fatal), `akka-repository` profile active, `BUILD SUCCESS`.
+
+## 68. Assistant — final response
+
+Confirmed the user's local validation passed: Java 25 selected, POM-local `akka-repository` profile active, no missing-profile warning. The Unsafe warnings come from Maven 3.9.11's bundled Guice and are harmless. Validation does not resolve Akka or run tests; next is the full probe `.\scripts\Test-AkkaCompatibility.ps1` with the authorized URL at the secure prompt, expecting `Tests run: 1, Failures: 0` and `BUILD SUCCESS`.
