@@ -620,3 +620,11 @@ Pasted full `.\scripts\Test-AkkaCompatibility.ps1` output: Java 25.0.4.1, `akka-
 ## 70. Assistant — final response
 
 Confirmed the full Akka probe passed on the user's machine under Java 25 with the repository profile active. Caveat recorded: Akka 2.10.23 was already cached and `-ntp` hides downloads, so vendor-repository resolution is still not proven; a cache-isolated rerun closes that gap. Updated decision 0002 (new evidence paragraph; stale "has not compiled" gate corrected) and the ROADMAP P1-01 partial-evidence line. Licensing/runtime-key decision and the combined Spring AI + Akka test remain open.
+
+## 71. User
+
+how to
+
+## 72. Assistant — final response
+
+Interpreted as how to prove vendor-repository resolution. Steps given: move `$HOME\.m2\repository\com\typesafe\akka` to a backup name; run `.\scripts\Test-AkkaCompatibility.ps1` and enter the authorized URL at the prompt; success requires `BUILD SUCCESS`, 1 test passed, and the `com\typesafe\akka\...\2.10.23` folders recreated; then delete the backup (or restore it on failure). No commands were run by the assistant.
