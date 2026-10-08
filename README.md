@@ -14,6 +14,12 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 8. Keeps the change open until all required checks pass. Failures or unclear results require follow-up; rollback needs authorization.
 9. Gives admins an eagle view of issue impact, affected services, timelines, evidence, agent work, code proposals, approvals and validation results.
 
+## Browser web application
+
+The application is accessible through an authenticated browser interface on desktop and mobile. Users can select a project, start an investigation, view background progress and evidence, and cancel permitted tasks.
+
+Later workflow phases add protected-action approvals, manual business validation and the admin eagle view. The first local lab includes a working browser investigation interface; it is not API-only. Messaging channels complement this interface.
+
 ## WhatsApp Telegram and SMS
 
 Linked users can start investigations, check progress and cancel permitted work through WhatsApp, Telegram or SMS. All channels use the same project permissions and delegated source access as the browser.
@@ -36,7 +42,7 @@ Phase 1 demonstrates this while the application stays running. Phase 2 adds pers
 
 ## Production requirements
 
-Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.5**, a draft for review.
+Read the [production requirements](docs/requirements/agenticawithakka-production-requirements.md) for detailed rules, acceptance tests and open decisions. The current requirements are **version 0.6**, a draft for review.
 
 Section 16 covers pod restarts and Jira code proposals. Section 17 covers the admin eagle view. Section 19 covers technical verification and manual business acceptance.
 
