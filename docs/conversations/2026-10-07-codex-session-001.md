@@ -693,3 +693,18 @@ Pasted end of `-Probe combined -IsolatedCache` run: `BUILD SUCCESS`, total time 
 ## 85. Assistant — final response
 
 Recorded the closed repository-access gate: decision 0002 (table row, new "Fresh repository resolution verified" paragraph, gate 1 done), ROADMAP (new checked P1-01 evidence item; remaining item is only the deferred production-license decision) and compatibility README. No URL recorded. P1-01 technical compatibility evidence is complete for development use; production licensing stays deferred. Next: define replaceable ports and message/tool/verification contracts.
+
+## 86. User
+
+proceed
+
+## 87. Assistant — work performed
+
+- Read technical design §3–5, Phase 1 instructions §3–9 and requirements AGT-02/AGT-06/ARC-01; identified this as P1-05 (done ahead of P1-03/P1-04 because contracts depend on neither — recorded).
+- Added framework-free contracts in `domain/contracts` (26 files): IDs, `ProjectId`, `IdentityContextRef`, `AgentRole`, `ReplyRoute`, `TaskInput`, `Budget`, `TaskEnvelope` (schema v1), `ExecutionStatus` (terminal states never transition), `TaskStatus`, `ErrorCode`, `Classification`, `EvidenceRef`, `EvidencePassage`, `Finding`/`FindingKind`, `TaskResult`, `ToolRef`, `ToolArguments`, `IdempotencyKey`, `ToolRequest`, `ContractValidation`, `ContractViolationException`.
+- Added ports in `application/ports`: `AgentRuntime`, `ModelGateway`, `SearchGateway`, `SourceConnector`, `DelegatedTokenProvider`, `PolicyDecisionService` with request/response types, `AdapterCapabilities`, `PortException`, redacting `DelegatedCredential`.
+- Tests: `ContractValidationTest` (42), `ContractJsonTest` (2), `PortContractTest` (4), `ArchitectureBoundaryTest` (2).
+- First `clean verify`: 4 failures — `Map.of(...).containsKey(null)` throws NPE; fixed by iterating entries. Second `clean verify`: Tests run: 59, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS on Temurin 25.
+- Mutation check: injecting an `org.springframework` reference into a domain file made `ArchitectureBoundaryTest` fail; reverted.
+- Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
+- Docs: new decision 0003; ROADMAP P1-05 item checked with limits; backend-scaffold package-boundary text updated.

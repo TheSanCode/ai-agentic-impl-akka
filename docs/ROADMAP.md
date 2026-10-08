@@ -4,7 +4,7 @@ Last reviewed: 8 October 2026
 
 ## Current position
 
-Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold only; Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes and versioned domain contracts/ports; Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -70,6 +70,7 @@ Deliverables:
 - [x] P1-01 partial evidence: isolated Akka Typed 2.10.23 request/reply and shutdown test passed on Temurin 25 from locally cached artifacts, including a user-run full hardened script with the repository profile active (fresh resolution and combined test are recorded below); [results and limits](decisions/0002-integration-probes.md).
 - [x] P1-01 partial evidence: combined Spring AI 2.0.1 + Akka Typed 2.10.23 probe passed on Temurin 25 in one Boot 4.0.8 context (actor delegates a ChatClient call to a bounded executor; loopback model fixture); [results and limits](decisions/0002-integration-probes.md).
 - [x] P1-01 partial evidence: fresh Akka 2.10.23 resolution from the authorized `akka-repository` into an empty isolated Maven cache, with the combined probe passing on Temurin 25 (user-run, 8 October 2026); [results and limits](decisions/0002-integration-probes.md).
+- [x] P1-05 versioned task/tool/evidence contracts and Phase 1 ports (AgentRuntime, ModelGateway, SearchGateway, SourceConnector, DelegatedTokenProvider, PolicyDecisionService); 50 new validation/serialization/boundary tests pass (59 total); approval/verification contracts deferred; [decision](decisions/0003-domain-contracts-and-ports.md).
 - [ ] Finish P1-01 with the deferred Akka production-license decision (current policy: dev/non-production only; key injected from a secret store); artifact availability is not runtime compatibility.
 - [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images
