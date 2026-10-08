@@ -1,6 +1,6 @@
 # agenticawithakka Agent Platform Production Requirements
 
-Version 0.6 | 7 October 2026 | Status: Requirements draft for review
+Version 0.7 | 7 October 2026 | Status: Requirements draft for review
 
 ## Sections added in version 0.3
 
@@ -354,3 +354,18 @@ Acceptance includes all three channels, duplicate webhook events, failed deliver
 | WEB-06 | Use accessible navigation/forms, keyboard operation and clear loading, failure, empty and partial-result states. Render source/model text safely and protect browser sessions against injection and CSRF as applicable. | Accessibility and security checks cover primary flows; retrieved text cannot execute script. |
 
 Define supported browsers and accessibility target before acceptance. Frontend technology remains replaceable. Phase 1 includes a minimal functioning browser investigation interface; approval and admin/business features arrive with their corresponding workflow phases.
+
+## 23 AKS hosting and container images
+
+AKS is the required target hosting platform. Local Compose/kind remains the development environment; no actual AKS deployment is authorized by these requirements.
+
+| ID | Requirement | Acceptance evidence |
+| --- | --- | --- |
+| AKS-01 | Package UI, API and durable workers as independently deployable workloads, using versioned manifests/charts and environment configuration. | UI/API can scale and release separately; worker recovery preserves accepted tasks. |
+| AKS-02 | Build all custom container images from approved maintained base images. Pin deployed image digests; record provenance, SBOM, scan results and rebuild policy for base-image updates. | A release identifies its base/build/runtime digests and passes agreed security gates. |
+| AKS-03 | Apply least privilege, non-root execution, resource requests/limits, probes, graceful termination and appropriate disruption policies. | Rolling update, node drain and failed readiness checks preserve agreed service behavior. |
+| AKS-04 | Route browser and API traffic through approved TLS ingress/gateway and internal Services. Expose only required routes; restrict external channel webhooks separately. | Internal administration, workers and data stores are unreachable through public application routes. |
+| AKS-05 | Use scoped workload identities for approved Azure infrastructure access while preserving delegated-user identity for source operations. | Managed workload access cannot silently replace user OBO. |
+| AKS-06 | Define persistent storage, backups, restore, network policy, secrets management and availability for all stateful dependencies. | Application pod replacement does not lose business state; recovery drills meet agreed targets. |
+
+Confirm subscription, cluster, region, namespace, network exposure, registry, approved base-image catalog, node capacity/GPU needs and operational ownership before deployment. Framework-specific base images may differ; a single identical image for Java and UI is not required.
