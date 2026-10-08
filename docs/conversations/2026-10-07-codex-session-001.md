@@ -302,3 +302,21 @@ I’ll replace the old prefix on the two recent local commits that use it, prese
 ## 27. Assistant — final response
 
 Updated both recent commit titles on `feature/agentic` to use `ai-agentic-testing:`. The rewritten commits are `d237e93` (integration probes) and `4b5e855` (conversation record); their contents were preserved. The scaffold commit was unchanged, `AGENTS.md` remains untouched, and no tests were rerun because only commit metadata changed.
+
+## 28. User
+
+commit all left over files
+
+## 29. Assistant
+
+The only leftover change is the conversation-recording guidance in `AGENTS.md`. I reviewed it and will commit it together with this conversation update on `feature/agentic`.
+
+## Tool evidence through entry 29
+
+- Confirmed `feature/agentic` and found only `AGENTS.md` modified before this record update. Reviewed its diff: it adds the requested conversation-recording instructions and does not contain credentials or generated files.
+- `git diff --check` passed; only Git's LF-to-CRLF warning appeared.
+- Staged `AGENTS.md` and this conversation record for one commit; no other files were left over.
+
+## 30. Assistant — final response
+
+Committed the remaining `AGENTS.md` guidance and this conversation update on `feature/agentic` as `ai-agentic-testing: docs: add conversation recording guidance`. The reviewed change adds conversation-recording rules; no other files were left over. The commit identifier and final branch status will be appended on continuation.
