@@ -36,7 +36,7 @@ The proposed full design uses **six AI agent roles**: Coordinator, Knowledge, Ob
 
 ## Technical design
 
-Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; the next artifact is implementation instructions.
+Read the [proposed technical design](docs/design/technical-design.md) for stack candidates, agent contracts, persistence, delegated access, approvals, retrieval, restart safety and verification. Unresolved choices remain explicit; implementation instructions are linked below.
 
 ## Implementation instructions
 
@@ -75,4 +75,4 @@ Example request:
 
 ## Current status
 
-Requirements gathering. Application code and the final technology stack have not been implemented or selected.
+Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phase 0 remains In progress; implementation and deployment have not started.
