@@ -465,3 +465,282 @@ The retry still sees the repository URL placeholder, so dependency resolution fa
 - Ran the documented command on Temurin 25: `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify`.
 - Maven activated/resolved the `akka-repository` profile but still attempted the placeholder repository URL and failed to transfer the artifact POM before compilation. URL output was redacted. No test ran.
 - Updated decision 0002 to record that the profile is active but the URL remains a placeholder. No settings contents or credentials were inspected; no scaffold tests or deployment.
+
+## 51. User
+
+[INFO] BUILD FAILURE
+-----------------------------------------------------------------------
+[INFO] Total time:  18.058 s
+[INFO] Finished at: 2026-10-07T23:59:48-04:00
+-----------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:testCompile (default-testCompile) on project akka-probe: Fatal error compiling: error: release version 25 not supported -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+
+## 52. Assistant
+
+The compiler error means Maven was using a JDK whose `javac` does not support `--release 25`. In this workspace, a fresh `mvnw --version` check defaulted to Microsoft JDK 21. I explicitly selected installed Temurin 25 and reran the isolated Akka probe: compilation and its typed request/reply/termination test passed (1 test). Maven warned the `akka-repository` profile was inactive, so the artifacts came from the local Maven cache; this verifies the limited Java 25 runtime path, not fresh vendor repository access. I updated probe documentation and the roadmap while leaving combined compatibility, remote access, and licensing open.
+
+## Tool evidence through entry 52
+
+- Before setting `JAVA_HOME`, `.\mvnw.cmd --version` reported Maven 3.9.11 on Microsoft JDK 21.0.8. Temurin 25.0.4.1+1 and its `javac` were present.
+- With `JAVA_HOME` and PATH explicitly pointed to Temurin 25.0.4.1+1, `.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility/akka/pom.xml verify` compiled the test and passed: 1 test, 0 failures/errors/skips. Output warned that `akka-repository` could not be activated; remote repository access therefore remains unverified.
+- Dependency tree listed `akka-actor-typed_2.13`, `akka-actor_2.13`, and `akka-slf4j_2.13` at 2.10.23. These were available in the local Maven cache.
+- Updated `compatibility/README.md`, decision 0002 and the roadmap to distinguish cache-backed Java 25 runtime success from fresh authorized repository resolution. No combined Spring AI/Akka test, scaffold rerun, deployment, or license decision.
+
+## 53. Assistant — final response
+
+Your error is consistent with Maven running under JDK 21, which cannot compile with `--release 25`. In this shell, `mvnw --version` defaulted to Microsoft JDK 21.0.8. With `JAVA_HOME` and `PATH` set to Temurin 25.0.4.1+1, the Akka probe compiled and passed **1 typed request/reply and termination test**; the resolved dependency tree showed Akka 2.10.23. The command I used was:
+
+```powershell
+$env:JAVA_HOME = Join-Path $env:LOCALAPPDATA 'Programs\Eclipse Adoptium\jdk-25.0.4.1+1'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$settings = Join-Path $HOME '.m2\settings.xml'
+.\mvnw.cmd -s $settings -P akka-repository -U -B -ntp -f compatibility\akka\pom.xml verify
+```
+
+Maven warned that the `akka-repository` profile was inactive in the successful run, so this verifies Java 25 runtime compatibility against locally cached artifacts, **not fresh authorized repository access**. That, the combined Spring AI/Akka test, and Akka licensing/runtime-key decisions remain open. Documentation and roadmap evidence are committed as `28ab9bc` on `feature/agentic`; scaffold checks were not repeated.
+
+## 54. User
+
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.217 s
+[INFO] Finished at: 2026-10-08T00:05:03-04:00
+[INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "akka-repository" could not be activated because it does not exist.
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:testCompile (default-testCompile) on project akka-probe: Fatal error compiling: error: release version 25 not supported -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+
+## 55. Assistant
+
+This is the same JDK selection issue: a current default `mvnw --version` again reports Microsoft JDK 21, while Temurin 25 is installed. Maven must be launched from the same PowerShell session after setting `JAVA_HOME` and prepending its `bin` to `PATH`. I added a guard to the compatibility instructions so they stop unless the wrapper confirms Java 25. I reran the guarded Akka command; it passed one typed request/reply/termination test on Temurin 25. The `akka-repository` profile warning is separate: dependencies came from the local Maven cache, so fresh vendor-repository access remains unresolved.
+
+## Tool evidence through entry 55
+
+- Rechecked: default wrapper used Microsoft JDK 21.0.8; installed Temurin `javac` is 25.0.4.1. The repository was `feature/agentic` with a clean worktree before edits.
+- Updated `compatibility/README.md` with a same-session Maven Java 25 version guard and Windows-style paths; clarified that an inactive-profile warning means cache-backed resolution only.
+- Ran the guarded command with `JAVA_HOME` and PATH explicitly set to Temurin 25.0.4.1+1. Wrapper reported Java 25 / Eclipse Adoptium; Akka compatibility test passed (1 test, 0 failures/errors/skips). It still warned that profile `akka-repository` could not be activated. URLs were redacted from output.
+- Updated decision 0002 with the repeated result and blocker. Scaffold checks were not repeated; no combined-stack test or deployment.
+
+## 56. Assistant — final response
+
+The compiler failure recurs because this shell's default Maven JVM is Microsoft JDK 21. Set `JAVA_HOME` and prepend its `bin` to `PATH`, then run the wrapper in the same PowerShell session. I added a Java 25 guard to `compatibility/README.md` and reran the Akka probe with it: **1 test passed** on Temurin 25.0.4.1+1. The profile warning is separate; Akka dependencies were available from the local cache, so authorized remote resolution remains unverified. Commit `9503e73` records the guard and probe result on `feature/agentic`.
+
+## 57. User
+
+could you try to fix
+
+## 58. Assistant
+
+I’ll address both repeat failures with a dedicated Akka probe command: it will select and verify JDK 25 in-process, and the probe POM will recognize the `akka-repository` profile without relying on a profile hidden in Maven settings. The tokenized repository URL will be read only from a local environment variable and redacted from output.
+
+## Tool evidence through entry 58
+
+- Confirmed branch `feature/agentic`; working tree was clean before edits. Rechecked the Akka POM, compatibility guide, `.gitignore`, AGENTS.md and earlier probe evidence.
+- Added `scripts/Test-AkkaCompatibility.ps1`. It selects a valid JDK 25 (explicit `-JavaHome`, existing JAVA_HOME, or the documented Temurin installation), checks `mvnw --version`, supports `-ValidateOnly`, activates the POM-local `akka-repository` profile, invokes Maven with a temporary empty settings file (to avoid stale external profiles), securely prompts for the tokenized repository URL when needed, redacts URLs, and deletes its temporary settings file.
+- Updated `compatibility/akka/pom.xml` with a repository profile whose URL comes only from `AKKA_REPOSITORY_URL`; no token or endpoint was added to source. Updated `compatibility/README.md` with use and credential handling.
+- PowerShell parser check passed. XML parsing confirmed the POM's `akka-repository` ID and `${env.AKKA_REPOSITORY_URL}` source. `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` passed: Maven reported Temurin 25.0.4.1+1 and the POM-local profile active, with no missing-profile warning. This does not resolve dependencies or run Akka's test.
+- Full Akka probe was not rerun: the authorized URL is not available to this process, and no credential was requested or printed. Existing cache-backed Java 25 test result remains valid but fresh repository resolution is still open.
+
+## 59. Assistant — final response
+
+I fixed the repeatable setup errors in the probe path. `scripts/Test-AkkaCompatibility.ps1` now selects and verifies JDK 25, activates the `akka-repository` profile defined by the probe POM, and uses a clean temporary Maven settings file so stale user profiles cannot trigger “profile does not exist.” The repository URL comes from a secure local prompt or `AKKA_REPOSITORY_URL`, never source control or command-line arguments; Maven output URLs are redacted.
+
+Validation: the script parsed successfully, and `-ValidateOnly` passed, confirming Maven uses Temurin 25 and sees the POM profile without warning. That mode does not resolve Akka or run its test. Fresh repository access and Akka licensing remain unresolved because the authorized URL is not available to this process. The previous cache-backed Akka runtime test passed.
+
+Commit outcome: `463f624` (`ai-agentic-testing: fix Akka probe invocation`) contains the script, POM profile, instructions, decision evidence, and this conversation update on `feature/agentic`. A follow-up conversation-only commit records this final handoff.
+
+## 60. User
+
+could you try to fix
+
+## 61. Assistant
+
+I’ll address both repeat failures with a dedicated Akka probe command: it will select and verify JDK 25 in-process, and the probe POM will recognize the `akka-repository` profile without relying on a profile hidden in Maven settings. The tokenized repository URL will be read only from a local environment variable and redacted from output.
+
+## Tool evidence through entry 61
+
+- Confirmed `feature/agentic` and a clean worktree before changes.
+- Added `scripts/Test-AkkaCompatibility.ps1`, which selects JDK 25, checks Maven's JVM, checks the POM-local profile, uses a temporary isolated Maven settings file, prompts securely for the URL if needed, redacts output URLs, and cleans up the temporary settings file and prompted URL environment variable.
+- Added the `akka-repository` profile to `compatibility/akka/pom.xml`; its URL is sourced from `AKKA_REPOSITORY_URL`, with no credential or URL committed. Updated the Windows probe instructions.
+- PowerShell parser check and POM XML validation passed. `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` passed: Maven used Temurin 25.0.4.1+1 and showed the POM-local profile active with no missing-profile warning. Temporary settings cleanup was verified. This validation mode does not resolve Akka dependencies or execute tests.
+- The full probe was not run because the authorized URL is not available in this process. No scaffold checks were repeated; no application behavior or deployment changed.
+
+## 62. Assistant — final response
+
+Fixed the repeatable Java/profile invocation problems in the probe setup. The new `scripts/Test-AkkaCompatibility.ps1` selects JDK 25, verifies the Maven JVM, activates the probe POM's repository profile, and isolates Maven from stale user-settings profiles with a temporary settings file. It takes the authorized URL from a non-echoing secure prompt or local `AKKA_REPOSITORY_URL`, redacts URL output, and cleans up temporary settings.
+
+PowerShell parsing, POM XML checks, and `-ValidateOnly` passed: Maven reported Temurin 25 and the expected profile active without the missing-profile warning. That validation-only mode does not run Akka tests. Fresh repository resolution is still unverified because the authorized URL was unavailable to this process; the previous local-cache Akka runtime test had passed.
+
+## 63. User
+
+how to check akka is setup properly
+
+## 64. Assistant — final response
+
+Answered with the documented check sequence (no commands run, no files besides this log changed):
+
+1. Use JDK 25 for Maven: `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` must report Java 25 and the `akka-repository` profile active with no missing-profile warning.
+2. Full check: set `$env:AKKA_REPOSITORY_URL` locally (tokenized URL from account.akka.io; never commit it) or enter it at the secure prompt, then run `.\scripts\Test-AkkaCompatibility.ps1`. Expect `BUILD SUCCESS` and `Tests run: 1, Failures: 0`.
+3. To prove remote resolution rather than cached artifacts, temporarily move `~\.m2\repository\com\typesafe\akka` aside and rerun; the artifacts must download again.
+4. The `Dev use only` log line is expected without `akka.license-key`; production needs a license-key decision.
+
+## 65. User
+
+Reported `.\scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` output: Maven 3.9.11 on Temurin 25.0.4.1, then a `NativeCommandError` at script line 64 for `mvnw.cmd : WARNING: A terminally deprecated method in sun.misc.Unsafe has been called`.
+
+## 66. Assistant — final response
+
+Cause: Windows PowerShell 5.1 converts native stderr into error records, and the script's `$ErrorActionPreference = 'Stop'` made Maven's harmless JDK 25 `sun.misc.Unsafe` warning terminate the script. Added an `Invoke-NativeCapture` helper that captures native stdout/stderr as text with a local `Continue` preference, used for `javac`, `mvnw --version`, the profile check and `verify`; exit codes are still checked via `$LASTEXITCODE`.
+
+Tool evidence: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\Test-AkkaCompatibility.ps1 -ValidateOnly` exited 0, showed `akka-repository` active and `BUILD SUCCESS`. Full probe (remote Akka resolution) not run; needs the authorized URL.
+
+## 67. User
+
+Pasted `-ValidateOnly` output: Maven 3.9.11 on Temurin 25.0.4.1, JDK 25 `sun.misc.Unsafe` warnings from Maven's Guice (non-fatal), `akka-repository` profile active, `BUILD SUCCESS`.
+
+## 68. Assistant — final response
+
+Confirmed the user's local validation passed: Java 25 selected, POM-local `akka-repository` profile active, no missing-profile warning. The Unsafe warnings come from Maven 3.9.11's bundled Guice and are harmless. Validation does not resolve Akka or run tests; next is the full probe `.\scripts\Test-AkkaCompatibility.ps1` with the authorized URL at the secure prompt, expecting `Tests run: 1, Failures: 0` and `BUILD SUCCESS`.
+
+## 69. User
+
+Pasted full `.\scripts\Test-AkkaCompatibility.ps1` output: Java 25.0.4.1, `akka-repository` profile active, `AkkaCompatibilityTest` Tests run: 1, Failures: 0, Errors: 0, Skipped: 0; `Dev use only` license warning (URL redacted); `BUILD SUCCESS`.
+
+## 70. Assistant — final response
+
+Confirmed the full Akka probe passed on the user's machine under Java 25 with the repository profile active. Caveat recorded: Akka 2.10.23 was already cached and `-ntp` hides downloads, so vendor-repository resolution is still not proven; a cache-isolated rerun closes that gap. Updated decision 0002 (new evidence paragraph; stale "has not compiled" gate corrected) and the ROADMAP P1-01 partial-evidence line. Licensing/runtime-key decision and the combined Spring AI + Akka test remain open.
+
+## 71. User
+
+how to
+
+## 72. Assistant — final response
+
+Interpreted as how to prove vendor-repository resolution. Steps given: move `$HOME\.m2\repository\com\typesafe\akka` to a backup name; run `.\scripts\Test-AkkaCompatibility.ps1` and enter the authorized URL at the prompt; success requires `BUILD SUCCESS`, 1 test passed, and the `com\typesafe\akka\...\2.10.23` folders recreated; then delete the backup (or restore it on failure). No commands were run by the assistant.
+
+## 73. User
+
+Testing Spring AI and Akka together.
+• The Akka licensing and license-key decision.
+
+## 74. Assistant — work performed
+
+- Added `compatibility/combined` (POM with Spring AI 2.0.1 BOM + Ollama starter, Akka Typed 2.10.23, `akka-repository` profile) and `CombinedCompatibilityTest`: Boot context with a typed ActorSystem bean whose actor delegates a `ChatClient` call to a bounded 2-thread executor and replies via `pipeToSelf`; loopback Ollama fixture.
+- Added `-Probe akka|combined` to `scripts/Test-AkkaCompatibility.ps1`.
+- First offline run failed: cached Akka artifacts are tagged with repository ID `akka-repository` (from `_remote.repositories`), which is unavailable without the profile. Two attempts setting a placeholder URL environment variable were refused by the tool environment ("Access is denied"); no URL was used.
+- Offline rerun with `-P akka-repository`: `CombinedCompatibilityTest` Tests run: 1, Failures: 0, Errors: 0, Skipped: 0; `BUILD SUCCESS` on Temurin 25. `dependency:tree`: single `slf4j-api` 2.0.18, `scala-library` 2.13.17, Akka core brings no Jackson.
+- `-Probe combined -ValidateOnly` passed under Windows PowerShell 5.1.
+- Updated compatibility README, decision 0002 (table row, scope note, gate 3) and ROADMAP (new checked combined-probe item; remaining item narrowed to repository-access proof and licensing).
+- Licensing/runtime-key decision requires the user's authorization; asked rather than decided.
+
+## 75. Assistant — question (ask_user)
+
+Asked for the Akka licensing path and runtime-key handling.
+
+## 76. User — answer
+
+license_path=dev-only-now, key_policy=secret-store
+
+## 77. Assistant — final response
+
+Recorded in decision 0002 gate 2 and ROADMAP: Akka is approved for development/non-production use only; the production license decision is deferred and remains a release blocker; `akka.license-key` must be injected from a secret store or environment variable and never committed. Combined Spring AI + Akka probe passed on Java 25 (commit `66a6dbb`). Remaining: cache-isolated vendor-repository proof, deferred production license, then replaceable ports before agent workflows.
+
+## 78. User
+
+The combined test ran offline using Akka files already on this machine. Those files are tagged as downloaded from  akka-repository , but a fresh download hasn't been tested.
+
+## 79. Assistant — work performed and final response
+
+- Removed a duplicated `Invoke-NativeCapture` definition in `scripts/Test-AkkaCompatibility.ps1` (left by the earlier fix's string replace).
+- Added `-IsolatedCache`: runs `verify` with an empty temporary `maven.repo.local`, then asserts the Akka jar exists there with `_remote.repositories` origin `akka-repository`, prints `VERIFIED: ...`, and deletes the temporary repository. The user's `~/.m2` is not modified.
+- Validation: Windows PowerShell parser 0 errors; `-Probe combined -ValidateOnly -IsolatedCache` exit 0 with `akka-repository` profile active; no temporary repository left. Full isolated run not executed — it requires the user's authorized URL.
+- User action: `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` and enter the URL at the secure prompt.
+
+## 80. User
+
+what is the next step
+
+## 81. Assistant — final response
+
+Next steps: (1) user runs `.\scripts\Test-AkkaCompatibility.ps1 -Probe combined -IsolatedCache` with the authorized URL to close the repository-access proof; (2) define replaceable ports and the message/tool/verification contracts (ROADMAP Phase 0 item, line 48) in the application module before any agent code; (3) then "Implement two agents with bounded execution" (ROADMAP line 78). Phase 0 approvals (requirements, capability matrices, AKS target) remain open and are user decisions. Production Akka license stays deferred.
+
+## 82. User
+
+Pasted `-Probe combined -IsolatedCache` output ending at "Using an empty temporary Maven repository; all dependencies will be downloaded." (profile active, BUILD SUCCESS for the profile check; no verify output yet).
+
+## 83. Assistant — work performed and final response
+
+- Diagnosis: not a failure. The script buffered all Maven `verify` output until exit, so the long fresh download looked like a hang.
+- Changed `scripts/Test-AkkaCompatibility.ps1` to stream redacted Maven lines as they arrive; with `-IsolatedCache` it now keeps transfer logs (no `-ntp`, URLs redacted) as download-source evidence and warns the run can take minutes.
+- Validation: Windows PowerShell 5.1 parser 0 errors; a stand-in native command confirmed incremental output, stderr tolerated, URL redaction and exit code (3) preserved. Isolated-cache verify itself still unrun by the assistant (needs the user's URL).
+- User action: let the running command finish (or Ctrl+C and rerun with the updated script) and look for `Downloaded from akka-repository`, `Tests run: 1, Failures: 0`, `BUILD SUCCESS`, `VERIFIED: ...`.
+
+## 84. User
+
+Pasted end of `-Probe combined -IsolatedCache` run: `BUILD SUCCESS`, total time 01:30 min, finished 2026-10-08T00:43:26-04:00, and `VERIFIED: akka-actor-typed_2.13-2.10.23.jar freshly downloaded from repository ID akka-repository.`
+
+## 85. Assistant — final response
+
+Recorded the closed repository-access gate: decision 0002 (table row, new "Fresh repository resolution verified" paragraph, gate 1 done), ROADMAP (new checked P1-01 evidence item; remaining item is only the deferred production-license decision) and compatibility README. No URL recorded. P1-01 technical compatibility evidence is complete for development use; production licensing stays deferred. Next: define replaceable ports and message/tool/verification contracts.
+
+## 86. User
+
+proceed
+
+## 87. Assistant — work performed
+
+- Read technical design §3–5, Phase 1 instructions §3–9 and requirements AGT-02/AGT-06/ARC-01; identified this as P1-05 (done ahead of P1-03/P1-04 because contracts depend on neither — recorded).
+- Added framework-free contracts in `domain/contracts` (26 files): IDs, `ProjectId`, `IdentityContextRef`, `AgentRole`, `ReplyRoute`, `TaskInput`, `Budget`, `TaskEnvelope` (schema v1), `ExecutionStatus` (terminal states never transition), `TaskStatus`, `ErrorCode`, `Classification`, `EvidenceRef`, `EvidencePassage`, `Finding`/`FindingKind`, `TaskResult`, `ToolRef`, `ToolArguments`, `IdempotencyKey`, `ToolRequest`, `ContractValidation`, `ContractViolationException`.
+- Added ports in `application/ports`: `AgentRuntime`, `ModelGateway`, `SearchGateway`, `SourceConnector`, `DelegatedTokenProvider`, `PolicyDecisionService` with request/response types, `AdapterCapabilities`, `PortException`, redacting `DelegatedCredential`.
+- Tests: `ContractValidationTest` (42), `ContractJsonTest` (2), `PortContractTest` (4), `ArchitectureBoundaryTest` (2).
+- First `clean verify`: 4 failures — `Map.of(...).containsKey(null)` throws NPE; fixed by iterating entries. Second `clean verify`: Tests run: 59, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS on Temurin 25.
+- Mutation check: injecting an `org.springframework` reference into a domain file made `ArchitectureBoundaryTest` fail; reverted.
+- Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
+- Docs: new decision 0003; ROADMAP P1-05 item checked with limits; backend-scaffold package-boundary text updated.
+
+## 88. Assistant — final response (pending entry from the previous turn)
+
+P1-05 is committed as `35b4420`. The full build passes on Java 25 with 59 tests (9 existing, 50 new) and BUILD SUCCESS. Added: contracts in `domain/contracts` (task envelope/result, tool request, evidence references and findings, budgets, execution states; fields validated on creation, errors never repeat rejected values; no Spring, Akka, HTTP or JSON-library types) and interfaces in `application/ports` (agent runtime, model, search, source connectors, delegated tokens, policy checks; asynchronous, capability-declaring, delegated tokens fail rather than fall back to shared credentials). The tests cover invalid-input rejection, JSON round-trips, credential redaction and a framework-reference check, which was shown to catch an injected Spring reference. Not done: approval and verification contracts (the Phase 0 item stays open), the budget cost unit and concrete limits. P1-05 was done ahead of P1-03/P1-04 (recorded in decision 0003). Nothing pushed. Next: P1-06 tool registry and permission checks.
+
+## 89. User
+
+proceed next
+
+## 90. Assistant — work performed
+
+- Read Phase 1 instructions §3/§6–7 and requirements SCP-03, SKL-01, TOL-01..05; identified the next task as P1-06.
+- Added a framework-free `tools` package: `ToolDefinition`, `ArgumentSpec`, `ArgumentType`, `TimeWindow`, `ToolRisk`, `ToolInvocationContext` (built from `TaskEnvelope`), `ToolHandler`, `ToolOutcome`/`ToolOutcomeStatus`, `ToolRegistry`, `DelegationTarget`, `DelegatedSourceAccess`, `SearchKnowledgeTool`, `QueryMockLogsTool`, `InspectMockHealthTool` and `PhaseOneReadTools` (READ-only, exactly three tools).
+- Tests: `ToolDefinitionTest` (24), `ToolRegistryTest` (21) and `ReadToolsTest` (9); `ArchitectureBoundaryTest` now also covers `tools` (+1).
+- First `clean verify`: test compile error (a helper named `capabilities(String)` was shadowed by the fakes' `capabilities()`); renamed it. Second `clean verify`: Tests run: 114, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS on Temurin 25.
+- Mutation check: bypassing the invocation policy gate made 4 tests fail (`ToolRegistryTest` and `ReadToolsTest`); the source was restored.
+- Health smoke check not rerun (HTTP/config unchanged). No dependencies added.
+- Docs: new decision 0004; ROADMAP P1-06 tool part checked, skill registry and real-adapter wiring left open; backend-scaffold package text updated.
+## 91. Assistant — final response (pending entry from the previous turn)
+
+The tool half of P1-06 is committed as `c707ea2` (not pushed): a read-only tool registry with only `searchKnowledge`, `queryMockLogs` and `inspectMockHealth`, usable only by the Investigation agent; draft/write tools are refused at startup. Before a tool runs, unknown tools, wrong roles, bad or smuggled arguments, expired deadlines and policy denials stop the call; a policy outage refuses it. After it runs, cross-project results are discarded, each evidence source is rechecked and output is capped; source access uses the user's own delegated credentials with no shared fallback. 114 tests pass on Java 25 (55 new); disabling the policy check made 4 tests fail. Still open: skill registry (SKL-01..03), real policy/identity/search adapters (P1-04/P1-07/P1-08), tool-call auditing, concurrency limits and provisional limits (decision 0004). Suggested next: P1-04.
+
+## 92. User
+
+what is tool registry and how its implemented in this project
+
+## 93. Assistant — final response
+
+Explained the tool registry concept and its implementation in `src/main/java/io/agenticawithakka/tools` (definitions, registry gate, read tools, delegated access, tests). No code changes.
+## 94. User
+
+will continue tomorrow
+
+## 95. Assistant — final response
+
+Session paused. State: branch `feature/agentic`, worktree clean, nothing pushed. Latest work: P1-06 tool part (`c707ea2`), 114 tests passing. Resume options: P1-04 (identity, project policy, mock delegated connectors; recommended) or the P1-06 skill registry. Open decisions are listed in decisions 0003 and 0004.
