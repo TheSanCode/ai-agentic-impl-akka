@@ -8,6 +8,8 @@ Requirements v0.7 and the phased design are documented. Phase 0 is **In progress
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
+For a proposed, dependency-aware execution order of remaining work, see the [autonomous development plan](implementation/autonomous-development-plan.md). The plan does not change roadmap status or authorize external actions.
+
 ## Phase overview
 
 | Phase | Goal | Status | Dependency |
