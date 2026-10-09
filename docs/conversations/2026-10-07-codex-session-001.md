@@ -358,6 +358,97 @@ I checked the current environment before retrying Akka. Authorized repository ac
 
 configured
 
+## 37. User — restored history
+
+Review the current repository and report what has been completed.
+Do not modify files.
+
+1. Read AGENTS.md, docs/ROADMAP.md and recent conversation records.
+2. Inspect git status, uncommitted changes and recent commits.
+3. Separate:
+   - Implemented and verified
+   - Implemented but unverified
+   - Partially completed
+   - Blocked or not started
+4. For completed work, cite file paths and available build/test evidence.
+5. Identify changes made since the previous Codex handoff.
+   If authorship cannot be established, say so.
+6. Report whether Spring AI and Akka dependencies and integration tests
+   are present, and whether repository-access/licensing decisions remain open.
+7. Recommend the next single task.
+
+Do not treat roadmap checkboxes or existing code alone as proof that tests passed.
+
+## 38. User — restored history
+
+Implement P1-04 identity, project-policy, and mock delegated-source adapters, keeping the production Akka-license decision separate and open
+
+## 39. User — restored history
+
+Review the current repository and report what has been completed.
+Do not modify files.
+
+1. Read AGENTS.md, docs/ROADMAP.md and recent conversation records.
+2. Inspect git status, uncommitted changes and recent commits.
+3. Separate:
+   - Implemented and verified
+   - Implemented but unverified
+   - Partially completed
+   - Blocked or not started
+4. For completed work, cite file paths and available build/test evidence.
+5. Identify changes made since the previous Codex handoff.
+   If authorship cannot be established, say so.
+6. Report whether Spring AI and Akka dependencies and integration tests
+   are present, and whether repository-access/licensing decisions remain open.
+7. Recommend the next single task.
+
+Do not treat roadmap checkboxes or existing code alone as proof that tests passed.
+
+## 40. User — restored history
+
+commit
+
+## 41. User — restored history
+
+Review the current repository and report what has been completed.
+Do not modify files.
+
+1. Read AGENTS.md, docs/ROADMAP.md and recent conversation records.
+2. Inspect git status, uncommitted changes and recent commits.
+3. Separate:
+   - Implemented and verified
+   - Implemented but unverified
+   - Partially completed
+   - Blocked or not started
+4. For completed work, cite file paths and available build/test evidence.
+5. Identify changes made since the previous Codex handoff.
+   If authorship cannot be established, say so.
+6. Report whether Spring AI and Akka dependencies and integration tests
+   are present, and whether repository-access/licensing decisions remain open.
+7. Recommend the next single task.
+
+Do not treat roadmap checkboxes or existing code alone as proof that tests passed.
+
+## 42. User — restored history
+
+proceed with  Implement Spring Security OIDC/JWT verification and map the verified principal to the identity-context store, with issuer, audience, signature, expiry, and project-binding tests
+
+The prompt summarized the intervening assistant turns from this restored history rather than providing them verbatim. They are not reconstructed here.
+
+## Tool evidence through entry 42
+
+- Work continued on `feature/agentic`. The pre-existing P1-04 implementation was already committed as `834203a`; OIDC files were uncommitted when this task resumed.
+- Added Spring Boot's managed `spring-boot-starter-oauth2-resource-server`, nested OIDC and server-side project-grant configuration, stateless Spring Security JWT validation, project access lookup by validated issuer+subject, and identity-context creation bounded by JWT expiry. Unconfigured business routes deny access; partial OIDC configuration fails startup.
+- Added unit tests for RSA/JWK signature verification, wrong issuer, wrong audience and expired tokens; identity mapping tests cover missing membership, project binding, separate resource/source grants and rejecting non-JWT principals. Added a real HTTP resource-server integration test with generated RSA keys and a loopback JWKS fixture; it verifies successful mapping and HTTP 401 on invalid signature.
+- The initial focused test attempt failed due to duplicate `anyRequest` authorization configuration, mock JWT test auth state, fixture time mismatch and an invalid expired-token fixture. These were fixed; a subsequent focused run passed 16 tests.
+- Final command on Temurin 25.0.4.1+1: `.\mvnw.cmd -B -ntp clean verify` — **131 tests, 0 failures, 0 errors, 0 skipped; BUILD SUCCESS**. `git diff --check` passed. Updated Markdown local-link validation passed. Git emitted LF-to-CRLF warnings for existing Windows working-copy behavior.
+- Updated README, roadmap and decision records 0005/0006 with verified scope and limits. Real-source OBO and the separate Akka production licensing/runtime-key decision remain open. No deployment or push occurred.
+- Implementation and documentation changes remain uncommitted; only the required conversation-only milestone commit may be created. The final assistant response has not yet been appended.
+
+## 43. Assistant — final response
+
+Pending; append the exact final response on the next turn. This record remains incomplete.
+
 ## 37. Assistant
 
 The probe still resolved only from Maven Central after your confirmation. I retried with `-U` to bypass Maven's cached not-found response, but dependency resolution again failed before compilation. This execution environment still has no `$HOME\.m2\settings.xml` or Akka repository/license environment variables, so the vendor repository configuration is not active for this Maven process. No Akka test ran; Java 25 compatibility remains unverified locally.
