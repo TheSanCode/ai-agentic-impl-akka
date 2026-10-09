@@ -1007,3 +1007,22 @@ $env:Path = "$env:JAVA_HOME/bin;$env:Path"
 The focused OIDC integration test starts the application on a random local port, creates a short-lived test-signed JWT and local JWKS, then exercises authenticated investigation creation, status and result retrieval, and cross-project/other-subject denial. Most recently, that focused suite passed 35 tests and `clean verify` passed 144. The health script only checks that the packaged server responds; it does not prove the investigation API works—the integration test does.
 
 For a manual API demo, you need an OIDC issuer/JWKS and a server-side principal/project/source grant; the example is in [decision 0007](../decisions/0007-process-local-investigation-workflow.md). The default configuration does not grant project access. The browser UI, model-driven investigation, Akka runtime, real-source OBO and restart-safe/multi-instance execution are not implemented, so those cannot yet be verified. No tests were run for this informational turn.
+
+## 120. User (2026-10-09 03:02:14 -04:00)
+
+can I clone and run in my office workspace?
+
+## 121. Assistant — final response
+
+Yes. The `feature/agentic` branch is on `origin` through the local investigation workflow commit `8ce96b68ad27356f675a99d6e0f7fbc568e632d2`; I verified the remote branch ref. Clone it in the office workspace, subject to your GitHub access:
+
+```powershell
+git clone --branch feature/agentic https://github.com/TheSanCode/ai-agentic-impl-akka.git
+Set-Location ai-agentic-impl-akka
+$env:JAVA_HOME = Join-Path $env:LOCALAPPDATA 'Programs\Eclipse Adoptium\jdk-25.0.4.1+1'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+.\mvnw.cmd -B -ntp clean verify
+.\scripts\Test-BackendHealth.ps1
+```
+
+You need Temurin JDK 25 and Maven Central access for the first wrapper/dependency downloads; no database, container, model, Akka runtime or deployment is needed for these checks. The tests cover the synthetic workflow and authorization. A hands-on authenticated API demo additionally needs an OIDC issuer/JWKS and server-side project/source grant, as documented in decision 0007. Port 8080 must be free for the health script. No tests were run on the office machine.
