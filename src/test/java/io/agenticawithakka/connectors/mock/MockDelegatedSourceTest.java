@@ -85,7 +85,7 @@ class MockDelegatedSourceTest {
         var shortLived = fixture(Set.of(SUBJECT), Duration.ofSeconds(1), Clock.fixed(NOW, ZoneOffset.UTC));
         var expiring = acquire(shortLived.provider(), shortLived.identity(), ALPHA, SOURCE, "logs.read");
         var laterConnector = connector(
-                Clock.fixed(NOW.plusSeconds(2), ZoneOffset.UTC), Set.of(SUBJECT));
+                shortLived.store(), Clock.fixed(NOW.plusSeconds(2), ZoneOffset.UTC), Set.of(SUBJECT));
         assertFailure(laterConnector.read(request(shortLived.identity(), ALPHA), expiring),
                 ErrorCode.AUTHENTICATION_REQUIRED);
     }
@@ -106,6 +106,18 @@ class MockDelegatedSourceTest {
         assertFailure(fixture.connector().read(request(fixture.identity(), ALPHA), wrongScope), ErrorCode.DENIED);
     }
 
+    @Test
+    void sourceRechecksCurrentProjectMembershipAfterCredentialWasIssued() {
+        var fixture = fixture(Set.of(SUBJECT), Duration.ofMinutes(5), Clock.fixed(NOW, ZoneOffset.UTC));
+        var credential = acquire(fixture.provider(), fixture.identity(), ALPHA, SOURCE, "logs.read");
+
+        assertThat(fixture.store().revokeProjectMembership(fixture.identity(), ALPHA)).isTrue();
+
+        assertFailure(
+                fixture.connector().read(request(fixture.identity(), ALPHA), credential),
+                ErrorCode.DENIED);
+    }
+
     private static Fixture fixture(Set<String> sourceAcl, Duration identityLifetime, Clock clock) {
         var store = new MockIdentityContextStore(clock, identityLifetime);
         var identity = store.registerAuthenticatedSubject(
@@ -118,10 +130,11 @@ class MockDelegatedSourceTest {
                 Duration.ofMinutes(5),
                 SIGNING_KEY,
                 Map.of(SOURCE, Set.of("logs.read"), "mock-other", Set.of("other.read")));
-        return new Fixture(store, identity, provider, connector(clock, sourceAcl));
+        return new Fixture(store, identity, provider, connector(store, clock, sourceAcl));
     }
 
-    private static MockSourceConnector connector(Clock clock, Set<String> sourceAcl) {
+    private static MockSourceConnector connector(
+            MockIdentityContextStore identities, Clock clock, Set<String> sourceAcl) {
         var evidence = new EvidencePassage(
                 new EvidenceRef(SOURCE, "v1", ALPHA, Classification.INTERNAL, NOW, "permission:alpha-logs"),
                 "synthetic timeout in billing");
@@ -131,7 +144,8 @@ class MockDelegatedSourceTest {
                 SIGNING_KEY,
                 Map.of("queryLogs", "logs.read"),
                 Map.of("queryLogs", List.of(evidence)),
-                Map.of(ALPHA, sourceAcl));
+                Map.of(ALPHA, sourceAcl),
+                identities);
     }
 
     private static SourceReadRequest request(IdentityContextRef identity, ProjectId project) {

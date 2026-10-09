@@ -44,7 +44,7 @@ public final class MockProjectPolicyService implements PolicyDecisionService {
             case READ_EVIDENCE -> completed(canReadEvidence(context, request)
                     ? PolicyDecision.permit()
                     : PolicyDecision.deny("evidence.denied"));
-            case START_EXECUTION, READ_EXECUTION, CANCEL_EXECUTION, DISCOVER_TOOL, INVOKE_TOOL ->
+            case START_EXECUTION, RESUME_EXECUTION, READ_EXECUTION, CANCEL_EXECUTION, DISCOVER_TOOL, INVOKE_TOOL ->
                 completed(PolicyDecision.permit());
         };
     }

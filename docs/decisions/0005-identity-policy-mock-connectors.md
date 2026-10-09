@@ -28,3 +28,7 @@ No dependency was added. The packaged-JAR health smoke check was not rerun becau
 - HMAC credentials are a synthetic local protocol only. They do not prove Keycloak token exchange or support for any enterprise source. Real connectors still need their own delegated authorization, consent, expiry and revocation tests. P1-04 therefore remains partial.
 - The adapters use in-memory grants and fixtures; they do not establish persistent membership, policy administration, audit, revocation propagation or multi-instance consistency.
 - Akka's production license decision remains separate and open. This work neither changes nor implies approval of the development/non-production-only policy recorded in [decision 0002](0002-integration-probes.md).
+
+## Follow-up
+
+Spring Security OIDC/JWT validation and server-side `(iss, sub)` project mapping were implemented and verified afterward; see [decision 0006](0006-oidc-jwt-authentication.md). This does not implement real-source OBO or resolve the separate Akka production-license decision.

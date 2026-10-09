@@ -14,6 +14,7 @@ import io.agenticawithakka.domain.contracts.ProjectId;
 import io.agenticawithakka.domain.contracts.ToolArguments;
 import io.agenticawithakka.domain.contracts.ToolRef;
 import io.agenticawithakka.domain.contracts.ToolRequest;
+import io.agenticawithakka.domain.contracts.TaskEnvelope;
 import io.agenticawithakka.security.MockIdentityContextStore;
 import io.agenticawithakka.security.MockProjectPolicyService;
 import java.nio.charset.StandardCharsets;
@@ -73,6 +74,33 @@ class MockAdaptersIntegrationTest {
         assertThat(noSourceGrant.status()).isEqualTo(ToolOutcomeStatus.DENIED);
     }
 
+    @Test
+    void membershipRevokedAfterTaskCreationDeniesItsNextToolInvocation() {
+        var fixture = fixture(Set.of(SOURCE));
+        var first = fixture.registry().invoke(
+                        fixture.context(),
+                        request(fixture.context(), Map.of(
+                                "service", "billing",
+                                "from", NOW.minusSeconds(60).toString(),
+                                "to", NOW.toString())))
+                .toCompletableFuture()
+                .join();
+        assertThat(first.status()).isEqualTo(ToolOutcomeStatus.SUCCEEDED);
+
+        assertThat(fixture.identities().revokeProjectMembership(fixture.identity(), ALPHA)).isTrue();
+        var afterRevocation = fixture.registry().invoke(
+                        fixture.context(),
+                        request(fixture.context(), Map.of(
+                                "service", "billing",
+                                "from", NOW.minusSeconds(60).toString(),
+                                "to", NOW.toString())))
+                .toCompletableFuture()
+                .join();
+
+        assertThat(afterRevocation.status()).isEqualTo(ToolOutcomeStatus.DENIED);
+        assertThat(afterRevocation.passages()).isEmpty();
+    }
+
     private static Fixture fixture(Set<String> sourceGrants) {
         var clock = Clock.fixed(NOW, java.time.ZoneOffset.UTC);
         var identities = new MockIdentityContextStore(clock, Duration.ofMinutes(5));
@@ -92,22 +120,29 @@ class MockAdaptersIntegrationTest {
                 KEY,
                 Map.of("queryLogs", "logs.read"),
                 Map.of("queryLogs", List.of(evidence)),
-                Map.of(ALPHA, Set.of("alpha-member")));
+                Map.of(ALPHA, Set.of("alpha-member")),
+                identities);
         var base = ContractFixtures.envelope();
-        var context = new ToolInvocationContext(
+        var envelope = new TaskEnvelope(
+                base.schemaVersion(),
                 base.executionId(),
                 base.taskId(),
+                base.correlationId(),
                 ALPHA,
                 identity,
+                base.deadline(),
                 AgentRole.INVESTIGATION,
-                NOW.plusSeconds(120));
+                base.input(),
+                base.replyRoute(),
+                base.budget());
+        var context = ToolInvocationContext.from(envelope);
         var registry = new ToolRegistry(
                 List.of(new QueryMockLogsTool(
                         connector, tokens, new DelegationTarget(SOURCE, Set.of("logs.read")), clock)),
                 Set.of(ToolRisk.READ),
                 policy,
                 clock);
-        return new Fixture(context, registry);
+        return new Fixture(context, registry, identities, identity, envelope);
     }
 
     private static ToolRequest request(ToolInvocationContext context, Map<String, String> arguments) {
@@ -119,5 +154,10 @@ class MockAdaptersIntegrationTest {
                 new IdempotencyKey("exec-1:task-1:queryMockLogs:0001"));
     }
 
-    private record Fixture(ToolInvocationContext context, ToolRegistry registry) {}
+    private record Fixture(
+            ToolInvocationContext context,
+            ToolRegistry registry,
+            MockIdentityContextStore identities,
+            io.agenticawithakka.domain.contracts.IdentityContextRef identity,
+            TaskEnvelope envelope) {}
 }

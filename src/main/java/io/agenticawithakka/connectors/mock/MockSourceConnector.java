@@ -9,6 +9,7 @@ import io.agenticawithakka.domain.contracts.ContractValidation;
 import io.agenticawithakka.domain.contracts.ErrorCode;
 import io.agenticawithakka.domain.contracts.EvidencePassage;
 import io.agenticawithakka.domain.contracts.ProjectId;
+import io.agenticawithakka.security.MockIdentityContextStore;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +29,7 @@ public final class MockSourceConnector implements SourceConnector {
     private final Map<String, String> requiredScopesByOperation;
     private final Map<String, List<EvidencePassage>> passagesByOperation;
     private final Map<ProjectId, Set<String>> allowedSubjects;
+    private final MockIdentityContextStore identities;
 
     public MockSourceConnector(
             String sourceId,
@@ -35,9 +37,11 @@ public final class MockSourceConnector implements SourceConnector {
             byte[] signingKey,
             Map<String, String> requiredScopesByOperation,
             Map<String, List<EvidencePassage>> passagesByOperation,
-            Map<ProjectId, Set<String>> allowedSubjects) {
+            Map<ProjectId, Set<String>> allowedSubjects,
+            MockIdentityContextStore identities) {
         this.sourceId = ContractValidation.matches(sourceId, "sourceId", ContractValidation.REFERENCE);
         this.clock = ContractValidation.required(clock, "clock");
+        this.identities = ContractValidation.required(identities, "identities");
         this.codec = new MockDelegationTokenCodec(signingKey);
         ContractValidation.required(requiredScopesByOperation, "requiredScopesByOperation");
         if (requiredScopesByOperation.isEmpty() || requiredScopesByOperation.size() > 64) {
@@ -80,8 +84,7 @@ public final class MockSourceConnector implements SourceConnector {
         allowedSubjects.forEach((project, subjects) -> {
             ContractValidation.required(project, "allowedSubjects.project");
             Set<String> validated = ContractValidation.set(subjects, "allowedSubjects.subjects", 256);
-            validated.forEach(subject -> ContractValidation.matches(
-                    subject, "allowedSubjects.subject", ContractValidation.REFERENCE));
+            validated.forEach(subject -> ContractValidation.text(subject, "allowedSubjects.subject", 768));
             acl.put(project, validated);
         });
         this.allowedSubjects = Map.copyOf(acl);
@@ -128,6 +131,14 @@ public final class MockSourceConnector implements SourceConnector {
                     || !claims.projectId().equals(request.projectId())
                     || !claims.identityContextRef().equals(request.identityContextRef())) {
                 throw new PortException(ErrorCode.DENIED, "mock delegated credential does not match the request");
+            }
+            var identity = identities.resolve(claims.identityContextRef())
+                    .orElseThrow(() ->
+                            new PortException(ErrorCode.AUTHENTICATION_REQUIRED, "authenticated identity is unavailable"));
+            if (!identity.subject().equals(claims.subject())
+                    || !identity.belongsTo(request.projectId())
+                    || !identity.mayAccessSource(request.projectId(), sourceId)) {
+                throw new PortException(ErrorCode.DENIED, "current identity or source access is not granted");
             }
             if (!allowedSubjects.getOrDefault(request.projectId(), Set.of()).contains(claims.subject())) {
                 throw new PortException(ErrorCode.DENIED, "mock source access is not granted");

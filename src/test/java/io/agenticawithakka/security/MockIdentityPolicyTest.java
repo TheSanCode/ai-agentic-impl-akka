@@ -42,6 +42,10 @@ class MockIdentityPolicyTest {
                 .isFalse();
         assertThat(decide(policy, alice, BETA, PolicyAction.START_EXECUTION, "execution:1").permitted())
                 .isFalse();
+        assertThat(decide(policy, alice, BETA, PolicyAction.READ_EVIDENCE, "arg:service:billing").permitted())
+                .isFalse();
+        assertThat(decide(policy, alice, ALPHA, PolicyAction.RESUME_EXECUTION, "execution:1").permitted())
+                .isTrue();
         assertThat(decide(policy, projectAdmin, ALPHA, PolicyAction.READ_EXECUTION, "execution:1").permitted())
                 .isTrue();
         assertThat(decide(policy, projectAdmin, ALPHA, PolicyAction.READ_EVIDENCE, "mock-logs").permitted())
@@ -73,6 +77,32 @@ class MockIdentityPolicyTest {
                 "alice", Map.of(ALPHA, new MockIdentityContextStore.ProjectAccess(Set.of(), Set.of())));
         revocableStore.revoke(revocable);
         assertThat(revocableStore.resolve(revocable)).isEmpty();
+    }
+
+    @Test
+    void projectMembershipRevocationImmediatelyDeniesSubsequentOperations() {
+        var store = new MockIdentityContextStore(CLOCK, Duration.ofMinutes(5));
+        var identity = store.registerAuthenticatedSubject(
+                "alice",
+                Map.of(
+                        ALPHA,
+                        new MockIdentityContextStore.ProjectAccess(Set.of("service:billing"), Set.of("mock-logs")),
+                        BETA,
+                        new MockIdentityContextStore.ProjectAccess(Set.of(), Set.of())));
+        var policy = new MockProjectPolicyService(store);
+
+        assertThat(decide(policy, identity, ALPHA, PolicyAction.READ_EXECUTION, "execution:existing").permitted())
+                .isTrue();
+        assertThat(store.revokeProjectMembership(identity, ALPHA)).isTrue();
+        assertThat(store.revokeProjectMembership(identity, ALPHA)).isFalse();
+        assertThat(decide(policy, identity, ALPHA, PolicyAction.INVOKE_TOOL, "tool:queryMockLogs:1").permitted())
+                .isFalse();
+        assertThat(decide(policy, identity, ALPHA, PolicyAction.READ_EXECUTION, "execution:existing").permitted())
+                .isFalse();
+        assertThat(decide(policy, identity, ALPHA, PolicyAction.READ_EVIDENCE, "mock-logs").permitted())
+                .isFalse();
+        assertThat(decide(policy, identity, BETA, PolicyAction.READ_EXECUTION, "execution:other").permitted())
+                .isTrue();
     }
 
     private static io.agenticawithakka.application.ports.PolicyDecision decide(

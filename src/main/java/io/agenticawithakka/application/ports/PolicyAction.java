@@ -3,6 +3,7 @@ package io.agenticawithakka.application.ports;
 /** Operations subject to policy decisions in Phase 1. */
 public enum PolicyAction {
     START_EXECUTION,
+    RESUME_EXECUTION,
     READ_EXECUTION,
     CANCEL_EXECUTION,
     DISCOVER_TOOL,

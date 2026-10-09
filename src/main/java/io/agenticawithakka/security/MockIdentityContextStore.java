@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * In-memory local-lab identity context store. Callers may register a subject only after an
@@ -35,7 +36,14 @@ public final class MockIdentityContextStore {
     /** Creates an opaque server-held reference for a principal already authenticated upstream. */
     public IdentityContextRef registerAuthenticatedSubject(
             String subject, Map<ProjectId, ProjectAccess> projectAccess) {
-        ContractValidation.matches(subject, "subject", ContractValidation.REFERENCE);
+        return registerAuthenticatedSubject(subject, projectAccess, clock.instant().plus(lifetime));
+    }
+
+    /** Creates a context bounded by both the store lifetime and the caller's credential expiry. */
+    public IdentityContextRef registerAuthenticatedSubject(
+            String subject, Map<ProjectId, ProjectAccess> projectAccess, Instant credentialExpiresAt) {
+        ContractValidation.text(subject, "subject", 768);
+        ContractValidation.required(credentialExpiresAt, "credentialExpiresAt");
         ContractValidation.required(projectAccess, "projectAccess");
         if (projectAccess.isEmpty() || projectAccess.size() > 32) {
             throw new IllegalArgumentException("projectAccess must contain between 1 and 32 projects");
@@ -45,7 +53,13 @@ public final class MockIdentityContextStore {
             ContractValidation.required(project, "projectAccess.project");
             ContractValidation.required(permissions, "projectAccess.permissions");
         });
-        var context = new IdentityContext(subject, access, clock.instant().plus(lifetime));
+        Instant now = clock.instant();
+        Instant storeExpiry = now.plus(lifetime);
+        Instant expiresAt = credentialExpiresAt.isBefore(storeExpiry) ? credentialExpiresAt : storeExpiry;
+        if (!now.isBefore(expiresAt)) {
+            throw new IllegalArgumentException("credentialExpiresAt must be in the future");
+        }
+        var context = new IdentityContext(subject, access, expiresAt);
         IdentityContextRef reference;
         do {
             byte[] bytes = new byte[32];
@@ -73,6 +87,26 @@ public final class MockIdentityContextStore {
         contexts.remove(reference);
     }
 
+    /** Removes one project grant immediately from an existing identity context. */
+    public boolean revokeProjectMembership(IdentityContextRef reference, ProjectId projectId) {
+        ContractValidation.required(reference, "reference");
+        ContractValidation.required(projectId, "projectId");
+        var revoked = new AtomicBoolean();
+        contexts.computeIfPresent(reference, (ignored, context) -> {
+            if (!clock.instant().isBefore(context.expiresAt())) {
+                return null;
+            }
+            if (!context.belongsTo(projectId)) {
+                return context;
+            }
+            var remaining = new java.util.HashMap<>(context.projectAccess());
+            remaining.remove(projectId);
+            revoked.set(true);
+            return new IdentityContext(context.subject(), remaining, context.expiresAt());
+        });
+        return revoked.get();
+    }
+
     public record ProjectAccess(Set<String> resources, Set<String> sources) {
         public ProjectAccess {
             resources = ContractValidation.set(resources, "resources", 256);
@@ -89,7 +123,7 @@ public final class MockIdentityContextStore {
     public record IdentityContext(
             String subject, Map<ProjectId, ProjectAccess> projectAccess, Instant expiresAt) {
         public IdentityContext {
-            ContractValidation.matches(subject, "subject", ContractValidation.REFERENCE);
+            ContractValidation.text(subject, "subject", 768);
             projectAccess = Map.copyOf(projectAccess);
             ContractValidation.required(expiresAt, "expiresAt");
         }

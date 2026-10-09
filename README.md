@@ -72,7 +72,7 @@ Start with the [Windows backend scaffold guide](docs/implementation/backend-scaf
 
 ## Implementation instructions
 
-Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold is tested, and local mock identity-context, policy and delegated-source adapters are implemented; OIDC/JWT authentication, real-source OBO, agents, production source adapters, frontend and full lab acceptance remain pending. See the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for compatibility evidence and the still-open Akka production-license decision.
+Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold, local mock identity-context/policy/delegated-source adapters, and OIDC/JWT verification with server-side identity mapping are implemented and tested; real-source OBO, agents, production source adapters, frontend and full lab acceptance remain pending. See the [OIDC/JWT decision and evidence](docs/decisions/0006-oidc-jwt-authentication.md), the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions, and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for compatibility evidence and the still-open Akka production-license decision.
 
 ## Roadmap
 
@@ -107,4 +107,4 @@ Example request:
 
 ## Current status
 
-Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold builds on Temurin 25 with 9 passing tests and a verified packaged-JAR health check. Local mock identity-context, project-policy and delegated-source adapters are implemented, but OIDC/JWT authentication, real-source OBO, agent workflows, seeded lab infrastructure, frontend and full lab acceptance remain pending. No deployment has occurred.
+Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold builds on Temurin 25 with 9 passing tests and a verified packaged-JAR health check. Local mock identity-context, project-policy, delegated-source adapters and OIDC/JWT authentication with server-side project mapping are implemented and tested. Real-source OBO, agent workflows, seeded lab infrastructure, frontend and full lab acceptance remain pending. No deployment has occurred.

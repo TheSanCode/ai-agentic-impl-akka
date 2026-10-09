@@ -60,7 +60,7 @@ The mock source shall independently validate its intended delegated credential a
 
 Keep secrets out of source control, prompts, task payloads and logs. Provide example configuration containing placeholders. Recheck access at tool invocation and evidence retrieval. Limit the lab to interactive ingestion unless a separate ingestion identity policy is agreed.
 
-The local in-memory identity, policy and mock-source adapters are simulations only; they do not validate OIDC/JWT credentials or prove vendor token exchange. See [decision 0005](../decisions/0005-identity-policy-mock-connectors.md) for the implemented boundary and remaining acceptance work.
+The local in-memory identity, policy and mock-source adapters remain simulations and do not prove vendor token exchange. Spring Security OIDC/JWT validation, server-side project grants, and local authorization revalidation gates are implemented; see [decision 0006](../decisions/0006-oidc-jwt-authentication.md). Real-source OBO remains open.
 
 ## 7 Agent and tool behavior
 
@@ -115,7 +115,7 @@ Provide a local setup guide with exact prerequisites, start/seed/demo/stop proce
 
 Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 remains Planned until implementation begins, and Complete only after mandatory exit criteria pass. This instructions document alone completes neither phase.
 
-P1-01 and P1-02 bootstrap work is recorded in the dependency and scaffold decisions. Select remaining implementation work from the current [roadmap](../ROADMAP.md); local mock adapters do not close OIDC, real-source OBO, actor recovery, operational-write or business-review acceptance.
+P1-01 and P1-02 bootstrap work is recorded in the dependency and scaffold decisions. Select remaining implementation work from the current [roadmap](../ROADMAP.md); local OIDC authorization gates do not close real-source OBO, durable actor recovery, operational-write or business-review acceptance.
 
 ## 13 Phase 1 background execution additions
 
