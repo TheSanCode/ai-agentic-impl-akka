@@ -977,3 +977,13 @@ The focused security/workflow suite now passes, including the JWT-protected HTTP
 ## 115. Assistant — final response pending
 
 The final response for this work unit is pending and will be appended on the next turn.
+
+## 116. Assistant — commit outcome
+
+Committed the local investigation workflow and documentation on `feature/agentic` as `af0e30144a8b308a74c0c875473ea497f6e6ef40` (`ai-agentic-testing: feat(workflow): add local investigation workflow`). This commit is local and was not pushed.
+
+## 117. Assistant — final response
+
+Implemented and committed the local read-only investigation workflow on `feature/agentic` as `af0e30144a8b308a74c0c875473ea497f6e6ef40` (local only; not pushed). It adds the bounded process-local Coordinator/Investigation flow and authenticated create/status/result/cancel/resume APIs, with per-tool, project, and stored-evidence authorization rechecks. The final focused suite passed (35 tests), `clean verify` passed (144 tests), `git diff --check` passed, and changed Markdown links resolve.
+
+Execution state and revocation remain process-local: restart loses tasks/results, replicas do not share state, and the 500-record cap has no eviction policy. Real-source OBO and production Akka licensing remain open; no protected writes or deployment were added. The next scoped task is redacted execution tracing with tests that verify trace redaction.
