@@ -1,6 +1,7 @@
 # Autonomous Development Plan
 
-Date: 9 October 2026  
+Date: 9 October 2026
+
 Status: Proposed execution order; not an authorization to make external changes
 
 ## Purpose and current baseline
