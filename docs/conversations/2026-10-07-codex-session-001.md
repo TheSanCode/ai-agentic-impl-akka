@@ -881,3 +881,54 @@ commit
 - Confirmed the authorized branch is `feature/agentic`, the P1-04 implementation and documentation are the current unstaged work, there are no staged changes, and `git diff --check` passes.
 - Committed the P1-04 implementation, tests, documentation, and this conversation update as one commit. The prior conversation-only commit `3898910` was preserved.
 - The preceding implementation verification remains Temurin 25 `.\mvnw.cmd -B -ntp clean verify`: 122 tests passed, 0 failures/errors/skips. No test rerun was needed for the commit-only request.
+
+## 105. Assistant — final response from the previous turn
+
+Implemented Spring Security OIDC/JWT verification and identity mapping. Tokens are checked for signature, issuer, audience, and expiry; verified principals are mapped by `(iss, sub)` to server-configured project/resource/source grants. Identity contexts expire no later than the JWT, and unconfigured business routes are denied by default.
+
+**Verification:** `.\mvnw.cmd -B -ntp clean verify` passed on Temurin 25: **131 tests, no failures or errors**. Tests cover issuer, audience, signature, expiry, project binding, and the HTTP bearer-token flow using a local JWKS fixture.
+
+The roadmap and decision records were updated. Real-source OBO and Akka’s production licensing/runtime-key decision remain open. Implementation changes are **uncommitted**; only the required conversation record was committed as `65a2de8` on `feature/agentic` (not pushed). The record notes that this final response is pending for the next turn.
+
+## 106. User (2026-10-09T01:27:47.847-04:00)
+
+Review and commit the verified security implementation on feature/agentic.
+Preserve unrelated changes and exclude secrets and build artifacts.
+Append the pending conversation response before recording this turn.
+
+Then check authorization enforcement at:
+- Each tool invocation
+- Background-task resume
+- Stored results, evidence and citations
+- Cross-project resource access
+
+Add meaningful tests for any uncovered boundary, including membership
+revocation after task creation and after completion.
+
+Keep real-source OBO and Akka production licensing open.
+Do not deploy. Report the commit SHA, checks and remaining gaps.
+
+## 107. Assistant — work performed
+
+- Confirmed branch `feature/agentic`. Before edits, the prior OIDC/JWT implementation was uncommitted; `65a2de8` was the conversation-only commit from the preceding turn.
+- Reviewed current requirements, design, roadmap, conversation record, tool registry and identity/policy/source adapters. The repository has no durable task runtime, resume flow, result persistence or result HTTP API.
+- Added per-project membership revocation to the local identity-context store. Tool invocations and the mock source now recheck current membership/source grants; the mock connector validates current identity-context subject and project/source access even when a delegated credential was already issued.
+- Added `RESUME_EXECUTION` policy action and `TaskResumeAuthorizer` to check the stored task's subject, deadline and current project membership before returning an envelope with the current identity-context reference.
+- Added `StoredTaskResultAuthorizer` to check task ownership, current membership, project binding and each evidence source before releasing results/citations. These are tested gates for trusted server-loaded records, not wired endpoints or durable workflows.
+- Added tests for membership revocation after task creation, after delegated credential issuance and after task completion; also covered another subject and cross-project evidence. Existing tool registry tests cover per-invocation checks and evidence-output reauthorization.
+- The first targeted build stopped at test compilation because the fixture helper did not receive the identity store; fixed the helper call. Targeted suite then passed: **35 tests, zero failures/errors/skips**.
+- Temurin 25 `.\mvnw.cmd -B -ntp clean verify` passed: **137 tests, zero failures/errors/skips**. `git diff --cached --check`, staged-file exclusion check and updated Markdown local-link check passed.
+- Committed the implementation, tests and related documentation as `86856f6` (`ai-agentic-testing: feat(security): add OIDC and authorization revalidation`) on `feature/agentic`. No build artifacts, local config or secrets were staged. Only the conversation file remained modified after the commit.
+- Nothing was pushed or deployed. Real-source OBO and Akka production licensing/runtime-key decisions remain open. Revocation is in-memory and instance-local; persistence/distributed revocation and actual resume/result workflows remain open.
+
+## 108. Assistant — final response
+
+Committed the verified security implementation on `feature/agentic` as `86856f6` (`ai-agentic-testing: feat(security): add OIDC and authorization revalidation`). The commit includes the OIDC/JWT implementation, authorization revalidation gates, tests and related documentation; build artifacts, local settings and secrets were excluded. Nothing was pushed or deployed.
+
+Authorization is checked on every tool call and again before evidence release; the mock source now rechecks current identity, membership and source grants when using a credential. Added tests for revocation after task creation, after delegated credential issuance and after completion, plus cross-project results and different-user access. `.\mvnw.cmd -B -ntp clean verify` passed on Temurin 25: **137 tests, zero failures or errors**. The targeted authorization suite passed 35 tests; staged whitespace/file-scope and documentation link checks passed.
+
+**Remaining gaps:** There is no durable background-task runtime/resume flow or stored-result HTTP/persistence layer; the new resume and result authorizers are tested gates for trusted server-loaded records, not wired workflows. Revocation remains in-memory and instance-local. Real-source OBO and Akka production licensing/runtime-key decisions remain open.
+
+## 109. Assistant — final response pending
+
+The preceding final response has been recorded verbatim above. This conversation record is not marked complete.
