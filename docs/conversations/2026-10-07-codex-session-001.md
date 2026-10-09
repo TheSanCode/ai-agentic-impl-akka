@@ -987,3 +987,23 @@ Committed the local investigation workflow and documentation on `feature/agentic
 Implemented and committed the local read-only investigation workflow on `feature/agentic` as `af0e30144a8b308a74c0c875473ea497f6e6ef40` (local only; not pushed). It adds the bounded process-local Coordinator/Investigation flow and authenticated create/status/result/cancel/resume APIs, with per-tool, project, and stored-evidence authorization rechecks. The final focused suite passed (35 tests), `clean verify` passed (144 tests), `git diff --check` passed, and changed Markdown links resolve.
 
 Execution state and revocation remain process-local: restart loses tasks/results, replicas do not share state, and the 500-record cap has no eviction policy. Real-source OBO and production Akka licensing remain open; no protected writes or deployment were added. The next scoped task is redacted execution tracing with tests that verify trace redaction.
+
+## 118. User (2026-10-09 02:59:57 -04:00)
+
+as far as developed can I verify?
+
+## 119. Assistant — final response
+
+Yes. You can verify the implemented local API and synthetic investigation workflow. From PowerShell at the repository root, select Temurin JDK 25 and run:
+
+```powershell
+$env:JAVA_HOME = Join-Path $env:LOCALAPPDATA 'Programs/Eclipse Adoptium/jdk-25.0.4.1+1'
+$env:Path = "$env:JAVA_HOME/bin;$env:Path"
+.\mvnw.cmd -B -ntp '-Dtest=ProcessLocalInvestigationServiceTest,OidcResourceServerIntegrationTest,MockDelegatedSourceTest,ToolRegistryTest' test
+.\mvnw.cmd -B -ntp clean verify
+.\scripts\Test-BackendHealth.ps1
+```
+
+The focused OIDC integration test starts the application on a random local port, creates a short-lived test-signed JWT and local JWKS, then exercises authenticated investigation creation, status and result retrieval, and cross-project/other-subject denial. Most recently, that focused suite passed 35 tests and `clean verify` passed 144. The health script only checks that the packaged server responds; it does not prove the investigation API works—the integration test does.
+
+For a manual API demo, you need an OIDC issuer/JWKS and a server-side principal/project/source grant; the example is in [decision 0007](../decisions/0007-process-local-investigation-workflow.md). The default configuration does not grant project access. The browser UI, model-driven investigation, Akka runtime, real-source OBO and restart-safe/multi-instance execution are not implemented, so those cannot yet be verified. No tests were run for this informational turn.
