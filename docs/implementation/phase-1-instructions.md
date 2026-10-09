@@ -27,7 +27,7 @@ Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources.
 | P1-01 | Inspect repository, confirm build/runtime decisions and record license inventory. | Decision record lists resolved versions, tested compatibility and remaining exceptions. |
 | P1-02 | Initialize application, wrapper, package boundaries, configuration validation and health endpoint. | Clean checkout builds and starts using documented prerequisites. |
 | P1-03 | Add local infrastructure profiles and synthetic fixtures. | Repeatable setup seeds both projects and mock sources without enterprise credentials. |
-| P1-04 | Implement trusted identity, project policy and mock delegated connector access. | Missing credentials, wrong audience/scope and unauthorized project access fail. |
+| P1-04 | Implement trusted identity, project policy and mock delegated connector access. | Local adapter tests reject missing identity, wrong audience/scope and unauthorized project/resource access; document OIDC and source-specific OBO limits. |
 | P1-05 | Define versioned agent/task/tool/evidence contracts. | Schema and argument validation tests reject malformed inputs. |
 | P1-06 | Implement skill/tool registry and permission checks. | Only permitted read tools are discoverable and executable. |
 | P1-07 | Implement ingestion and hybrid search with evidence citations. | Expected documents are found; restricted chunks never enter model context. |
@@ -59,6 +59,8 @@ Configure OIDC for the local API and enforce project membership server-side. Val
 The mock source shall independently validate its intended delegated credential and scopes. Bind token acquisition to authenticated context, not model arguments. Demonstrate source-specific audience rejection and user-level access differences. If actual token exchange cannot be configured, explicitly label the connector test as a simulation and leave the exchange acceptance check incomplete.
 
 Keep secrets out of source control, prompts, task payloads and logs. Provide example configuration containing placeholders. Recheck access at tool invocation and evidence retrieval. Limit the lab to interactive ingestion unless a separate ingestion identity policy is agreed.
+
+The local in-memory identity, policy and mock-source adapters are simulations only; they do not validate OIDC/JWT credentials or prove vendor token exchange. See [decision 0005](../decisions/0005-identity-policy-mock-connectors.md) for the implemented boundary and remaining acceptance work.
 
 ## 7 Agent and tool behavior
 
@@ -113,7 +115,7 @@ Provide a local setup guide with exact prerequisites, start/seed/demo/stop proce
 
 Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 remains Planned until implementation begins, and Complete only after mandatory exit criteria pass. This instructions document alone completes neither phase.
 
-The next action is P1-01 followed by repository scaffolding. Keep production OBO, actor recovery, operational writes and business review pending until their later implementation and acceptance evidence exist.
+P1-01 and P1-02 bootstrap work is recorded in the dependency and scaffold decisions. Select remaining implementation work from the current [roadmap](../ROADMAP.md); local mock adapters do not close OIDC, real-source OBO, actor recovery, operational-write or business-review acceptance.
 
 ## 13 Phase 1 background execution additions
 

@@ -1,2 +1,2 @@
-/** Reserved for synthetic source adapters; no sources are connected. */
+/** Synthetic delegated source adapters; they do not prove real-vendor OBO support. */
 package io.agenticawithakka.connectors.mock;
