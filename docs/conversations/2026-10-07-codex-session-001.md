@@ -1026,3 +1026,13 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 ```
 
 You need Temurin JDK 25 and Maven Central access for the first wrapper/dependency downloads; no database, container, model, Akka runtime or deployment is needed for these checks. The tests cover the synthetic workflow and authorization. A hands-on authenticated API demo additionally needs an OIDC issuer/JWKS and server-side project/source grant, as documented in decision 0007. Port 8080 must be free for the health script. No tests were run on the office machine.
+
+## 122. User (2026-10-09 03:03:06 -04:00)
+
+how about software dependencies hope all are open source
+
+## 123. Assistant — final response
+
+For the application you can currently build and run, the key point is that **Akka and Spring AI are not runtime dependencies** in the root `pom.xml`; they exist only in separate compatibility probes. The current application uses Spring Boot/Spring Security and other dependencies whose licenses are listed in [decision 0001](../decisions/0001-backend-scaffold.md). That inventory identifies Apache-2.0, MIT, EPL-1.0 and LGPL-2.1 components, among others; it is explicitly not a complete transitive-license audit or SBOM.
+
+One planned dependency needs special attention: **Akka is BSL-1.1, source-available but not an OSI-approved open-source license**. Its production licensing decision remains open, so the planned complete system cannot yet be described as entirely open source. Spring AI is Apache-2.0, but any chosen model/provider has separate terms. For office use, have your organization review the dependency tree and licenses against its policy; the current local workflow does not require Akka, Spring AI or model downloads.
