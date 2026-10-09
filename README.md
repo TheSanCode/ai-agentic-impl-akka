@@ -16,9 +16,9 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 
 ## Browser web application
 
-The application is accessible through an authenticated browser interface on desktop and mobile. Users can select a project, start an investigation, view background progress and evidence, and cancel permitted tasks.
+The target is an authenticated browser interface on desktop and mobile. The current local investigation slice exposes authenticated APIs only; a browser interface, project-selection screens and accessibility checks are not implemented.
 
-Later workflow phases add protected-action approvals, manual business validation and the admin eagle view. The first local lab includes a working browser investigation interface; it is not API-only. Messaging channels complement this interface.
+Later workflow phases add protected-action approvals, manual business validation and the admin eagle view. Messaging channels complement the planned interface.
 
 ## WhatsApp Telegram and SMS
 
@@ -28,9 +28,9 @@ Unlinked users must securely link their account first. Login, MFA, protected app
 
 ## Background tasks and agent loops
 
-Investigations run asynchronously and return an execution ID, so users can close the browser and check progress later. Agents repeat reasoning, authorized tool calls and result evaluation within step, time, token and retry limits. They pause for authentication, approvals or business review rather than holding a thread open.
+The current Phase 1 API runs a deterministic, read-only Coordinator/Investigation sequence over synthetic knowledge, logs and health adapters. It returns an execution ID; authorized status, result, cancellation and same-subject reauthentication/resume routes work only while the same process remains running. Tool steps, elapsed time, active work, queue size and retained execution count are bounded. It does not call a model or run Akka actors.
 
-Phase 1 demonstrates this while the application stays running. Phase 2 adds persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery. Authorization is rechecked during execution; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
+Execution state, checkpoints and revocation are process-local. A restart loses all executions; another application instance does not share or observe this state. Phase 2 must add persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery before those capabilities can be claimed. Authorization is rechecked during execution and before stored evidence is returned; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
 
 ## Access and control
 
@@ -38,7 +38,7 @@ Phase 1 demonstrates this while the application stays running. Phase 2 adds pers
 - Each user sees only authorized project and source information. Admin status does not bypass source permissions.
 - Interactive source calls act on behalf of the user using the source's supported delegated authentication. Unsupported sources cannot silently use shared accounts.
 - Authentication, authorization, search and vector storage use open-source components. Other licenses and exceptions require review.
-- Execution state survives application restarts. Audit records show who requested, approved and performed actions.
+- Restart-safe execution state and audit records are production requirements, not capabilities of the current local process-only implementation.
 
 ## Production requirements
 
@@ -72,7 +72,7 @@ Start with the [Windows backend scaffold guide](docs/implementation/backend-scaf
 
 ## Implementation instructions
 
-Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold, local mock identity-context/policy/delegated-source adapters, and OIDC/JWT verification with server-side identity mapping are implemented and tested; real-source OBO, agents, production source adapters, frontend and full lab acceptance remain pending. See the [OIDC/JWT decision and evidence](docs/decisions/0006-oidc-jwt-authentication.md), the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions, and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for compatibility evidence and the still-open Akka production-license decision.
+Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for remaining local lab tasks. The backend scaffold, local identity/policy/mock-source adapters, OIDC/JWT verification and process-local deterministic read-only investigation API are implemented and tested. Model-driven agent behavior, real-source OBO, production source adapters, frontend and full lab acceptance remain pending. See [decision 0007](docs/decisions/0007-process-local-investigation-workflow.md) for workflow boundaries, the [OIDC/JWT decision](docs/decisions/0006-oidc-jwt-authentication.md), the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions, and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for compatibility evidence and the still-open Akka production-license decision.
 
 ## Roadmap
 
@@ -107,4 +107,4 @@ Example request:
 
 ## Current status
 
-Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold builds on Temurin 25 with 9 passing tests and a verified packaged-JAR health check. Local mock identity-context, project-policy, delegated-source adapters and OIDC/JWT authentication with server-side project mapping are implemented and tested. Real-source OBO, agent workflows, seeded lab infrastructure, frontend and full lab acceptance remain pending. No deployment has occurred.
+Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold, mock identity/policy/delegated-source adapters, OIDC/JWT authentication and a process-local read-only investigation API are implemented and tested. The workflow uses deterministic synthetic evidence rather than AI inference; it has no durable recovery, multi-instance state, UI or full-lab setup. Real-source OBO, production Akka licensing/runtime-key decisions and full lab acceptance remain open. No deployment has occurred.

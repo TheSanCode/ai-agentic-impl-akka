@@ -29,14 +29,14 @@ final class MockDelegationTokenCodec {
         String scopeValue = String.join(",", claims.scopes().stream().sorted().toList());
         String payload = String.join(
                 "\n",
-                claims.subject(),
-                claims.projectId().value(),
-                claims.identityContextRef().value(),
-                claims.audience(),
-                Long.toString(claims.expiresAtEpochSecond()),
-                scopeValue);
+                encode(claims.subject()),
+                encode(claims.projectId().value()),
+                encode(claims.identityContextRef().value()),
+                encode(claims.audience()),
+                encode(Long.toString(claims.expiresAtEpochSecond())),
+                encode(scopeValue));
         byte[] payloadBytes = payload.getBytes(StandardCharsets.UTF_8);
-        return "v1."
+        return "v2."
                 + Base64.getUrlEncoder().withoutPadding().encodeToString(payloadBytes)
                 + "."
                 + Base64.getUrlEncoder().withoutPadding().encodeToString(sign(payloadBytes));
@@ -48,7 +48,7 @@ final class MockDelegationTokenCodec {
         }
         try {
             String[] parts = token.split("\\.", -1);
-            if (parts.length != 3 || !parts[0].equals("v1")) {
+            if (parts.length != 3 || !parts[0].equals("v2")) {
                 throw denied();
             }
             byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
@@ -56,17 +56,17 @@ final class MockDelegationTokenCodec {
             if (!MessageDigest.isEqual(sign(payload), signature)) {
                 throw denied();
             }
-            String[] fields = new String(payload, StandardCharsets.UTF_8).split("\n", -1);
+            String[] fields = new String(payload, StandardCharsets.US_ASCII).split("\n", -1);
             if (fields.length != 6 || fields[5].isBlank()) {
                 throw denied();
             }
-            var scopes = Set.copyOf(Arrays.asList(fields[5].split(",", -1)));
+            var scopes = Set.copyOf(Arrays.asList(decode(fields[5]).split(",", -1)));
             return new Claims(
-                    fields[0],
-                    new ProjectId(fields[1]),
-                    new IdentityContextRef(fields[2]),
-                    fields[3],
-                    Long.parseLong(fields[4]),
+                    decode(fields[0]),
+                    new ProjectId(decode(fields[1])),
+                    new IdentityContextRef(decode(fields[2])),
+                    decode(fields[3]),
+                    Long.parseLong(decode(fields[4])),
                     scopes);
         } catch (IllegalArgumentException e) {
             throw denied();
@@ -81,6 +81,14 @@ final class MockDelegationTokenCodec {
         } catch (java.security.GeneralSecurityException e) {
             throw new IllegalStateException("HmacSHA256 is unavailable", e);
         }
+    }
+
+    private static String encode(String value) {
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String decode(String value) {
+        return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
     }
 
     private static PortException denied() {

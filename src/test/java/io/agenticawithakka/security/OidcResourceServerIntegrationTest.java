@@ -31,6 +31,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(OidcResourceServerIntegrationTest.IdentityProbe.class)
@@ -78,24 +79,81 @@ class OidcResourceServerIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(401);
     }
 
+    @Test
+    void investigationApiReturnsAuthorizedExecutionAndRechecksProjectBinding() throws Exception {
+        String accessToken = token(signingKey);
+        var created = send(
+                "POST",
+                "/api/projects/alpha/investigations",
+                accessToken,
+                "{\"instruction\":\"Investigate billing connection timeouts\"}");
+        assertThat(created.statusCode()).isEqualTo(202);
+        var json = JsonMapper.builder().build().readTree(created.body());
+        String executionId = json.get("executionId").asString();
+        assertThat(json.get("statusUrl").asString()).isEqualTo("/api/executions/" + executionId);
+
+        HttpResponse<String> status = null;
+        for (int attempt = 0; attempt < 100; attempt++) {
+            status = send("GET", "/api/executions/" + executionId, accessToken, null);
+            if (status.body().contains("\"SUCCEEDED\"")
+                    || status.body().contains("\"PARTIAL\"")
+                    || status.body().contains("\"FAILED\"")) {
+                break;
+            }
+            Thread.sleep(20);
+        }
+        assertThat(status).isNotNull();
+        assertThat(status.statusCode()).isEqualTo(200);
+        var result = send("GET", "/api/executions/" + executionId + "/result", accessToken, null);
+        assertThat(result.statusCode()).isEqualTo(200);
+        assertThat(result.body()).contains("mock-logs", "Synthetic billing log");
+
+        var anotherSubject = send(
+                "GET",
+                "/api/executions/" + executionId,
+                tokenFor(signingKey, "mallory"),
+                null);
+        assertThat(anotherSubject.statusCode()).isEqualTo(403);
+
+        var crossProject = send(
+                "POST",
+                "/api/projects/beta/investigations",
+                accessToken,
+                "{\"instruction\":\"Investigate beta\"}");
+        assertThat(crossProject.statusCode()).isEqualTo(403);
+    }
+
     private HttpResponse<String> send(String token) throws Exception {
-        var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/test/identity"))
-                .header("Authorization", "Bearer " + token)
-                .GET()
-                .build();
+        return send("GET", "/api/test/identity", token, null);
+    }
+
+    private HttpResponse<String> send(String method, String path, String token, String body) throws Exception {
+        var builder = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
+                .header("Authorization", "Bearer " + token);
+        if (body == null) {
+            builder.method(method, HttpRequest.BodyPublishers.noBody());
+        } else {
+            builder.header("Content-Type", "application/json")
+                    .method(method, HttpRequest.BodyPublishers.ofString(body));
+        }
+        var request = builder.build();
         try (var client = HttpClient.newHttpClient()) {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         }
     }
 
     private static String token(RSAKey key) {
+        return tokenFor(key, "alice");
+    }
+
+    private static String tokenFor(RSAKey key, String subject) {
         var jwkSource = new com.nimbusds.jose.jwk.source.ImmutableJWKSet<SecurityContext>(
                 new JWKSet(key));
         var encoder = new NimbusJwtEncoder(jwkSource);
         Instant now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer(ISSUER)
-                .subject("alice")
+                .subject(subject)
                 .audience(List.of(AUDIENCE))
                 .issuedAt(now.minusSeconds(1))
                 .expiresAt(now.plusSeconds(60))

@@ -932,3 +932,48 @@ Authorization is checked on every tool call and again before evidence release; t
 ## 109. Assistant — final response pending
 
 The preceding final response has been recorded verbatim above. This conversation record is not marked complete.
+
+## 110. User (timestamp unavailable)
+
+Implement the local read-only investigation workflow.
+
+1. Inspect existing contracts and code; preserve established boundaries.
+2. Add Coordinator and Investigation execution.
+3. Wire authorization into tool calls and result retrieval.
+4. Return an execution ID with authorized status/result APIs.
+5. Support bounded loops, cancellation and authentication expiry.
+6. Test cross-project denial and revocation during execution.
+7. Clearly document process-local state and restart limitations.
+
+Do not claim durable recovery or multi-instance revocation.
+Do not add protected writes or deploy.
+Update the roadmap and conversation record from verified results.
+
+## 111. Assistant — commentary
+
+I’m continuing from the prior inspection, first checking the authorized branch, current worktree, project constraints, and existing conversation record so implementation preserves the established contracts and unrelated changes.
+
+## 112. Assistant — commentary
+
+The repository has contracts and authorization gates but no runtime, result store, or API, so this slice will add a bounded in-process coordinator and read-only investigator, explicitly seeded mock adapters, and authenticated create/status/result/cancel/resume endpoints. It will remain a local single-process demonstration—not an Akka runtime, durable queue, browser UI, or real-source OBO implementation.
+
+## 113. Assistant — commentary
+
+The focused security/workflow suite now passes, including the JWT-protected HTTP flow. It also exposed and fixed a delimiter bug: verified `(issuer, subject)` values contain a newline, so mock credential claims now encode each field independently under a bumped token format version. I’m reviewing edge cases and documenting only the tested process-local capabilities before running the full suite.
+
+## 114. Assistant — work performed
+
+- Confirmed `feature/agentic` and an initially clean worktree, two commits ahead of `origin/feature/agentic`; no unrelated edits were present.
+- Added a process-local Coordinator and deterministic Investigation role. It calls only `searchKnowledge` and `queryMockLogs` through the existing `ToolRegistry`; the seeded evidence is synthetic and there is no model call, hypothesis generation, protected write or Akka runtime.
+- Added bounded asynchronous execution with four cumulative tool steps, a 45-second deadline, 32 active executions, a two-worker/32-entry queue and a 500-record process-local retention cap. Added authenticated create, status, result, cancellation and same-subject authentication-resume endpoints returning server-generated execution IDs.
+- Reused the existing OIDC principal/project mapping, project policy, per-tool authorization and stored-result authorizer. Status/result/cancel/resume check current subject and membership; evidence/citations are reauthorized at result retrieval. Missing identity context at the tool policy gate now maps to `AwaitingAuthentication`.
+- Added HTTP tests for bearer-token execution creation/status/result and project/subject denial. Added tests for cancellation before and during a pending read, membership revocation during execution and after completion, expired identity resume and cumulative step exhaustion.
+- The first focused runs failed: the OIDC-composite subject contains a newline, which the previous mock credential delimiter parser split into extra fields; also, an expired context's `identity.unavailable` policy denial was reported as a generic denial rather than an authentication wait. Fixed the credential encoding with independently Base64-encoded fields under format `v2`, and mapped that policy reason to `AUTHENTICATION_REQUIRED`.
+- Final focused command `.\mvnw.cmd -B -ntp '-Dtest=ProcessLocalInvestigationServiceTest,OidcResourceServerIntegrationTest,MockDelegatedSourceTest,ToolRegistryTest' test` passed: 35 tests, no failures/errors/skips.
+- Final Temurin 25 command `.\mvnw.cmd -B -ntp clean verify` passed: 144 tests, no failures/errors/skips; `BUILD SUCCESS`. `git diff --check` passed, and all changed Markdown relative links resolve.
+- Updated README, Phase 1 implementation instructions, roadmap and decision 0007. Documentation states state/revocation are instance-local, restart loses executions/results, no multi-instance behavior is claimed, the 500-record cap has no eviction, browser UI and tracing remain open, and real-source OBO/Akka production licensing stay separate and unresolved. No deployment occurred.
+- Changes are on `feature/agentic`; local commit outcome will be recorded after the commit completes.
+
+## 115. Assistant — final response pending
+
+The final response for this work unit is pending and will be appended on the next turn.

@@ -32,17 +32,33 @@ public final class StoredTaskResultAuthorizer {
         ContractValidation.required(storedEnvelope, "storedEnvelope");
         ContractValidation.required(currentIdentityContextRef, "currentIdentityContextRef");
         ContractValidation.required(result, "result");
+        var originalIdentity = identities.resolve(storedEnvelope.identityContextRef())
+                .orElse(null);
+        if (originalIdentity == null) {
+            return failed(ErrorCode.AUTHENTICATION_REQUIRED, "task identity is unavailable");
+        }
+        return authorizeRead(storedEnvelope, currentIdentityContextRef, result, originalIdentity.subject());
+    }
+
+    /** Authorizes a result after reauthentication using the trusted original principal key. */
+    public CompletionStage<TaskResult> authorizeRead(
+            TaskEnvelope storedEnvelope,
+            IdentityContextRef currentIdentityContextRef,
+            TaskResult result,
+            String originalSubject) {
+        ContractValidation.required(storedEnvelope, "storedEnvelope");
+        ContractValidation.required(currentIdentityContextRef, "currentIdentityContextRef");
+        ContractValidation.required(result, "result");
+        ContractValidation.text(originalSubject, "originalSubject", 768);
         if (!storedEnvelope.taskId().equals(result.taskId())) {
             return failed(ErrorCode.DENIED, "result does not belong to the requested task");
         }
-        var originalIdentity = identities.resolve(storedEnvelope.identityContextRef())
-                .orElse(null);
         var currentIdentity = identities.resolve(currentIdentityContextRef)
                 .orElse(null);
-        if (originalIdentity == null || currentIdentity == null) {
+        if (currentIdentity == null) {
             return failed(ErrorCode.AUTHENTICATION_REQUIRED, "task identity is unavailable");
         }
-        if (!originalIdentity.subject().equals(currentIdentity.subject())) {
+        if (!originalSubject.equals(currentIdentity.subject())) {
             return failed(ErrorCode.DENIED, "task results are restricted to their original subject");
         }
 

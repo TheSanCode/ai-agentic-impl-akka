@@ -7,12 +7,13 @@ public enum ExecutionStatus {
     AWAITING_APPROVAL,
     AWAITING_AUTHENTICATION,
     AWAITING_BUSINESS_REVIEW,
+    PARTIAL,
     SUCCEEDED,
     FAILED,
     CANCELLED;
 
     public boolean isTerminal() {
-        return this == SUCCEEDED || this == FAILED || this == CANCELLED;
+        return this == PARTIAL || this == SUCCEEDED || this == FAILED || this == CANCELLED;
     }
 
     public boolean canTransitionTo(ExecutionStatus next) {

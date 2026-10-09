@@ -4,7 +4,7 @@ Last reviewed: 9 October 2026
 
 ## Current position
 
-Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes, versioned domain contracts/ports, a policy-gated read-only tool registry and P1-04 local identity/policy/mock-source adapters with OIDC/JWT verification and identity mapping; real-source OBO remains open. Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes, versioned domain contracts/ports, a policy-gated read-only tool registry, OIDC/JWT identity mapping and a process-local deterministic investigation API over synthetic sources. The local workflow has no model calls, durable recovery, multi-instance state or browser UI; real-source OBO remains open. Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -75,18 +75,19 @@ Deliverables:
 - [ ] Finish P1-04 source integration: real-source OBO, consent and revocation are not implemented; mock adapters are not vendor token exchange.
 - [x] P1-05 versioned task/tool/evidence contracts and Phase 1 ports (AgentRuntime, ModelGateway, SearchGateway, SourceConnector, DelegatedTokenProvider, PolicyDecisionService); 50 new validation/serialization/boundary tests pass (59 total); approval/verification contracts deferred; [decision](decisions/0003-domain-contracts-and-ports.md).
 - [x] P1-06 tool part: read-only tool registry exposing only searchKnowledge, queryMockLogs and inspectMockHealth. Discovery and invocation are gated by role, argument schema and policy (tool and resource arguments), with deadline/timeout, bounded retries and per-source evidence re-authorization before release. Verified with test fakes: 55 new tests pass (114 total); [decision](decisions/0004-tool-registry-and-permissions.md).
-- [ ] P1-06 skill registry (SKL-01..03), plus wiring the tool registry to real policy, identity and search adapters (P1-04, P1-07, P1-08).
+- [ ] P1-06 skill registry (SKL-01..03) and production policy/identity/search adapters; process-local wiring to the mock adapters is implemented under P1-08; see [decision 0007](decisions/0007-process-local-investigation-workflow.md).
 - [ ] Finish P1-01 with the deferred Akka production-license decision (current policy: dev/non-production only; key injected from a secret store); artifact availability is not runtime compatibility.
 - [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
 - [ ] Test browser reconnect, safe rendering and primary keyboard navigation
 - [ ] Seed synthetic runbooks and mock logs
-- [ ] Implement two agents with bounded execution
-- [ ] Return background execution IDs and support authorized disconnect/reconnect progress
-- [ ] Test cumulative loop budgets, authentication expiry and cancellation
-- [ ] Add project and user authorization
-- [ ] Return cited evidence and test prompt-injection resistance
+- [x] Implement bounded local Coordinator and Investigation roles using registered read tools; deterministic synthetic workflow only, no model or Akka runtime; tested in `ProcessLocalInvestigationServiceTest`.
+- [x] Return execution IDs and provide same-process authorized status/result reconnect, cancellation and same-subject authentication resume; HTTP bearer flow tested in `OidcResourceServerIntegrationTest`.
+- [x] Test cumulative step exhaustion, authentication expiry/resume, cancellation before and during a read, cross-project access and membership revocation during execution and after completion; focused suite passes (35 tests); see [decision 0007](decisions/0007-process-local-investigation-workflow.md).
+- [x] Enforce project/user authorization at create, status, cancel, resume, each tool call and evidence retrieval; supported by OIDC integration and authorization-revalidation tests.
+- [x] Return reauthorized evidence citations; prompt-injection resistance remains untested.
+- [ ] Add redacted execution tracing and verify trace redaction.
 
 Exit criteria: An authorized investigation succeeds; cross-project access is denied and runaway tasks terminate.
 

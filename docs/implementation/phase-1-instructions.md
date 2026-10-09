@@ -31,8 +31,8 @@ Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources.
 | P1-05 | Define versioned agent/task/tool/evidence contracts. | Schema and argument validation tests reject malformed inputs. |
 | P1-06 | Implement skill/tool registry and permission checks. | Only permitted read tools are discoverable and executable. |
 | P1-07 | Implement ingestion and hybrid search with evidence citations. | Expected documents are found; restricted chunks never enter model context. |
-| P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Delegation produces a structured result; deadlines, cancellation and budgets stop work. |
-| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | API tests and trace inspection establish correct states and no credential leakage. |
+| P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Local deterministic roles invoke only registered read tools; limits, cancellation and reauthentication are covered by workflow tests. No model or Akka runtime is used. |
+| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | Create/status/result/cancel/resume APIs are implemented and HTTP-tested; redacted execution tracing remains open. |
 | P1-10 | Run actual-model evaluation and negative end-to-end scenarios. | Versioned results identify successes, failures and missing evidence. |
 | P1-11 | Document setup, demo, limitations and update roadmap from evidence. | Another developer can reproduce the lab; unchecked gates remain visible. |
 
@@ -64,15 +64,15 @@ The local in-memory identity, policy and mock-source adapters remain simulations
 
 ## 7 Agent and tool behavior
 
-Coordinator validates the request and delegates a scoped task with execution ID, task ID, project, trusted identity reference and deadline. Investigation retrieves documents and queries mock logs, then returns evidence references and structured findings. Coordinator combines results and returns facts separately from hypotheses.
+The process-local implementation now has a deterministic Coordinator delegating to Investigation. It creates a scoped task with execution ID, task ID, project, trusted identity reference and deadline; Investigation calls `searchKnowledge` and `queryMockLogs` through `ToolRegistry`, and returns authorized evidence references and source citations. The current implementation reports retrieval facts only: it does not call a model, infer a hypothesis or claim an action was performed. See [decision 0007](../decisions/0007-process-local-investigation-workflow.md).
 
 Use illustrative typed contracts such as StartInvestigation, InvestigateEvidence, EvidenceFound, TaskFailed and CancelInvestigation. If using Akka, adapt specialist replies to coordinator commands and return asynchronous model/API completions into the actor mailbox. Do not block dispatchers or infer durable delivery from tell/ask.
 
 Register only searchKnowledge, queryMockLogs and inspectMockHealth as read operations. Validate arguments, allowed time ranges, source IDs, output size and deadlines. The policy service decides access before the tool adapter runs. Unknown or forbidden tools fail explicitly.
 
-Represent Queued, Running, AwaitingAuthentication, Succeeded, Failed and Cancelled states. Expired delegated access stops new calls and requires reauthentication by the same subject/project before continuing within the original deadline. Approval and business-review states may exist in contracts but are not implemented workflows in this phase. Persist execution summaries if appropriate; do not claim restart-safe continuation until Phase 2 recovery tests pass.
+The API reports Queued, Running, AwaitingAuthentication, Partial, Succeeded, Failed and Cancelled states. Expired delegated access stops further tool calls and requires reauthentication by the same subject/project before continuing within the original deadline and cumulative step budget. Approval and business-review states may exist in contracts but are not implemented workflows in this phase. Execution envelopes and results exist only in process memory; do not claim restart-safe continuation until Phase 2 recovery tests pass.
 
-Set configurable step, time, token, concurrency and output limits. Budget values are lab settings documented with the selected model. Cancellation prevents new operations; late results cannot change a terminal cancelled state.
+The local implementation bounds each execution to four tool steps and 45 seconds, active execution count to 32, the worker queue to 32, and retained execution records to 500. The current tool flow is read-only and does not consume model tokens. Cancellation prevents additional tool operations; a late in-flight read cannot overwrite a terminal cancelled state. These fixed local limits are not production sizing decisions.
 
 ## 8 Retrieval and model integration
 
@@ -84,9 +84,9 @@ Use a mock model for deterministic workflow tests, then a real local model to as
 
 ## 9 API contract
 
-Propose POST /api/projects/{projectId}/investigations to create an execution, GET on its execution resource for results and POST on its cancel subresource. Return a server-generated execution ID; use consistent Denied, InvalidInput, Unsupported, Conflict, RateLimited and DependencyUnavailable errors.
+The API implements `POST /api/projects/{projectId}/investigations` to create an execution and return HTTP 202 with a server-generated execution ID and status/result URLs. `GET /api/executions/{executionId}` returns authorized status; `GET /api/executions/{executionId}/result` returns the reauthorized result and citations; `POST` on `/cancel` cancels; and `POST` on `/resume` resumes an authentication-paused task. The routes require a verified bearer JWT and server-configured project grants; default configuration denies business routes.
 
-All read/cancel operations recheck identity and ownership/project permissions. Recheck current source access before returning stored evidence, summaries or citations; withhold protected content if its permission currency cannot be established. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A minimal browser interface is mandatory for this slice after the API flow works; the complete admin dashboard and six-role topology arrive in later phases.
+All operations recheck subject ownership and current project membership; result retrieval additionally reauthorizes every cited source. Unknown execution IDs are hidden as denials. Responses do not include credentials, model reasoning or stack traces. The result API is bounded by tool output limits, but pagination, redacted execution tracing and a browser interface are not implemented.
 
 ## 10 Acceptance suite
 
@@ -113,17 +113,17 @@ Record the provisional role/tool matrix, model and image versions, source scopes
 
 Provide a local setup guide with exact prerequisites, start/seed/demo/stop procedures, ports, resource needs, model installation, expected output and known limitations. Verify commands against the implemented files; do not publish speculative runnable commands.
 
-Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 remains Planned until implementation begins, and Complete only after mandatory exit criteria pass. This instructions document alone completes neither phase.
+Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 is In progress and remains so until all mandatory exit criteria pass. This instructions document alone completes neither phase.
 
 P1-01 and P1-02 bootstrap work is recorded in the dependency and scaffold decisions. Select remaining implementation work from the current [roadmap](../ROADMAP.md); local OIDC authorization gates do not close real-source OBO, durable actor recovery, operational-write or business-review acceptance.
 
 ## 13 Phase 1 background execution additions
 
-Create investigation work asynchronously and return HTTP 202 with a server execution ID and authorized status URL. Do not tie cancellation to browser disconnect. An authorized reconnect shall obtain progress and final results while the process remains running.
+Create investigation work asynchronously and return HTTP 202 with a server execution ID and authorized status URL. The local API supports status/result reconnect and cancellation while the process remains running; disconnect does not cancel work.
 
-Implement a loop checkpoint record containing current step, cumulative budget, status, last update and wait reason. AwaitingAuthentication must stop source calls; resume only with valid same-user/project access and an unexpired deadline. Add bounds for active processing and absolute elapsed time; document wait accounting. No raw access tokens belong in progress records.
+The current process-local record tracks current step, status, last update and authentication wait through in-memory task state. AwaitingAuthentication stops source calls; resume requires valid same-user/project access and an unexpired original deadline. Step, elapsed-time, active-work, queue and retained-record caps are fixed local bounds. No access tokens are stored. Durable checkpointing and wait accounting remain Phase 2 work.
 
-Add tests for disconnect/reconnect, status authorization, loop termination, expiration mid-loop and explicit cancellation. For process restart, document the Phase 1 limitation and mark interrupted tasks failed if persisted; do not leave them falsely running. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
+Tests cover HTTP creation/status/result, cross-project denial, same-subject resume after identity expiry, cumulative step exhaustion, revocation during execution and after completion, and cancellation. Since state is not persisted, restart loses accepted tasks and results; no restart recovery is claimed. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
 
 ## 14 Required Phase 1 browser deliverable
 

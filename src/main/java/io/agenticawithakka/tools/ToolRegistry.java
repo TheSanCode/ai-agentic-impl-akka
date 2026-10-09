@@ -143,8 +143,11 @@ public final class ToolRegistry {
             for (CompletableFuture<PolicyDecision> decision : decisions) {
                 PolicyDecision result = decision.join();
                 if (!result.permitted()) {
+                    ToolOutcomeStatus status = result.reasonCode().equals("identity.unavailable")
+                            ? ToolOutcomeStatus.AUTHENTICATION_REQUIRED
+                            : ToolOutcomeStatus.DENIED;
                     return Optional.of(ToolOutcome.failure(
-                            definition.ref(), ToolOutcomeStatus.DENIED, result.reasonCode()));
+                            definition.ref(), status, result.reasonCode()));
                 }
             }
             return Optional.empty();

@@ -29,16 +29,7 @@ public final class AuthenticatedIdentityContextResolver {
     }
 
     public IdentityContextRef resolve(Authentication authentication) {
-        if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)
-                || !jwtAuthentication.isAuthenticated()) {
-            throw new PortException(ErrorCode.AUTHENTICATION_REQUIRED, "a verified JWT principal is required");
-        }
-        var jwt = jwtAuthentication.getToken();
-        if (jwt.getIssuer() == null || jwt.getSubject() == null || jwt.getExpiresAt() == null) {
-            throw new PortException(
-                    ErrorCode.AUTHENTICATION_REQUIRED, "verified JWT lacks issuer, subject or expiry");
-        }
-        var key = new OidcPrincipalKey(jwt.getIssuer().toString(), jwt.getSubject());
+        OidcPrincipalKey key = principalKey(authentication);
         var projectAccess = accessResolver.resolve(key)
                 .filter(access -> !access.isEmpty())
                 .orElseThrow(() ->
@@ -48,11 +39,27 @@ public final class AuthenticatedIdentityContextResolver {
         if (existing != null && contexts.resolve(existing).isPresent()) {
             return existing;
         }
-        String storeSubject = key.identityStoreKey();
         IdentityContextRef created =
-                contexts.registerAuthenticatedSubject(storeSubject, projectAccess, jwt.getExpiresAt());
+                contexts.registerAuthenticatedSubject(key.identityStoreKey(), projectAccess, expiresAt(authentication));
         references.put(key, created);
         return created;
+    }
+
+    public OidcPrincipalKey principalKey(Authentication authentication) {
+        if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)
+                || !jwtAuthentication.isAuthenticated()) {
+            throw new PortException(ErrorCode.AUTHENTICATION_REQUIRED, "a verified JWT principal is required");
+        }
+        var jwt = jwtAuthentication.getToken();
+        if (jwt.getIssuer() == null || jwt.getSubject() == null || jwt.getExpiresAt() == null) {
+            throw new PortException(
+                    ErrorCode.AUTHENTICATION_REQUIRED, "verified JWT lacks issuer, subject or expiry");
+        }
+        return new OidcPrincipalKey(jwt.getIssuer().toString(), jwt.getSubject());
+    }
+
+    private static java.time.Instant expiresAt(Authentication authentication) {
+        return ((JwtAuthenticationToken) authentication).getToken().getExpiresAt();
     }
 
     public boolean mayAccessProject(IdentityContextRef identityContextRef, ProjectId projectId) {
