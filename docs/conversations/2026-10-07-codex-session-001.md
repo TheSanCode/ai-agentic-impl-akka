@@ -744,3 +744,39 @@ will continue tomorrow
 ## 95. Assistant — final response
 
 Session paused. State: branch `feature/agentic`, worktree clean, nothing pushed. Latest work: P1-06 tool part (`c707ea2`), 114 tests passing. Resume options: P1-04 (identity, project policy, mock delegated connectors; recommended) or the P1-06 skill registry. Open decisions are listed in decisions 0003 and 0004.
+
+## 96. User (2026-10-09T00:08:03.247-04:00)
+
+Implement P1-04 identity, project-policy, and mock delegated-source adapters, keeping the production Akka-license decision separate and open
+
+## 97. Assistant — commentary
+
+I’ll first check the authorized branch/worktree and the P1-04 requirements/design plus current port and conversation context, then implement only the identity, project-policy, and mock delegated-source adapter slice.
+
+## 98. Assistant — commentary
+
+The worktree is clean on `feature/agentic`. The project instructions distinguish local mock delegation from real-source OBO, so I’m checking the existing port contracts and tool call path before deciding the smallest adapter boundary; I’ll keep external OIDC/token exchange and production Akka licensing explicitly outside this implementation.
+
+## 99. Assistant — commentary
+
+The mock adapters are now in place: identity references are server-held and revocable, policy checks separate project/resource/source grants, and the mock source verifies signed credentials independently. I’m running the focused adapter tests now and checking the diff for integration or boundary issues.
+
+## 100. Assistant — commentary
+
+The focused integration suite now passes, including the real tool gate composed with the mock policy and delegated connector. I’m running the complete clean verification next; after that I’ll record the exact evidence and remaining OIDC/OBO boundary in the decision and roadmap.
+
+## 101. Assistant — work performed
+
+- Added `MockIdentityContextStore` with random opaque references, bounded expiry, revocation, project membership and explicit resource/source grants; added deny-first `MockProjectPolicyService`.
+- Added `MockDelegatedTokenProvider` and `MockSourceConnector`. The mock provider issues short-lived HMAC-SHA256 credentials bound to the trusted identity context, project, audience and scopes; the source independently validates signature, request binding, expiry, operation scope and its own subject/project ACL.
+- Added identity/policy, source-negative-case and `ToolRegistry` integration tests. The first focused run found a compile-time method-name mismatch and the next found a missing test import; both were corrected. Focused adapter tests then passed (8 tests).
+- Validation: Temurin 25 `.\mvnw.cmd -B -ntp clean verify` passed with 122 tests, 0 failures, 0 errors and 0 skipped. `git diff --check` passed; Git reported only expected LF-to-CRLF warnings for existing Windows-checkout package-info files. No dependencies were added.
+- Updated `docs/decisions/0005-identity-policy-mock-connectors.md`, `docs/ROADMAP.md`, the Phase 1 instructions, backend scaffold guide and README. The roadmap records only the local adapter slice as complete; P1-04 OIDC/JWT and real-source OBO remain open. Production Akka licensing remains separate and open. The packaged-JAR health smoke check was not rerun; HTTP/configuration was unchanged.
+
+## 102. Assistant — final response
+
+Implemented P1-04’s **local adapter slice**. Added opaque, expiring/revocable identity contexts; deny-first project/resource/source policy; and an HMAC-bound mock delegated token provider/source that independently checks identity, project, audience, scope, expiry, and its own ACL. The `ToolRegistry` integration verifies both permitted reads and denials. Documented the simulation boundaries in [decision 0005](../decisions/0005-identity-policy-mock-connectors.md) and updated the roadmap, implementation guide, backend scaffold guide, and README.
+
+**Validation:** Temurin 25 `.\mvnw.cmd -B -ntp clean verify` passed: 122 tests, 0 failures/errors/skips; `git diff --check` passed. No dependencies were added.
+
+**Remaining:** This does not implement OIDC/JWT validation, Spring/API composition, Keycloak, or real-source OBO; P1-04 remains partial. The Akka production-license decision remains separate and open. Next: implement OIDC/JWT authentication and local identity-provider composition, then prove delegated access separately for each real source.
