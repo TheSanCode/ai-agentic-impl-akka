@@ -37,6 +37,8 @@ app:
             sources: [mock-knowledge, mock-logs, mock-health]
 ```
 
+The in-memory synthetic fixture is reconstructed when the application starts from the configured principal/project grants; it contains no mutable user data or external source copy. Restarting the process resets task state and regenerates these fixed passages. `OidcResourceServerIntegrationTest` configures separate Alpha and Beta subjects, serves a generated JWKS from loopback, and proves that each authorized API investigation receives its own runbook/log evidence while cross-project creation is denied. No enterprise credentials, identity service, database, model or container is used by that automated scenario. This test documents the synthetic fixture boundary; it is not a turnkey manual login/profile or full local lab setup.
+
 Credentials for real enterprise sources are neither required nor supported by these adapters. The mock signing key is randomly generated per process, used only for synthetic delegated credentials, and is not persisted or logged.
 
 ## Process-local limits and failure boundaries
@@ -66,6 +68,14 @@ Execution tracing verification:
 ```
 
 The focused tracing suite passed **8 tests**. It verifies correlated lifecycle events across completion, reauthentication/resume and cancellation, confirms the trace representation excludes prompts, evidence text, credentials, project/user/source identifiers, and checks bounded oldest-event eviction. Traces remain process-local and are not exposed through an API.
+
+Synthetic Alpha/Beta API fixture verification:
+
+```powershell
+.\mvnw.cmd -B -ntp '-Dtest=OidcResourceServerIntegrationTest' test
+```
+
+The integration test uses generated signing keys and an in-process loopback JWKS endpoint. It verifies separate Alpha/Beta principals, seeded synthetic runbook/log evidence and cross-project denial without a real identity provider or external credentials. All four tests passed both from the working tree and from a fresh source-only copy with no `target` output, using the local Maven cache.
 
 Full Temurin 25 verification also passed:
 

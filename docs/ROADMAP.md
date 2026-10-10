@@ -4,7 +4,7 @@ Last reviewed: 9 October 2026
 
 ## Current position
 
-Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes, versioned domain contracts/ports, a policy-gated read-only tool registry, OIDC/JWT identity mapping and a process-local deterministic investigation API over synthetic sources. The local workflow has no model calls, durable recovery, multi-instance state or browser UI; real-source OBO remains open. Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes, versioned domain contracts/ports, a policy-gated read-only tool registry, OIDC/JWT identity mapping and a process-local deterministic investigation API over synthetic sources. Bounded allowlisted execution tracing is tested; an authenticated synthetic Alpha/Beta integration fixture proves project-isolated runbook/log retrieval without an external identity provider and passed from a fresh source-only copy. The local workflow has no model calls, durable recovery, multi-instance state or browser UI; real-source OBO remains open. Phases 2–6 are **Planned**. The scaffold does not establish full lab acceptance or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
 
@@ -83,7 +83,7 @@ Deliverables:
 - [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
 - [ ] Test browser reconnect, safe rendering and primary keyboard navigation
-- [ ] Seed synthetic runbooks and mock logs
+- [x] Seed synthetic runbook, log and health evidence per configured project grant; the authenticated Alpha/Beta integration fixture verifies project isolation and evidence retrieval ([decision 0007](decisions/0007-process-local-investigation-workflow.md)).
 - [x] Implement bounded local Coordinator and Investigation roles using registered read tools; deterministic synthetic workflow only, no model or Akka runtime; tested in `ProcessLocalInvestigationServiceTest`.
 - [x] Return execution IDs and provide same-process authorized status/result reconnect, cancellation and same-subject authentication resume; HTTP bearer flow tested in `OidcResourceServerIntegrationTest`.
 - [x] Test cumulative step exhaustion, authentication expiry/resume, cancellation before and during a read, cross-project access and membership revocation during execution and after completion; focused suite passes (35 tests); see [decision 0007](decisions/0007-process-local-investigation-workflow.md).

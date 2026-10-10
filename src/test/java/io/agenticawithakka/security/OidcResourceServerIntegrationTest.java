@@ -54,7 +54,15 @@ class OidcResourceServerIntegrationTest {
         registry.add("app.security.principals[0].issuer", () -> ISSUER);
         registry.add("app.security.principals[0].subject", () -> "alice");
         registry.add("app.security.principals[0].projects.alpha.resources[0]", () -> "service:billing");
-        registry.add("app.security.principals[0].projects.alpha.sources[0]", () -> "mock-logs");
+        registry.add("app.security.principals[0].projects.alpha.sources[0]", () -> "mock-knowledge");
+        registry.add("app.security.principals[0].projects.alpha.sources[1]", () -> "mock-logs");
+        registry.add("app.security.principals[0].projects.alpha.sources[2]", () -> "mock-health");
+        registry.add("app.security.principals[1].issuer", () -> ISSUER);
+        registry.add("app.security.principals[1].subject", () -> "bob");
+        registry.add("app.security.principals[1].projects.beta.resources[0]", () -> "service:billing");
+        registry.add("app.security.principals[1].projects.beta.sources[0]", () -> "mock-knowledge");
+        registry.add("app.security.principals[1].projects.beta.sources[1]", () -> "mock-logs");
+        registry.add("app.security.principals[1].projects.beta.sources[2]", () -> "mock-health");
     }
 
     @AfterAll
@@ -106,7 +114,8 @@ class OidcResourceServerIntegrationTest {
         assertThat(status.statusCode()).isEqualTo(200);
         var result = send("GET", "/api/executions/" + executionId + "/result", accessToken, null);
         assertThat(result.statusCode()).isEqualTo(200);
-        assertThat(result.body()).contains("mock-logs", "Synthetic billing log");
+        assertThat(result.body()).contains(
+                "mock-knowledge", "Synthetic runbook", "mock-logs", "Synthetic billing log");
 
         var anotherSubject = send(
                 "GET",
@@ -121,6 +130,55 @@ class OidcResourceServerIntegrationTest {
                 accessToken,
                 "{\"instruction\":\"Investigate beta\"}");
         assertThat(crossProject.statusCode()).isEqualTo(403);
+    }
+
+    @Test
+    void configuredSyntheticAlphaAndBetaUsersReceiveOnlyTheirProjectFixtures() throws Exception {
+        var alphaResult = investigate("alpha", tokenFor(signingKey, "alice"));
+        var betaResult = investigate("beta", tokenFor(signingKey, "bob"));
+
+        assertThat(alphaResult).contains("Synthetic runbook", "Synthetic billing log");
+        assertThat(betaResult).contains("Synthetic runbook", "Synthetic billing log");
+
+        var alphaCannotReadBeta = send(
+                "POST",
+                "/api/projects/beta/investigations",
+                tokenFor(signingKey, "alice"),
+                "{\"instruction\":\"Investigate beta\"}");
+        var betaCannotReadAlpha = send(
+                "POST",
+                "/api/projects/alpha/investigations",
+                tokenFor(signingKey, "bob"),
+                "{\"instruction\":\"Investigate alpha\"}");
+        assertThat(alphaCannotReadBeta.statusCode()).isEqualTo(403);
+        assertThat(betaCannotReadAlpha.statusCode()).isEqualTo(403);
+    }
+
+    private String investigate(String project, String accessToken) throws Exception {
+        var created = send(
+                "POST",
+                "/api/projects/" + project + "/investigations",
+                accessToken,
+                "{\"instruction\":\"Investigate billing connection timeouts\"}");
+        assertThat(created.statusCode()).isEqualTo(202);
+        String executionId = JsonMapper.builder().build().readTree(created.body()).get("executionId").asString();
+
+        HttpResponse<String> status = null;
+        for (int attempt = 0; attempt < 100; attempt++) {
+            status = send("GET", "/api/executions/" + executionId, accessToken, null);
+            if (status.body().contains("\"SUCCEEDED\"")
+                    || status.body().contains("\"PARTIAL\"")
+                    || status.body().contains("\"FAILED\"")) {
+                break;
+            }
+            Thread.sleep(20);
+        }
+        assertThat(status).isNotNull();
+        assertThat(status.statusCode()).isEqualTo(200);
+
+        var result = send("GET", "/api/executions/" + executionId + "/result", accessToken, null);
+        assertThat(result.statusCode()).isEqualTo(200);
+        return result.body();
     }
 
     private HttpResponse<String> send(String token) throws Exception {

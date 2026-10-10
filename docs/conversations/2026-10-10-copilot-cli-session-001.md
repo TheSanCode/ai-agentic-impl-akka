@@ -22,6 +22,14 @@
 
    > I’ll treat that as approval for routine, reversible work within this local task; it does not authorize external or protected actions, deployment, or decisions that the plan reserves for a human. The implementation and docs are in place, so I’m running the full verification before saving the milestone.
 
+6. **Assistant** — timestamp unavailable
+
+   > P1-09 is implemented, fully verified, and committed locally as `8ae564b` on `feature/agentic`; nothing was pushed. I’m continuing to the next planned item, P1-03, by first checking whether the current synthetic data already satisfies reproducible local setup or what specific fixture/profile gap remains—without assuming containers or external services are needed.
+
+7. **Assistant** — timestamp unavailable
+
+   > The current adapters already generate synthetic knowledge/log/health records at startup from server-configured project grants, and restart recreates them; the gap is evidence for both Alpha and Beta through the authenticated API. I’ll add a loopback-JWKS integration case for two separately authorized synthetic users, document the reset/setup limits, and leave the broader infrastructure/profile work open.
+
 ## Work record
 
 - Confirmed the worktree was clean and the active branch was `feature/agentic`.
@@ -32,6 +40,11 @@
   - `.\mvnw.cmd -B -ntp clean verify` — 146 tests passed, zero failures/errors/skips; `BUILD SUCCESS`.
   - `git diff --check` passed.
 - No deployment or external action was performed. The trace is process-local operational metadata, not a durable audit log, and is not exposed through a public API.
+- Committed P1-09 as `8ae564b` (`ai-agentic-testing: feat add redacted execution tracing`) on `feature/agentic`; it is local only and not pushed.
+- For P1-03, extended the authenticated OIDC API fixture to configure separate Alpha/Beta subjects with mock knowledge/log/health grants. Both users retrieve their own synthetic runbook/log evidence; requests across projects are denied. Documented that the test generates its own signing keys/JWKS and requires no external identity provider, enterprise credential, database, model or container. This is automated fixture evidence, not a manual local login profile or full lab.
+- `.\mvnw.cmd -B -ntp '-Dtest=OidcResourceServerIntegrationTest' test` passed **4 tests** on Temurin 25. The same suite passed from a fresh source-only copy without `target` output, using the local Maven cache.
+- Final `.\mvnw.cmd -B -ntp clean verify` passed **147 tests**, zero failures/errors/skips; `BUILD SUCCESS`. Changed Markdown relative links resolve and `git diff --check` passes.
+- Roadmap evidence was updated only for the bounded execution trace and seeded synthetic fixtures. Phase 0/1 remain In progress; manual identity setup, ingestion/hybrid search and full lab acceptance remain incomplete. P1-07 requires human agreement on the minimal data/provenance model and policy-approved storage/embedding choices; those will not be selected autonomously.
 
 ## Session status
 
