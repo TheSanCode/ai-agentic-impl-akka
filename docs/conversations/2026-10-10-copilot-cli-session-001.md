@@ -69,7 +69,8 @@
   - `.\mvnw.cmd -B -ntp clean verify` — 155 tests passed, zero failures/errors/skips; `BUILD SUCCESS`.
   - Updated Markdown relative links resolve; `git diff --check` passed. Testcontainers shut down its PostgreSQL container after the run.
 - Decision 0008 and the roadmap/implementation docs record the limitation: the selected reset-on-application-restart behavior is **not implemented or verified for an active application database**. There is no database runtime wiring, local application reset routine, or actual embedding provider, and production use remains deferred. Do not claim P1-07 complete.
+- Committed this bounded foundation locally on `feature/agentic` as `962e5fa` (`ai-agentic-testing: add synthetic pgvector retrieval foundation`) with the required Copilot co-author trailer. The worktree is clean; the commit was not pushed.
 
 ## Session status
 
-This session remains in progress. The P1-07 foundation is ready for local commit after final diff review. Do not push. The final assistant response has not yet been recorded.
+This session remains in progress. P1-07's synthetic retrieval foundation is committed, but the feature remains unwired and incomplete as described above. Do not push. The final assistant response has not yet been recorded and must be appended on the next turn.
