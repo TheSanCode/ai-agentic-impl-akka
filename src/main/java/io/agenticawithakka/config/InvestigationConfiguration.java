@@ -12,6 +12,7 @@ import io.agenticawithakka.domain.contracts.Classification;
 import io.agenticawithakka.domain.contracts.EvidencePassage;
 import io.agenticawithakka.domain.contracts.EvidenceRef;
 import io.agenticawithakka.domain.contracts.ProjectId;
+import io.agenticawithakka.observability.ExecutionTrace;
 import io.agenticawithakka.retrieval.MockSearchGateway;
 import io.agenticawithakka.security.MockIdentityContextStore;
 import io.agenticawithakka.security.MockProjectPolicyService;
@@ -149,6 +150,11 @@ public class InvestigationConfiguration {
     }
 
     @Bean
+    ExecutionTrace executionTrace() {
+        return new ExecutionTrace();
+    }
+
+    @Bean
     InvestigationAgent investigationAgent(ToolRegistry tools, Clock clock) {
         return new InvestigationAgent(tools, clock);
     }
@@ -182,9 +188,17 @@ public class InvestigationConfiguration {
             StoredTaskResultAuthorizer resultAuthorizer,
             Coordinator coordinator,
             ThreadPoolExecutor investigationExecutor,
+            ExecutionTrace executionTrace,
             Clock clock) {
         return new ProcessLocalInvestigationService(
-                identities, identityStore, policy, resultAuthorizer, coordinator, investigationExecutor, clock);
+                identities,
+                identityStore,
+                policy,
+                resultAuthorizer,
+                coordinator,
+                investigationExecutor,
+                executionTrace,
+                clock);
     }
 
     private static List<ProjectId> projectIds(ServiceProperties properties) {

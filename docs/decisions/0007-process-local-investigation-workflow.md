@@ -45,7 +45,9 @@ Each execution is capped at four tool steps (including retries after reauthentic
 
 State, authorization contexts and membership revocation are in memory on one application instance. A process restart loses accepted tasks, progress and results; another replica cannot see the same state or a revocation performed in this instance. There is no durable recovery, distributed queue, actor persistence, audit trail, or guarantee that cancellation interrupts a currently executing source request. Do not describe this as restart-safe background work or multi-instance revocation.
 
-This API does not add protected writes, approvals, browser UI, telemetry/tracing, durable persistence or deployment. Spring AI/Akka compatibility probes do not mean this flow uses either runtime. Real-source OBO and production Akka licensing/runtime-key decisions remain open and independent.
+The process-local execution trace retains at most 10,000 lifecycle events and evicts the oldest event when full. Each event contains only the server-generated execution and correlation IDs, timestamp, event/status enums and step count. It excludes project/user/source identifiers, request text, evidence passages, credentials, free-form errors and model reasoning. Events are available only through the internal trace component; no trace API or log exporter is exposed. They disappear on restart and are operational metadata, not a durable audit record. Production retention, audit access and export policy remain open.
+
+This API does not add protected writes, approvals, browser UI, durable persistence, audit logging or deployment. Spring AI/Akka compatibility probes do not mean this flow uses either runtime. Real-source OBO and production Akka licensing/runtime-key decisions remain open and independent.
 
 ## Verification evidence
 
@@ -57,10 +59,18 @@ Focused Temurin 25 verification command:
 
 The focused suite passed **35 tests**. It covers HTTP bearer-token creation/status/result and cross-project denial, another subject, tool execution, cancellation before execution and during an in-flight read, membership revocation during execution and after completion, authentication expiry/resume, and cumulative step exhaustion.
 
+Execution tracing verification:
+
+```powershell
+.\mvnw.cmd -B -ntp '-Dtest=ProcessLocalInvestigationServiceTest,ExecutionTraceTest' test
+```
+
+The focused tracing suite passed **8 tests**. It verifies correlated lifecycle events across completion, reauthentication/resume and cancellation, confirms the trace representation excludes prompts, evidence text, credentials, project/user/source identifiers, and checks bounded oldest-event eviction. Traces remain process-local and are not exposed through an API.
+
 Full Temurin 25 verification also passed:
 
 ```powershell
 .\mvnw.cmd -B -ntp clean verify
 ```
 
-Result: **144 tests, zero failures, zero errors and zero skips; `BUILD SUCCESS`**. Changed Markdown relative links were checked and all targets exist. No deployment was performed.
+Result: **146 tests, zero failures, zero errors and zero skips; `BUILD SUCCESS`**. Changed Markdown relative links were checked and all targets exist. No deployment was performed.

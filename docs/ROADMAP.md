@@ -89,7 +89,7 @@ Deliverables:
 - [x] Test cumulative step exhaustion, authentication expiry/resume, cancellation before and during a read, cross-project access and membership revocation during execution and after completion; focused suite passes (35 tests); see [decision 0007](decisions/0007-process-local-investigation-workflow.md).
 - [x] Enforce project/user authorization at create, status, cancel, resume, each tool call and evidence retrieval; supported by OIDC integration and authorization-revalidation tests.
 - [x] Return reauthorized evidence citations; prompt-injection resistance remains untested.
-- [ ] Add redacted execution tracing and verify trace redaction.
+- [x] Add bounded, redacted process-local execution tracing with correlated lifecycle events; focused tests verify the allowlisted event shape, sensitive-data exclusion and retention bound ([decision 0007](decisions/0007-process-local-investigation-workflow.md)).
 
 Exit criteria: An authorized investigation succeeds; cross-project access is denied and runaway tasks terminate.
 

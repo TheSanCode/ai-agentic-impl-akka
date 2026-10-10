@@ -28,7 +28,7 @@ Unlinked users must securely link their account first. Login, MFA, protected app
 
 ## Background tasks and agent loops
 
-The current Phase 1 API runs a deterministic, read-only Coordinator/Investigation sequence over synthetic knowledge, logs and health adapters. It returns an execution ID; authorized status, result, cancellation and same-subject reauthentication/resume routes work only while the same process remains running. Tool steps, elapsed time, active work, queue size and retained execution count are bounded. It does not call a model or run Akka actors.
+The current Phase 1 API runs a deterministic, read-only Coordinator/Investigation sequence over synthetic knowledge, logs and health adapters. It returns an execution ID; authorized status, result, cancellation and same-subject reauthentication/resume routes work only while the same process remains running. Tool steps, elapsed time, active work, queue size, retained execution count and lifecycle trace events are bounded. Traces use an allowlisted metadata schema, are process-local, and have no public retrieval route; they are not an audit log. The workflow does not call a model or run Akka actors.
 
 Execution state, checkpoints and revocation are process-local. A restart loses all executions; another application instance does not share or observe this state. Phase 2 must add persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery before those capabilities can be claimed. Authorization is rechecked during execution and before stored evidence is returned; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
 

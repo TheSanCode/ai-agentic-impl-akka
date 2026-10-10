@@ -23,6 +23,8 @@ import io.agenticawithakka.domain.contracts.TaskId;
 import io.agenticawithakka.domain.contracts.TaskInput;
 import io.agenticawithakka.domain.contracts.TaskResult;
 import io.agenticawithakka.domain.contracts.TaskStatus;
+import io.agenticawithakka.observability.ExecutionTrace;
+import io.agenticawithakka.observability.ExecutionTrace.EventType;
 import io.agenticawithakka.security.AuthenticatedIdentityContextResolver;
 import io.agenticawithakka.security.MockIdentityContextStore;
 import io.agenticawithakka.security.OidcPrincipalKey;
@@ -54,6 +56,7 @@ public final class ProcessLocalInvestigationService {
     private final StoredTaskResultAuthorizer resultAuthorizer;
     private final Coordinator coordinator;
     private final Executor executor;
+    private final ExecutionTrace trace;
     private final Clock clock;
     private final Map<UUID, Record> executions = new ConcurrentHashMap<>();
     private final AtomicInteger activeExecutions = new AtomicInteger();
@@ -66,6 +69,7 @@ public final class ProcessLocalInvestigationService {
             StoredTaskResultAuthorizer resultAuthorizer,
             Coordinator coordinator,
             Executor executor,
+            ExecutionTrace trace,
             Clock clock) {
         this.identities = ContractValidation.required(identities, "identities");
         this.identityStore = ContractValidation.required(identityStore, "identityStore");
@@ -73,6 +77,7 @@ public final class ProcessLocalInvestigationService {
         this.resultAuthorizer = ContractValidation.required(resultAuthorizer, "resultAuthorizer");
         this.coordinator = ContractValidation.required(coordinator, "coordinator");
         this.executor = ContractValidation.required(executor, "executor");
+        this.trace = ContractValidation.required(trace, "trace");
         this.clock = ContractValidation.required(clock, "clock");
     }
 
@@ -113,6 +118,7 @@ public final class ProcessLocalInvestigationService {
             retainedExecutions.decrementAndGet();
             throw new IllegalStateException("generated duplicate execution ID");
         }
+        trace(record, EventType.ADMITTED);
         try {
             enqueue(record);
         } catch (WorkflowException failure) {
@@ -163,6 +169,7 @@ public final class ProcessLocalInvestigationService {
                     List.of("Investigation cancelled before further tools were called."),
                     ErrorCode.CANCELLED,
                     record.updatedAt);
+            trace(record, EventType.CANCELLED);
             releaseActive(record);
         }
         return view(record);
@@ -201,6 +208,7 @@ public final class ProcessLocalInvestigationService {
             record.status = ExecutionStatus.QUEUED;
             record.updatedAt = clock.instant();
             record.active.set(true);
+            trace(record, EventType.RESUMED);
             enqueue(record);
         }
         return view(record);
@@ -215,6 +223,7 @@ public final class ProcessLocalInvestigationService {
                     record.status = ExecutionStatus.FAILED;
                     record.updatedAt = clock.instant();
                     record.result = failedResult(record, ErrorCode.RATE_LIMITED, "execution queue is full");
+                    trace(record, EventType.FAILED);
                     releaseActive(record);
                 }
             }
@@ -229,6 +238,7 @@ public final class ProcessLocalInvestigationService {
             }
             record.status = ExecutionStatus.RUNNING;
             record.updatedAt = clock.instant();
+            trace(record, EventType.STARTED);
         }
         try {
             coordinator.investigate(
@@ -252,12 +262,14 @@ public final class ProcessLocalInvestigationService {
                 record.status = ExecutionStatus.FAILED;
                 record.result =
                         failedResult(record, ErrorCode.DEPENDENCY_UNAVAILABLE, "investigation execution failed");
+                trace(record, EventType.FAILED);
                 releaseActive(record);
             } else {
                 record.cursor = outcome.cursor();
                 record.steps = outcome.cursor().steps();
                 if (outcome.awaitingAuthentication()) {
                     record.status = ExecutionStatus.AWAITING_AUTHENTICATION;
+                    trace(record, EventType.AUTHENTICATION_REQUIRED);
                     releaseActive(record);
                 } else {
                     record.result = outcome.result();
@@ -267,6 +279,13 @@ public final class ProcessLocalInvestigationService {
                         case FAILED -> ExecutionStatus.FAILED;
                         case CANCELLED -> ExecutionStatus.CANCELLED;
                     };
+                    trace(record, switch (record.status) {
+                        case SUCCEEDED -> EventType.SUCCEEDED;
+                        case PARTIAL -> EventType.PARTIAL;
+                        case FAILED -> EventType.FAILED;
+                        case CANCELLED -> EventType.CANCELLED;
+                        default -> throw new IllegalStateException("execution result is not terminal");
+                    });
                     releaseActive(record);
                 }
             }
@@ -282,8 +301,19 @@ public final class ProcessLocalInvestigationService {
             }
             record.steps++;
             record.updatedAt = clock.instant();
+            trace(record, EventType.STEP_RESERVED);
             return true;
         }
+    }
+
+    private void trace(Record record, EventType type) {
+        trace.record(
+                record.envelope.executionId(),
+                record.envelope.correlationId(),
+                clock.instant(),
+                type,
+                record.status,
+                record.steps);
     }
 
     private IdentityContextRef authorizeOwner(

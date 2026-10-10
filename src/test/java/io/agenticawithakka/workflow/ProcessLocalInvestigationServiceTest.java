@@ -18,6 +18,8 @@ import io.agenticawithakka.domain.contracts.EvidenceRef;
 import io.agenticawithakka.domain.contracts.ErrorCode;
 import io.agenticawithakka.domain.contracts.IdentityContextRef;
 import io.agenticawithakka.domain.contracts.ProjectId;
+import io.agenticawithakka.observability.ExecutionTrace;
+import io.agenticawithakka.observability.ExecutionTrace.EventType;
 import io.agenticawithakka.security.AuthenticatedIdentityContextResolver;
 import io.agenticawithakka.security.MockIdentityContextStore;
 import io.agenticawithakka.security.MockProjectPolicyService;
@@ -66,6 +68,29 @@ class ProcessLocalInvestigationServiceTest {
         var result = fixture.service.result(owner, uuid(accepted.executionId()));
         assertThat(result.evidence()).hasSize(2);
         assertThat(result.result().evidenceRefs()).hasSize(2);
+        var events = fixture.trace.eventsFor(uuid(accepted.executionId()));
+        assertThat(events)
+                .extracting(event -> event.type())
+                .containsExactly(
+                        EventType.ADMITTED,
+                        EventType.STARTED,
+                        EventType.STEP_RESERVED,
+                        EventType.STEP_RESERVED,
+                        EventType.SUCCEEDED);
+        assertThat(events)
+                .extracting(event -> event.correlationId())
+                .containsOnly(events.getFirst().correlationId());
+        var renderedTrace = events.toString();
+        assertThat(renderedTrace)
+                .doesNotContain(
+                        "Investigate billing connection timeouts",
+                        "Synthetic runbook evidence.",
+                        "Synthetic log evidence.",
+                        "test-token-alice",
+                        "alpha",
+                        "alice",
+                        "mock-knowledge",
+                        "mock-logs");
 
         var otherProjectUser = authentication("bob", fixture.clock.instant().plusSeconds(120));
         assertThatThrownBy(() -> fixture.service.status(otherProjectUser, uuid(accepted.executionId())))
@@ -98,6 +123,9 @@ class ProcessLocalInvestigationServiceTest {
         assertThat(fixture.service.status(owner, uuid(queued.executionId())).status())
                 .isEqualTo(io.agenticawithakka.domain.contracts.ExecutionStatus.CANCELLED);
         assertThat(searchCalls).hasValue(0);
+        assertThat(fixture.trace.eventsFor(uuid(queued.executionId())))
+                .extracting(event -> event.type())
+                .containsExactly(EventType.ADMITTED, EventType.CANCELLED);
     }
 
     @Test
@@ -118,6 +146,13 @@ class ProcessLocalInvestigationServiceTest {
         assertThat(result.result().status()).isEqualTo(io.agenticawithakka.domain.contracts.TaskStatus.CANCELLED);
         assertThat(result.evidence()).isEmpty();
         assertThat(fixture.sourceReads).hasValue(0);
+        assertThat(fixture.trace.eventsFor(uuid(queued.executionId())))
+                .extracting(event -> event.type())
+                .containsExactly(
+                        EventType.ADMITTED,
+                        EventType.STARTED,
+                        EventType.STEP_RESERVED,
+                        EventType.CANCELLED);
     }
 
     @Test
@@ -163,6 +198,12 @@ class ProcessLocalInvestigationServiceTest {
         assertThat(result.result().status()).isEqualTo(io.agenticawithakka.domain.contracts.TaskStatus.PARTIAL);
         assertThat(result.evidence()).singleElement().extracting(evidence -> evidence.ref().sourceId())
                 .isEqualTo("mock-logs");
+        assertThat(fixture.trace.eventsFor(uuid(queued.executionId())))
+                .extracting(event -> event.type())
+                .contains(
+                        EventType.AUTHENTICATION_REQUIRED,
+                        EventType.RESUMED,
+                        EventType.PARTIAL);
     }
 
     @Test
@@ -214,6 +255,7 @@ class ProcessLocalInvestigationServiceTest {
         private final MockIdentityContextStore store;
         private final AuthenticatedIdentityContextResolver identities;
         private final QueuedExecutor executor = new QueuedExecutor();
+        private final ExecutionTrace trace = new ExecutionTrace();
         private final ProcessLocalInvestigationService service;
         private final AtomicInteger sourceReads = new AtomicInteger();
         private CompletableFuture<List<EvidencePassage>> pendingSearch;
@@ -304,6 +346,7 @@ class ProcessLocalInvestigationServiceTest {
                     new StoredTaskResultAuthorizer(store, policy),
                     coordinator,
                     executor,
+                    trace,
                     clock);
             onSearch = initialSearchAction;
         }

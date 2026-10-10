@@ -32,7 +32,7 @@ Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources.
 | P1-06 | Implement skill/tool registry and permission checks. | Only permitted read tools are discoverable and executable. |
 | P1-07 | Implement ingestion and hybrid search with evidence citations. | Expected documents are found; restricted chunks never enter model context. |
 | P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Local deterministic roles invoke only registered read tools; limits, cancellation and reauthentication are covered by workflow tests. No model or Akka runtime is used. |
-| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | Create/status/result/cancel/resume APIs are implemented and HTTP-tested; redacted execution tracing remains open. |
+| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | Create/status/result/cancel/resume APIs are implemented and HTTP-tested; bounded, allowlisted process-local lifecycle tracing is tested in decision 0007. |
 | P1-10 | Run actual-model evaluation and negative end-to-end scenarios. | Versioned results identify successes, failures and missing evidence. |
 | P1-11 | Document setup, demo, limitations and update roadmap from evidence. | Another developer can reproduce the lab; unchecked gates remain visible. |
 
@@ -86,7 +86,7 @@ Use a mock model for deterministic workflow tests, then a real local model to as
 
 The API implements `POST /api/projects/{projectId}/investigations` to create an execution and return HTTP 202 with a server-generated execution ID and status/result URLs. `GET /api/executions/{executionId}` returns authorized status; `GET /api/executions/{executionId}/result` returns the reauthorized result and citations; `POST` on `/cancel` cancels; and `POST` on `/resume` resumes an authentication-paused task. The routes require a verified bearer JWT and server-configured project grants; default configuration denies business routes.
 
-All operations recheck subject ownership and current project membership; result retrieval additionally reauthorizes every cited source. Unknown execution IDs are hidden as denials. Responses do not include credentials, model reasoning or stack traces. The result API is bounded by tool output limits, but pagination, redacted execution tracing and a browser interface are not implemented.
+All operations recheck subject ownership and current project membership; result retrieval additionally reauthorizes every cited source. Unknown execution IDs are hidden as denials. Responses do not include credentials, model reasoning or stack traces. The result API is bounded by tool output limits. Execution tracing retains at most 10,000 typed lifecycle events in process memory, with no project/user/source identifiers or free-form content and no public retrieval route; it is not a durable audit log. Pagination and a browser interface are not implemented.
 
 ## 10 Acceptance suite
 
@@ -102,6 +102,7 @@ All operations recheck subject ownership and current project membership; result 
 | Unknown tool or invalid arguments | Rejected before execution. | AGT-06, TOL-01 |
 | Loop budget, timeout and cancellation | Bounded termination and consistent terminal state. | AGT-02, AGT-05 |
 | Output/log inspection | No access tokens, secrets or private model reasoning. | DEL-05, AUD-03 |
+| Execution trace inspection | Correlated lifecycle and step events; no prompts, passages, credentials, identity/source identifiers or free-form failure details. | AUD-01, AUD-03 |
 
 Record commands and actual test outputs. Do not report unrun tests as passed. Model evaluation thresholds are agreed before declaring quality acceptance. Verify schema/migrations and negative access cases before broadening tests.
 
