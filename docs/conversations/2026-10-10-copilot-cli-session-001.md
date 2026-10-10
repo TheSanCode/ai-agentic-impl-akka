@@ -38,6 +38,18 @@
 
    > The PostgreSQL/pgvector adapter now compiles and its disposable-database integration suite passes. I’m recording the selected synthetic-only boundary, then checking the full project before deciding what can safely be committed; the runtime adapter will remain inactive because restart reset and a real embedding provider are still unresolved.
 
+10. **Assistant** — timestamp unavailable
+
+   > Added and locally committed the synthetic PostgreSQL/pgvector retrieval foundation on `feature/agentic`: versioned evidence provenance, hybrid keyword/vector search, and authorization checks around ingestion and result release. The default application still uses `MockSearchGateway`; production use remains deferred.
+   >
+   > **Verification:** `clean verify` passed all 155 tests; the PostgreSQL/pgvector integration tests passed against a digest-pinned, disposable container. Markdown links and `git diff --check` passed, and no test container remains running.
+   >
+   > **Still open:** Application wiring and reset-on-application-restart are not implemented; no embedding provider was selected, so semantic quality is unverified. Commits `962e5fa` and `d5e8fc2` are local and were not pushed. Next: implement a safely isolated synthetic-only database profile that enforces the selected restart-reset behavior, keeping production use disabled.
+
+11. **User** — 10 October 2026, 13:40:22.380 -04:00
+
+   > RECORD SESSION CONVERSATION
+
 ## Work record
 
 - Confirmed the worktree was clean and the active branch was `feature/agentic`.
@@ -73,4 +85,4 @@
 
 ## Session status
 
-This session remains in progress. P1-07's synthetic retrieval foundation is committed, but the feature remains unwired and incomplete as described above. Do not push. The final assistant response has not yet been recorded and must be appended on the next turn.
+This session remains in progress. P1-07's synthetic retrieval foundation is committed, but the feature remains unwired and incomplete as described above. Do not push. The response to the user's conversation-recording request is pending its transcript entry and must be appended on the next turn.
