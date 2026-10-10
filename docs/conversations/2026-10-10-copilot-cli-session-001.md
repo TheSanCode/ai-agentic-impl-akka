@@ -30,6 +30,14 @@
 
    > The current adapters already generate synthetic knowledge/log/health records at startup from server-configured project grants, and restart recreates them; the gap is evidence for both Alpha and Beta through the authenticated API. I’ll add a loopback-JWKS integration case for two separately authorized synthetic users, document the reset/setup limits, and leave the broader infrastructure/profile work open.
 
+8. **User** — timestamp unavailable
+
+   The supplied continuation summary reports the P1-07 selection as **PostgreSQL full-text + pgvector; defer production use pending separate approval** and **ephemeral synthetic data, reset on process restart; no user or enterprise source content**. This is recorded as summary-provided wording, not a reconstruction of the earlier unsummarized turn.
+
+9. **Assistant** — timestamp unavailable
+
+   > The PostgreSQL/pgvector adapter now compiles and its disposable-database integration suite passes. I’m recording the selected synthetic-only boundary, then checking the full project before deciding what can safely be committed; the runtime adapter will remain inactive because restart reset and a real embedding provider are still unresolved.
+
 ## Work record
 
 - Confirmed the worktree was clean and the active branch was `feature/agentic`.
@@ -46,6 +54,22 @@
 - Final `.\mvnw.cmd -B -ntp clean verify` passed **147 tests**, zero failures/errors/skips; `BUILD SUCCESS`. Changed Markdown relative links resolve and `git diff --check` passes.
 - Roadmap evidence was updated only for the bounded execution trace and seeded synthetic fixtures. Phase 0/1 remain In progress; manual identity setup, ingestion/hybrid search and full lab acceptance remain incomplete. P1-07 requires human agreement on the minimal data/provenance model and policy-approved storage/embedding choices; those will not be selected autonomously.
 
+### P1-07 synthetic retrieval foundation
+
+- The continuation summary reports the user's choices: local PostgreSQL full-text plus pgvector; production use deferred for separate approval; synthetic-only ephemeral data reset on application restart; no user or enterprise content. No embedding provider/model was selected.
+- Added a provenance-preserving `KnowledgeChunk`, model/dimension-bound `EmbeddingVector`, replaceable embedding/index ports, and a Flyway schema for versioned chunks with generated PostgreSQL full-text vectors and pgvector embeddings.
+- Added a PostgreSQL index using project/source/model/dimension filters and reciprocal-rank fusion of keyword and cosine-vector candidates. The query limits are explicitly ordered by rank before limiting. Index/search remain unwired; the default continues to use `MockSearchGateway`.
+- Added interactive-authorized ingestion and retrieval checks. Ingestion checks identity, project/source access and `READ_EVIDENCE` before embedding and again before upsert/delete. Retrieval filters to current grants in SQL and rechecks passage/project/source authorization before release.
+- Extended `EvidenceRef` compatibly with an optional HTTP(S) source link; malformed, unsupported-scheme and user-info links are rejected without echoing the supplied URI. Added embedding-vector contract tests.
+- Added Testcontainers integration coverage for migrations, hybrid retrieval, project/source/model filtering, provenance links, versioned upsert/deletion, denied cross-project ingestion and membership revocation during embedding. The pgvector image is digest-pinned; the test database is disposable and contains only synthetic fixtures.
+- Dependency compatibility: Testcontainers 1.21.3 compiled, but its Docker client API 1.32 was rejected by this Docker Engine 29 environment (minimum API 1.40). Verified official Testcontainers 2.0.5 release/module coordinates and selected its renamed PostgreSQL/JUnit artifacts. No standalone database was provisioned.
+- Verification on Temurin 25:
+  - `.\mvnw.cmd -B -ntp '-Dtest=PostgresKnowledgeIndexTest' test` — 5 database integration tests passed.
+  - `.\mvnw.cmd -B -ntp '-Dtest=PostgresKnowledgeIndexTest,EmbeddingVectorTest,ContractValidationTest' test` — 50 tests passed.
+  - `.\mvnw.cmd -B -ntp clean verify` — 155 tests passed, zero failures/errors/skips; `BUILD SUCCESS`.
+  - Updated Markdown relative links resolve; `git diff --check` passed. Testcontainers shut down its PostgreSQL container after the run.
+- Decision 0008 and the roadmap/implementation docs record the limitation: the selected reset-on-application-restart behavior is **not implemented or verified for an active application database**. There is no database runtime wiring, local application reset routine, or actual embedding provider, and production use remains deferred. Do not claim P1-07 complete.
+
 ## Session status
 
-This session remains in progress. Append subsequent user/assistant messages, task outcomes and validation results in order. The final assistant response has not yet been recorded.
+This session remains in progress. The P1-07 foundation is ready for local commit after final diff review. Do not push. The final assistant response has not yet been recorded.

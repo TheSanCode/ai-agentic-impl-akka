@@ -186,6 +186,41 @@ class ContractValidationTest {
     }
 
     @Test
+    void evidenceSourceLinksMustBeValidHttpUrisWithoutEmbeddedCredentials() {
+        var linked = new EvidenceRef(
+                "doc-1",
+                "v1",
+                ALPHA,
+                Classification.INTERNAL,
+                NOW,
+                "perm",
+                "https://docs.example.invalid/runbook");
+        assertThat(linked.sourceLink()).isEqualTo("https://docs.example.invalid/runbook");
+        assertThatThrownBy(() -> new EvidenceRef(
+                        "doc-1",
+                        "v1",
+                        ALPHA,
+                        Classification.INTERNAL,
+                        NOW,
+                        "perm",
+                        "https://" + "user@docs.example.invalid/runbook"))
+                .isInstanceOf(ContractViolationException.class)
+                .hasMessage("evidence.sourceLink: must be an absolute HTTP(S) URI without user info");
+        assertThatThrownBy(() -> new EvidenceRef(
+                        "doc-1", "v1", ALPHA, Classification.INTERNAL, NOW, "perm", "javascript:alert(1)"))
+                .isInstanceOf(ContractViolationException.class)
+                .hasMessage("evidence.sourceLink: must be an absolute HTTP(S) URI without user info");
+        assertThatThrownBy(() -> new EvidenceRef(
+                        "doc-1", "v1", ALPHA, Classification.INTERNAL, NOW, "perm", "https://user:pass@example.invalid"))
+                .isInstanceOf(ContractViolationException.class)
+                .hasMessage("evidence.sourceLink: must be an absolute HTTP(S) URI without user info");
+        assertThatThrownBy(() -> new EvidenceRef(
+                        "doc-1", "v1", ALPHA, Classification.INTERNAL, NOW, "perm", "https://example.invalid/with space"))
+                .isInstanceOf(ContractViolationException.class)
+                .hasMessage("evidence.sourceLink: must be a valid HTTP(S) URI");
+    }
+
+    @Test
     void terminalExecutionStatesNeverTransition() {
         for (var terminal : List.of(ExecutionStatus.SUCCEEDED, ExecutionStatus.FAILED, ExecutionStatus.CANCELLED)) {
             assertThat(terminal.isTerminal()).isTrue();

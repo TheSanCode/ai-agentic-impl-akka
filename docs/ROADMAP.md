@@ -90,6 +90,7 @@ Deliverables:
 - [x] Enforce project/user authorization at create, status, cancel, resume, each tool call and evidence retrieval; supported by OIDC integration and authorization-revalidation tests.
 - [x] Return reauthorized evidence citations; prompt-injection resistance remains untested.
 - [x] Add bounded, redacted process-local execution tracing with correlated lifecycle events; focused tests verify the allowlisted event shape, sensitive-data exclusion and retention bound ([decision 0007](decisions/0007-process-local-investigation-workflow.md)).
+- [ ] P1-07 synthetic ingestion/hybrid retrieval: decision 0008 records the selected local PostgreSQL full-text/pgvector store and synthetic reset-on-restart boundary. Versioned provenance, authorization-gated ingestion/search, migration and disposable-database tests are implemented, but the adapter is not wired, no embedding provider is selected, and reset-on-application-restart is not yet implemented or verified. Keep this deliverable open.
 
 Exit criteria: An authorized investigation succeeds; cross-project access is denied and runaway tasks terminate.
 

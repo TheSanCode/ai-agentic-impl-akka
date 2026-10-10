@@ -30,7 +30,7 @@ Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources.
 | P1-04 | Implement trusted identity, project policy and mock delegated connector access. | Local adapter tests reject missing identity, wrong audience/scope and unauthorized project/resource access; document OIDC and source-specific OBO limits. |
 | P1-05 | Define versioned agent/task/tool/evidence contracts. | Schema and argument validation tests reject malformed inputs. |
 | P1-06 | Implement skill/tool registry and permission checks. | Only permitted read tools are discoverable and executable. |
-| P1-07 | Implement ingestion and hybrid search with evidence citations. | Expected documents are found; restricted chunks never enter model context. |
+| P1-07 | Implement ingestion and hybrid search with evidence citations. A synthetic-only PostgreSQL full-text/pgvector adapter and focused container tests exist but are not application-wired; see [decision 0008](../decisions/0008-synthetic-postgres-hybrid-retrieval.md). | Expected synthetic documents are found; restricted chunks never enter model context; permissions are current; content resets on application restart. The last reset criterion is still open, and production use is separately gated. |
 | P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Local deterministic roles invoke only registered read tools; limits, cancellation and reauthentication are covered by workflow tests. No model or Akka runtime is used. |
 | P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | Create/status/result/cancel/resume APIs are implemented and HTTP-tested; bounded, allowlisted process-local lifecycle tracing is tested in decision 0007. |
 | P1-10 | Run actual-model evaluation and negative end-to-end scenarios. | Versioned results identify successes, failures and missing evidence. |
@@ -76,7 +76,7 @@ The local implementation bounds each execution to four tool steps and 45 seconds
 
 ## 8 Retrieval and model integration
 
-Extract/chunk synthetic runbooks and store vectors with embedding model/version and dimension. Use PostgreSQL full-text and pgvector candidates behind SearchGateway, then combine rankings with a documented strategy. Apply project/source filtering and a current authorization check before including any text in prompts.
+Extract/chunk synthetic runbooks and store vectors with embedding model/version and dimension. Use PostgreSQL full-text and pgvector candidates behind SearchGateway, then combine rankings with a documented strategy. Apply project/source filtering and current authorization checks before including any text in prompts. The current test adapter uses reciprocal-rank fusion and fixed test vectors only; it is not the default application search, and no real embedding model is selected.
 
 Return source IDs, links, versions and passages. Do not expose restricted document titles or snippets through citations, summaries or caches. Treat retrieved content as evidence, never as authority to change system instructions.
 
