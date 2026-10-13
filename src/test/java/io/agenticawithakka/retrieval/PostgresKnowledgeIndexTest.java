@@ -69,6 +69,12 @@ class PostgresKnowledgeIndexTest {
         postgres.setUser(POSTGRES.getUsername());
         postgres.setPassword(POSTGRES.getPassword());
         dataSource = postgres;
+        try (var connection = dataSource.getConnection();
+                var statement = connection.createStatement()) {
+            statement.execute("CREATE EXTENSION IF NOT EXISTS vector");
+        } catch (java.sql.SQLException failure) {
+            throw new IllegalStateException("could not install pgvector in the disposable test database", failure);
+        }
         Flyway.configure().dataSource(dataSource).load().migrate();
     }
 

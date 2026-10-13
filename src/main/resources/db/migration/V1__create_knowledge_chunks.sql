@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS vector;
-
 CREATE TABLE knowledge_chunks (
     project_id text NOT NULL,
     source_id text NOT NULL,

@@ -1,6 +1,6 @@
 # Windows Local Installation Prerequisites
 
-Last updated: 7 October 2026
+Last updated: 12 October 2026
 
 Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
@@ -10,7 +10,7 @@ This guide checks development tools for the full lab. The [backend scaffold guid
 
 ## Current Installation Status
 
-Versions below were checked on 7 October 2026. An installed side-by-side runtime is not necessarily the default selected by `PATH`.
+Versions below were checked on 12 October 2026 unless otherwise stated. An installed side-by-side runtime is not necessarily the default selected by `PATH`.
 
 | Tool | Observed status / version | Next action |
 | --- | --- | --- |
@@ -19,8 +19,8 @@ Versions below were checked on 7 October 2026. An installed side-by-side runtime
 | Java JDK | Microsoft OpenJDK 21.0.8 is selected by `PATH`. Temurin 25.0.4.1+1 is installed per-user. | Temurin `java -version` and `javac -version` verified by full path. Select it explicitly for this project after compatibility tests; Java 21 remains the current default. |
 | Node.js | Node.js LTS 24.19.0 (npm 11.17.0) is installed per-user. `PATH` still selects Node.js 24.10.0 and npm 11.6.1. | Put the 24.19.0 installation ahead of the existing system Node.js path when ready to switch. Confirm compatibility with the selected Angular release. |
 | VS Code | 1.140.0 | Updated; `code --version` verified. VSCodium is available if an open-source editor distribution is preferred. |
-| Container runtime | Podman and Podman Desktop are not installed. Docker Desktop is not installed. | Install WSL2 first, then install Podman Desktop and configure its Podman machine. Prefer Podman over Docker Desktop for the local lab. |
-| Ollama | 0.40.0; service not running | Updated; `ollama --version` verified. Start the service when needed and verify `ollama list`; model installation remains separate. |
+| Container runtime | Docker CLI is present but Docker Engine is unavailable (`dockerDesktopLinuxEngine` named pipe missing); Podman and Podman Desktop are not installed. | Install/configure a container engine after WSL2 setup. The pgvector profile acceptance test is currently blocked on an available engine. |
+| Ollama | 0.40.0; service reachable. `nomic-embed-text:latest` installed, embedding-capable, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions. | Verified a real synthetic-text embedding request. The selected model is limited to the opt-in synthetic retrieval profile; agent chat/model evaluation remains pending. |
 | WSL2 | Not installed | Install WSL2 and an Ubuntu distribution from Administrator PowerShell; restart if prompted. The current shell is not elevated. |
 
 The current shell lacks administrator rights, so WSL2 and a usable container engine remain blocked. Recommended order: **WSL2 → Podman Desktop/engine → select project JDK and Node.js → Ollama server → final toolchain/model checks**. Installation versions are evidence of tool presence only, not application acceptance.

@@ -34,6 +34,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /** Composition of the process-local coordinator and synthetic read-only adapters. */
 @Configuration(proxyBeanMethods = false)
@@ -48,6 +49,7 @@ public class InvestigationConfiguration {
     }
 
     @Bean
+    @Profile("!synthetic-postgres")
     SearchGateway mockSearchGateway(MockIdentityContextStore identities, ServiceProperties properties, Clock clock) {
         List<EvidencePassage> seeded = projectIds(properties).stream()
                 .map(project -> passage(
