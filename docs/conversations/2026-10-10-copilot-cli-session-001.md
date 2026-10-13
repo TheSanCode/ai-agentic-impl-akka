@@ -122,3 +122,21 @@ This session remains in progress. P1-07's synthetic retrieval foundation is comm
 - `ollama list` initially showed only chat models. Pulled `nomic-embed-text:latest` (274 MB) from Ollama. Verified through `/api/show` that it supports `embedding`, its local model digest is `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, and a real synthetic-text `/api/embeddings` request returned 768 finite dimensions.
 - Docker CLI exists but Docker Engine is unavailable (`dockerDesktopLinuxEngine` named pipe missing); Podman, `psql`, `postgres`, and `pg_ctl` are not installed. The `PostgresKnowledgeIndexTest` results in the earlier record were not rerun in this session.
 - Implementation and validation outcomes are pending.
+
+### Continued session — 12 October 2026
+
+15. **User** — timestamp unavailable
+
+   > Some of the conversation history has been summarized to free up context.
+
+   The supplied continuation included the earlier requests and a P1-07 work summary. The original status-review and P1-07 requests are already recorded above; no unavailable conversation was reconstructed.
+
+16. **Assistant — work record** — 12 October 2026, 23:40 -04:00
+
+- Implemented the `synthetic-postgres` opt-in profile with a real, digest-pinned Ollama embedding adapter (`nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions), synthetic runbook ingestion route, PostgreSQL/pgvector composition and current identity/policy checks.
+- Added a non-destructive local database provisioning script requiring a restricted pre-existing app role. Startup verifies loopback URL, exact database/schema, connection catalog and the application/owner/synthetic-only marker before Flyway; disables Flyway clean and clears only synthetic knowledge rows after verification. Moved pgvector extension creation to provisioning/test setup rather than application migrations.
+- Added profile-level Testcontainers acceptance coverage for actual Ollama ingestion and hybrid retrieval, project/source provenance, denied cross-project ingestion, membership revocation, wrong-owner refusal without clearing data, and valid-owner restart reset. This end-to-end test was not executed because the local Docker Engine is unavailable and PostgreSQL/Podman tools are absent.
+- `.\mvnw.cmd -B -ntp clean verify '-Dtest=!PostgresKnowledgeIndexTest' '-Dollama.embedding.live=true'` completed successfully: 155 tests total, 0 failures, 0 errors, 1 skipped (154 passed). The live Ollama embedding test and three ownership-guard tests passed; the skipped test was the profile-level PostgreSQL integration test.
+- `.\mvnw.cmd -B -ntp '-Dtest=SyntheticPostgresProfileIntegrationTest' test` completed with 1 skipped and no failures because Testcontainers found no valid Docker environment. Thus database-backed ingestion, hybrid retrieval, revocation and restart-reset results remain unverified.
+- `git diff --check` passed. Relative Markdown links in 8 changed documentation files were checked; no broken targets were found. Updated README, decision 0008, Phase 1 instructions, local prerequisites, technology stack, backend guide, autonomous plan and roadmap. Roadmap date is 12 October 2026; P1-07 remains unchecked and explicitly blocked on its database-backed acceptance run. UI, durable recovery and model-driven agent execution remain pending.
+- No deployment or push occurred. The implementation/documentation changes are not yet committed. The final assistant response is pending its transcript entry.
