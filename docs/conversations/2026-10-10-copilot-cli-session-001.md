@@ -86,3 +86,39 @@
 ## Session status
 
 This session remains in progress. P1-07's synthetic retrieval foundation is committed, but the feature remains unwired and incomplete as described above. Do not push. The response to the user's conversation-recording request is pending its transcript entry and must be appended on the next turn.
+
+## Continued session — 12 October 2026
+
+### Messages
+
+12. **User** — 12 October 2026, 23:11:04 -04:00
+
+   > Complete P1-07 only.
+   >
+   > 1. Inspect available Ollama models and explicitly select an embedding model.
+   >    Do not substitute fixed test vectors for real embeddings.
+   > 2. Wire PostgreSQL/pgvector into an opt-in synthetic local profile.
+   > 3. Preserve project/source authorization and citation provenance.
+   > 4. Implement restart-reset behavior only for a positively verified,
+   >    application-owned synthetic database. Never reset an arbitrary database.
+   > 5. Test ingestion, hybrid retrieval, revocation and restart-reset behavior.
+   > 6. Record actual results and update the roadmap's review date and status.
+   >
+   > Keep UI, durable recovery and model-driven agent execution pending.
+   > Follow AGENTS.md conversation and commit rules. Do not deploy.
+
+13. **Assistant** — timestamp unavailable
+
+   > I’ll inspect the current P1-07 implementation, repository rules and recorded session state, then check which Ollama models are actually available before selecting one. If there is no usable local model or safe database ownership proof, I’ll report that blocker rather than fall back to fixed vectors or risk resetting unrelated data.
+
+14. **Assistant** — timestamp unavailable
+
+   > The running Ollama instance has only chat-capable models, not an embedding model, and the Docker Engine is currently unavailable. I’m selecting `nomic-embed-text` as the real embedding model and will install/verify it locally; I’ll also check whether a local PostgreSQL server can support the required database tests before deciding whether test execution is blocked.
+
+### Work record
+
+- Confirmed clean worktree and `feature/agentic`, synchronized with `origin/feature/agentic`; recent head `29219f3`.
+- Read current AGENTS.md, README, roadmap, Phase 1 instructions, decision 0008, technical design retrieval guidance, and previous session log before implementation.
+- `ollama list` initially showed only chat models. Pulled `nomic-embed-text:latest` (274 MB) from Ollama. Verified through `/api/show` that it supports `embedding`, its local model digest is `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, and a real synthetic-text `/api/embeddings` request returned 768 finite dimensions.
+- Docker CLI exists but Docker Engine is unavailable (`dockerDesktopLinuxEngine` named pipe missing); Podman, `psql`, `postgres`, and `pg_ctl` are not installed. The `PostgresKnowledgeIndexTest` results in the earlier record were not rerun in this session.
+- Implementation and validation outcomes are pending.
