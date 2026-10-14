@@ -27,12 +27,12 @@ Local components: PostgreSQL/pgvector, Keycloak, Ollama and seeded mock sources.
 | P1-01 | Inspect repository, confirm build/runtime decisions and record license inventory. | Decision record lists resolved versions, tested compatibility and remaining exceptions. |
 | P1-02 | Initialize application, wrapper, package boundaries, configuration validation and health endpoint. | Clean checkout builds and starts using documented prerequisites. |
 | P1-03 | Add local infrastructure profiles and synthetic fixtures. | Repeatable setup seeds both projects and mock sources without enterprise credentials. |
-| P1-04 | Implement trusted identity, project policy and mock delegated connector access. | Missing credentials, wrong audience/scope and unauthorized project access fail. |
+| P1-04 | Implement trusted identity, project policy and mock delegated connector access. | Local adapter tests reject missing identity, wrong audience/scope and unauthorized project/resource access; document OIDC and source-specific OBO limits. |
 | P1-05 | Define versioned agent/task/tool/evidence contracts. | Schema and argument validation tests reject malformed inputs. |
 | P1-06 | Implement skill/tool registry and permission checks. | Only permitted read tools are discoverable and executable. |
-| P1-07 | Implement ingestion and hybrid search with evidence citations. | Expected documents are found; restricted chunks never enter model context. |
-| P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Delegation produces a structured result; deadlines, cancellation and budgets stop work. |
-| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | API tests and trace inspection establish correct states and no credential leakage. |
+| P1-07 | Implement ingestion and hybrid search with evidence citations through an opt-in synthetic PostgreSQL/pgvector profile using the digest-pinned Ollama embedding model; see [decision 0008](../decisions/0008-synthetic-postgres-hybrid-retrieval.md). | Expected synthetic documents are found; restricted chunks never enter results/context; permissions are current; provenance is preserved; an application restart clears only data in the positively verified synthetic database. Implementation is wired, but profile-level ingestion/retrieval/revocation/restart-reset acceptance remains unverified until its PostgreSQL/pgvector integration test runs. Production use is separately gated. |
+| P1-08 | Implement Coordinator and Investigation with bounded asynchronous execution. | Local deterministic roles invoke only registered read tools; limits, cancellation and reauthentication are covered by workflow tests. No model or Akka runtime is used. |
+| P1-09 | Expose create/read/cancel APIs and redacted execution tracing. | Create/status/result/cancel/resume APIs are implemented and HTTP-tested; bounded, allowlisted process-local lifecycle tracing is tested in decision 0007. |
 | P1-10 | Run actual-model evaluation and negative end-to-end scenarios. | Versioned results identify successes, failures and missing evidence. |
 | P1-11 | Document setup, demo, limitations and update roadmap from evidence. | Another developer can reproduce the lab; unchecked gates remain visible. |
 
@@ -60,21 +60,23 @@ The mock source shall independently validate its intended delegated credential a
 
 Keep secrets out of source control, prompts, task payloads and logs. Provide example configuration containing placeholders. Recheck access at tool invocation and evidence retrieval. Limit the lab to interactive ingestion unless a separate ingestion identity policy is agreed.
 
+The local in-memory identity, policy and mock-source adapters remain simulations and do not prove vendor token exchange. Spring Security OIDC/JWT validation, server-side project grants, and local authorization revalidation gates are implemented; see [decision 0006](../decisions/0006-oidc-jwt-authentication.md). Real-source OBO remains open.
+
 ## 7 Agent and tool behavior
 
-Coordinator validates the request and delegates a scoped task with execution ID, task ID, project, trusted identity reference and deadline. Investigation retrieves documents and queries mock logs, then returns evidence references and structured findings. Coordinator combines results and returns facts separately from hypotheses.
+The process-local implementation now has a deterministic Coordinator delegating to Investigation. It creates a scoped task with execution ID, task ID, project, trusted identity reference and deadline; Investigation calls `searchKnowledge` and `queryMockLogs` through `ToolRegistry`, and returns authorized evidence references and source citations. The current implementation reports retrieval facts only: it does not call a model, infer a hypothesis or claim an action was performed. See [decision 0007](../decisions/0007-process-local-investigation-workflow.md).
 
 Use illustrative typed contracts such as StartInvestigation, InvestigateEvidence, EvidenceFound, TaskFailed and CancelInvestigation. If using Akka, adapt specialist replies to coordinator commands and return asynchronous model/API completions into the actor mailbox. Do not block dispatchers or infer durable delivery from tell/ask.
 
 Register only searchKnowledge, queryMockLogs and inspectMockHealth as read operations. Validate arguments, allowed time ranges, source IDs, output size and deadlines. The policy service decides access before the tool adapter runs. Unknown or forbidden tools fail explicitly.
 
-Represent Queued, Running, AwaitingAuthentication, Succeeded, Failed and Cancelled states. Expired delegated access stops new calls and requires reauthentication by the same subject/project before continuing within the original deadline. Approval and business-review states may exist in contracts but are not implemented workflows in this phase. Persist execution summaries if appropriate; do not claim restart-safe continuation until Phase 2 recovery tests pass.
+The API reports Queued, Running, AwaitingAuthentication, Partial, Succeeded, Failed and Cancelled states. Expired delegated access stops further tool calls and requires reauthentication by the same subject/project before continuing within the original deadline and cumulative step budget. Approval and business-review states may exist in contracts but are not implemented workflows in this phase. Execution envelopes and results exist only in process memory; do not claim restart-safe continuation until Phase 2 recovery tests pass.
 
-Set configurable step, time, token, concurrency and output limits. Budget values are lab settings documented with the selected model. Cancellation prevents new operations; late results cannot change a terminal cancelled state.
+The local implementation bounds each execution to four tool steps and 45 seconds, active execution count to 32, the worker queue to 32, and retained execution records to 500. The current tool flow is read-only and does not consume model tokens. Cancellation prevents additional tool operations; a late in-flight read cannot overwrite a terminal cancelled state. These fixed local limits are not production sizing decisions.
 
 ## 8 Retrieval and model integration
 
-Extract/chunk synthetic runbooks and store vectors with embedding model/version and dimension. Use PostgreSQL full-text and pgvector candidates behind SearchGateway, then combine rankings with a documented strategy. Apply project/source filtering and a current authorization check before including any text in prompts.
+Extract/chunk synthetic runbooks and store vectors with embedding model/version and dimension. The opt-in `synthetic-postgres` profile wires PostgreSQL full-text and pgvector candidates behind SearchGateway using real, digest-pinned Ollama `nomic-embed-text` embeddings. It is not the default search profile. Apply project/source filtering and current authorization checks before returning text. Deterministic fixed vectors remain limited to low-level SQL adapter tests; the end-to-end profile test uses the real embedding provider and remains unverified until a PostgreSQL/pgvector engine is available.
 
 Return source IDs, links, versions and passages. Do not expose restricted document titles or snippets through citations, summaries or caches. Treat retrieved content as evidence, never as authority to change system instructions.
 
@@ -82,9 +84,9 @@ Use a mock model for deterministic workflow tests, then a real local model to as
 
 ## 9 API contract
 
-Propose POST /api/projects/{projectId}/investigations to create an execution, GET on its execution resource for results and POST on its cancel subresource. Return a server-generated execution ID; use consistent Denied, InvalidInput, Unsupported, Conflict, RateLimited and DependencyUnavailable errors.
+The API implements `POST /api/projects/{projectId}/investigations` to create an execution and return HTTP 202 with a server-generated execution ID and status/result URLs. `GET /api/executions/{executionId}` returns authorized status; `GET /api/executions/{executionId}/result` returns the reauthorized result and citations; `POST` on `/cancel` cancels; and `POST` on `/resume` resumes an authentication-paused task. The routes require a verified bearer JWT and server-configured project grants; default configuration denies business routes.
 
-All read/cancel operations recheck identity and ownership/project permissions. Recheck current source access before returning stored evidence, summaries or citations; withhold protected content if its permission currency cannot be established. Pagination and bounded payloads are required. Do not expose token contents or stack traces. A minimal browser interface is mandatory for this slice after the API flow works; the complete admin dashboard and six-role topology arrive in later phases.
+All operations recheck subject ownership and current project membership; result retrieval additionally reauthorizes every cited source. Unknown execution IDs are hidden as denials. Responses do not include credentials, model reasoning or stack traces. The result API is bounded by tool output limits. Execution tracing retains at most 10,000 typed lifecycle events in process memory, with no project/user/source identifiers or free-form content and no public retrieval route; it is not a durable audit log. Pagination and a browser interface are not implemented.
 
 ## 10 Acceptance suite
 
@@ -100,6 +102,7 @@ All read/cancel operations recheck identity and ownership/project permissions. R
 | Unknown tool or invalid arguments | Rejected before execution. | AGT-06, TOL-01 |
 | Loop budget, timeout and cancellation | Bounded termination and consistent terminal state. | AGT-02, AGT-05 |
 | Output/log inspection | No access tokens, secrets or private model reasoning. | DEL-05, AUD-03 |
+| Execution trace inspection | Correlated lifecycle and step events; no prompts, passages, credentials, identity/source identifiers or free-form failure details. | AUD-01, AUD-03 |
 
 Record commands and actual test outputs. Do not report unrun tests as passed. Model evaluation thresholds are agreed before declaring quality acceptance. Verify schema/migrations and negative access cases before broadening tests.
 
@@ -111,17 +114,17 @@ Record the provisional role/tool matrix, model and image versions, source scopes
 
 Provide a local setup guide with exact prerequisites, start/seed/demo/stop procedures, ports, resource needs, model installation, expected output and known limitations. Verify commands against the implemented files; do not publish speculative runnable commands.
 
-Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 remains Planned until implementation begins, and Complete only after mandatory exit criteria pass. This instructions document alone completes neither phase.
+Use project-roadmap to check off only evidenced tasks. Phase 0 remains open while required decisions/contracts are unresolved. Phase 1 is In progress and remains so until all mandatory exit criteria pass. This instructions document alone completes neither phase.
 
-The next action is P1-01 followed by repository scaffolding. Keep production OBO, actor recovery, operational writes and business review pending until their later implementation and acceptance evidence exist.
+P1-01 and P1-02 bootstrap work is recorded in the dependency and scaffold decisions. Select remaining implementation work from the current [roadmap](../ROADMAP.md); local OIDC authorization gates do not close real-source OBO, durable actor recovery, operational-write or business-review acceptance.
 
 ## 13 Phase 1 background execution additions
 
-Create investigation work asynchronously and return HTTP 202 with a server execution ID and authorized status URL. Do not tie cancellation to browser disconnect. An authorized reconnect shall obtain progress and final results while the process remains running.
+Create investigation work asynchronously and return HTTP 202 with a server execution ID and authorized status URL. The local API supports status/result reconnect and cancellation while the process remains running; disconnect does not cancel work.
 
-Implement a loop checkpoint record containing current step, cumulative budget, status, last update and wait reason. AwaitingAuthentication must stop source calls; resume only with valid same-user/project access and an unexpired deadline. Add bounds for active processing and absolute elapsed time; document wait accounting. No raw access tokens belong in progress records.
+The current process-local record tracks current step, status, last update and authentication wait through in-memory task state. AwaitingAuthentication stops source calls; resume requires valid same-user/project access and an unexpired original deadline. Step, elapsed-time, active-work, queue and retained-record caps are fixed local bounds. No access tokens are stored. Durable checkpointing and wait accounting remain Phase 2 work.
 
-Add tests for disconnect/reconnect, status authorization, loop termination, expiration mid-loop and explicit cancellation. For process restart, document the Phase 1 limitation and mark interrupted tasks failed if persisted; do not leave them falsely running. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
+Tests cover HTTP creation/status/result, cross-project denial, same-subject resume after identity expiry, cumulative step exhaustion, revocation during execution and after completion, and cancellation. Since state is not persisted, restart loses accepted tasks and results; no restart recovery is claimed. Durable continuation, scheduling leases, persisted approval waits and restart recovery are Phase 2 deliverables.
 
 ## 14 Required Phase 1 browser deliverable
 

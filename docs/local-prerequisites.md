@@ -1,29 +1,46 @@
 # Windows Local Installation Prerequisites
 
-Last updated: 7 October 2026
+Last updated: 14 October 2026
 
 Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
 ## Current setup context
 
-This guide checks development tools for the full lab. The [backend scaffold guide](implementation/backend-scaffold.md) now provides verified JDK 25 build and health-check commands without containers or models; Compose and full lab setup remain pending. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git, Ollama and Podman. VS Code is optional; VSCodium is an open-source alternative.
+This guide checks development tools for the full lab. The [backend scaffold guide](implementation/backend-scaffold.md) provides verified JDK 25 build and health-check commands without containers or models; the repository's full Compose lab remains pending. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git and Podman. Ollama is the implemented local embedding provider, but company policy currently blocks its model downloads; an approved replacement requires integration before use. VS Code is optional; VSCodium is an open-source alternative.
 
 ## Current Installation Status
 
-Versions below were checked on 7 October 2026. An installed side-by-side runtime is not necessarily the default selected by `PATH`.
+The table combines direct tool checks and user-provided WSL/Podman command output from 14 October 2026, recorded in the [setup conversation](conversations/2026-10-14-copilot-cli-session-003.md). Earlier machine observations are not evidence of this machine's readiness. An installed runtime is not necessarily selected by an already-open shell.
 
 | Tool | Observed status / version | Next action |
 | --- | --- | --- |
 | WinGet | v1.29.380 | Available; `winget source update` completed successfully. |
-| Git | 2.55.0.windows.5 | Updated; `git --version` verified. |
-| Java JDK | Microsoft OpenJDK 21.0.8 is selected by `PATH`. Temurin 25.0.4.1+1 is installed per-user. | Temurin `java -version` and `javac -version` verified by full path. Select it explicitly for this project after compatibility tests; Java 21 remains the current default. |
-| Node.js | Node.js LTS 24.19.0 (npm 11.17.0) is installed per-user. `PATH` still selects Node.js 24.10.0 and npm 11.6.1. | Put the 24.19.0 installation ahead of the existing system Node.js path when ready to switch. Confirm compatibility with the selected Angular release. |
-| VS Code | 1.140.0 | Updated; `code --version` verified. VSCodium is available if an open-source editor distribution is preferred. |
-| Container runtime | Podman and Podman Desktop are not installed. Docker Desktop is not installed. | Install WSL2 first, then install Podman Desktop and configure its Podman machine. Prefer Podman over Docker Desktop for the local lab. |
-| Ollama | 0.40.0; service not running | Updated; `ollama --version` verified. Start the service when needed and verify `ollama list`; model installation remains separate. |
-| WSL2 | Not installed | Install WSL2 and an Ubuntu distribution from Administrator PowerShell; restart if prompted. The current shell is not elevated. |
+| Git | 2.55.0.windows.5 | `git --version` verified. |
+| Java JDK | Temurin OpenJDK 25.0.4.1+1 LTS installed per-user through WinGet; Java and Javac 25.0.4.1 verified. User `JAVA_HOME` and user PATH are configured by the installer. | Reopen PowerShell to pick up environment changes. Maven Wrapper selected Java 25 when the current process environment was explicitly refreshed. |
+| Maven | Repository wrapper runs Apache Maven 3.9.11 on Java 25.0.4.1. | No standalone installation needed. Application build/tests were not run during this installation session. |
+| Node.js | PATH selects Node.js 24.19.0 and npm 11.17.0. | Confirm compatibility with the selected Angular release before frontend work. |
+| VS Code | 1.141.1 | `code --version` verified. VSCodium is an optional alternative. |
+| Container runtime | Podman Desktop 1.29.3 installed. User-provided output confirms `podman-machine-default` running with WSL, successful `podman info` reporting client/server 6.0.2, and Docker Compose provider v5.6.0. Earlier CLI checks reported 5.8.3. | Engine connectivity and Compose availability are verified; application containers, Testcontainers compatibility and database-backed acceptance have not been rerun. |
+| Ollama | 0.40.3 installed and local API responsive. No models installed. `ollama pull nomic-embed-text:latest` failed with HTTP 403; the registry response identifies a Zscaler policy block. The user reports company restrictions on Ollama. | Do not bypass policy or repeat blocked downloads. Obtain non-sensitive company-approved embedding-provider details and approved usage boundaries before implementing a replacement. |
+| WSL2 | Ubuntu-24.04 registered as version 2. User-provided startup check returned kernel `6.18.54.1-microsoft-standard-WSL2`. | WSL2 startup is verified; the earlier virtualization/startup blocker is no longer observed. |
 
-The current shell lacks administrator rights, so WSL2 and a usable container engine remain blocked. Recommended order: **WSL2 → Podman Desktop/engine → select project JDK and Node.js → Ollama server → final toolchain/model checks**. Installation versions are evidence of tool presence only, not application acceptance.
+JDK 25, Maven selection, WSL2 startup, Podman connectivity and Compose availability are verified. No application build or database-backed/full-lab acceptance was performed during this setup session. The next bounded task is to identify and integrate a company-approved text-embedding provider, then verify actual embeddings and database-backed retrieval. No replacement has been selected or implemented.
+
+### Company-approved embedding provider
+
+Follow the [company embedding-provider replacement guide](company-embedding-provider-setup.md) for the IT handoff, implementation surfaces and acceptance checks.
+
+Company policy takes precedence over the local Ollama setup instructions below. Do not bypass Zscaler, use an unapproved mirror or send source content to an unapproved hosted service.
+
+Before integration, establish:
+
+- The approved model and provider, including **text-embedding** support. A chat-only model cannot directly replace the retrieval embedding model.
+- The supported API or SDK and authentication method. Keep credentials and confidential endpoints out of conversation records and committed documentation.
+- Approval to send synthetic development text to the provider, plus applicable licensing, retention and data-handling constraints. Requirements still prefer open-source components; any exception requires explicit review.
+
+The current opt-in synthetic profile implements Ollama-specific model/digest checks for `nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions. That remains the existing code configuration, not an approved or available replacement on this machine.
+
+A replacement requires an adapter behind the existing embedding interface, provider-appropriate model/version validation, confirmed vector dimensions and compatible index/profile configuration. Verify real embeddings, ingestion, hybrid retrieval, authorization/revocation and restart-reset behavior before claiming retrieval acceptance. Do not silently substitute fixed vectors or reuse vectors from a different model.
 
 ## 1 Check WinGet and refresh its catalog
 
@@ -68,7 +85,7 @@ Run individually so you can inspect errors or prompts. These commands use the la
 
 WinGet install normally attempts an upgrade when the package is already installed. For an explicit update, use `winget upgrade --id <package-id> -e --source winget`. No available upgrade means no update was found, not an installation failure. Inspect other error messages rather than treating every nonzero exit as package absence. Do not automatically upgrade unrelated software.
 
-Temurin is an open-source OpenJDK distribution. On this machine it was installed from the official Temurin 25.0.4.1+1 Windows archive after verifying its published SHA-256 checksum; it is side-by-side with Microsoft OpenJDK 21 and does not change the system default. Node.js LTS 24.19.0 was installed per-user, but the pre-existing system Node.js 24.10.0 still wins in `PATH`. Resolve the active executable before building. Match Node.js to the selected Angular release's supported range.
+Temurin is an open-source OpenJDK distribution. On this machine WinGet verified the installer hash and installed JDK 25 per-user. The first attempt was cancelled (MSI 1602); an explicitly approved interactive retry succeeded. Node.js 24.19.0 and npm 11.17.0 are already selected by PATH. Resolve active executables before building and match Node.js to the selected Angular release's supported range.
 
 Podman and Podman Desktop are open-source alternatives to Docker Desktop. Configure Podman Desktop to create its Podman machine after WSL2 is installed, and verify the Compose provider before using Compose files. Docker Desktop remains an optional alternative; review its licensing terms for organizational use. Verify package identities with `winget show --id <package-id> -e --source winget` if catalog resolution changes.
 
@@ -113,11 +130,11 @@ ollama --version
 code --version
 ```
 
-The current default JDK is Microsoft OpenJDK 21. To check the side-by-side Temurin 25 installation without changing system configuration, use its full path under `%LOCALAPPDATA%\Programs\Eclipse Adoptium\jdk-25.0.4.1+1\bin` for `java.exe -version` and `javac.exe -version`. Select the project JDK in its build/IDE configuration only after compatibility is established.
+The installed JDK is under `%LOCALAPPDATA%\Programs\Eclipse Adoptium\jdk-25.0.4.101-hotspot`. User `JAVA_HOME` points there. An existing terminal or assistant process may retain the old environment: reopen it or explicitly select this JDK for that process before running Maven. Full-path Java and Javac checks and Maven's Java 25 selection passed.
 
-Use `where.exe node` if `node --version` does not show the intended Node.js LTS. On this machine the older system installation currently takes precedence over the per-user 24.19.0 installation; adjust PATH deliberately rather than removing or replacing a runtime used by other projects. If PowerShell blocks npm's script wrapper, try `npm.cmd --version` rather than broadly disabling execution policy.
+Use `where.exe node` if `node --version` does not show the intended Node.js LTS. Current checks select 24.19.0; do not remove or replace runtimes used by other projects. If PowerShell blocks npm's script wrapper, try `npm.cmd --version` rather than broadly disabling execution policy.
 
-Podman must be running for `podman info`; the CLI version alone does not prove the engine works. `podman compose` also requires a supported Compose provider. Ollama installation does not install or start a chat or embedding model. Model selection, weight licenses, downloads and resource budgets are separate bootstrap tasks.
+Podman must be running for `podman info`; the CLI version alone does not prove the engine works. Follow the [Podman Desktop machine setup guide](podman-desktop-setup.md) to create, start and verify a machine. `podman compose` also requires a supported Compose provider. Ollama installation does not install or start a chat or embedding model. Model selection, weight licenses, downloads and resource budgets are separate bootstrap tasks.
 
 ## 6 Tools and services for later phases
 

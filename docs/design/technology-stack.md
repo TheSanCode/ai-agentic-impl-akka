@@ -15,7 +15,7 @@ Use the following candidates for the local implementation. These are design sele
 | Backend | Spring Boot 4.0.x plus Spring Security | Initially align with Spring AI 2.0.x and verify latest supported patch. Boot 4.1.x is an upgrade candidate after combined tests. |
 | AI integration | Spring AI 2.0.1 candidate | Boot 4.0.8 / Java 25 verified only for an isolated Ollama HTTP-fixture round trip; model inference, embeddings, tool calling, combined Akka compatibility and application integration remain open. |
 | Actor runtime | Akka Typed | Two-agent local communication; Akka Persistence Typed in Phase 2. Exact runtime version and persistence plugin remain to select/test. |
-| Local inference | Ollama | Local chat and embedding endpoints. Pick actual models after measuring GPU/RAM, tool reliability and weight licenses. |
+| Local inference | Ollama; synthetic retrieval embedding model selected as `nomic-embed-text:latest` (digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions) | Real embedding request verified locally and wired only to the opt-in synthetic profile. Chat model, agent evaluation, hardware fit and weight-license review remain open. |
 | Identity | Keycloak and Spring Security OIDC | Browser login, MFA and local token-exchange proof. Real-source delegation stays source-specific. |
 | Authorization | Application policy service initially; optional OPA adapter | Enforce user/project/source/tool boundaries in code. |
 | Application state | PostgreSQL and Flyway | Durable records, migrations, projections and audit metadata. |

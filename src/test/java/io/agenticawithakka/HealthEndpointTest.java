@@ -30,9 +30,9 @@ class HealthEndpointTest {
     }
 
     @Test
-    void businessAndManagementEndpointsAreAbsent() throws Exception {
-        assertThat(get("/api/projects").statusCode()).isEqualTo(404);
-        assertThat(get("/actuator/env").statusCode()).isEqualTo(404);
+    void businessAndManagementRoutesAreDeniedWhenOidcIsNotConfigured() throws Exception {
+        assertThat(get("/api/projects").statusCode()).isEqualTo(401);
+        assertThat(get("/actuator/env").statusCode()).isEqualTo(401);
     }
 
     private HttpResponse<String> get(String path) throws Exception {

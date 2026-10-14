@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${AGENTICA_SYNTHETIC_JDBC_URL:jdbc:postgresql://127.0.0.1:5432/agenticawithakka_synthetic}
+    username: ${AGENTICA_SYNTHETIC_DB_USERNAME}
+    password: ${AGENTICA_SYNTHETIC_DB_PASSWORD}
+  flyway:
+    enabled: false
+retrieval:
+  synthetic:
+    database-name: agenticawithakka_synthetic
+    schema-name: agentica_synthetic
+    owner-id: ${AGENTICA_SYNTHETIC_DB_OWNER_ID}
+    ollama-base-url: http://127.0.0.1:11434
+    embedding-model: nomic-embed-text:latest
+    embedding-model-digest: 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+    embedding-dimensions: 768
