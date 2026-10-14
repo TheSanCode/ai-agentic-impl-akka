@@ -26,3 +26,33 @@ Earlier conversations outside the messages visible in this session are unavailab
 - The installation status in docs/local-prerequisites.md describes earlier observations and does not represent this checkout's current machine.
 - No software was installed, system configuration changed, application code modified or services provisioned. Only this conversation record was added.
 - Next scoped task: install/configure JDK 25 and verify the wrapper; WSL2, a container engine/Compose and Ollama are additional full-lab prerequisites.
+
+## Continued messages
+
+3. **Assistant** - timestamp unavailable
+
+   > **Not all prerequisites are installed. The immediate blocker is JDK 25.**
+   >
+   > | Software | Current status |
+   > |---|---|
+   > | Git | Installed: 2.55.0 |
+   > | Node.js / npm | Installed: 24.19.0 / 11.17.0 |
+   > | VS Code | Installed: 1.141.1 |
+   > | WinGet | Installed: 1.29.380 |
+   > | **JDK 25** | Not found; `java`/`javac` unavailable and `JAVA_HOME` unset |
+   > | Maven | Repository wrapper present; no separate installation needed |
+   > | WSL2 | Not installed |
+   > | Podman / Docker | Neither found |
+   > | Ollama | Not found; local service unreachable |
+   >
+   > **Backend:** `.\mvnw.cmd --version` failed because Java is unavailable, so builds/tests could not run. Install JDK 25 and configure `JAVA_HOME` first.
+   >
+   > **Full local lab:** additionally requires WSL2, a working container engine with Compose, and Ollama with the selected embedding model. These are not needed for the default backend scaffold.
+   >
+   > No software or system settings were changed. The check record was committed locally on `feature/agentic`; nothing was pushed.
+
+4. **User** - 13 October 2026, 23:34:17 -04:00
+
+   > for the missing software get me the list winget command
+
+Commands will be provided for Temurin JDK 25, Podman Desktop, Podman engine and Ollama, plus the separate Windows WSL installation command. No installation is being performed. The response to entry 4 is pending and must be appended on the next turn.
