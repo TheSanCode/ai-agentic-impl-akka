@@ -258,3 +258,22 @@ The response will provide read-only Git commands for recent history, full commit
 - The latest read-only check executed `java.exe -version` and `javac.exe -version` from the persisted user JAVA_HOME. Both succeeded: Temurin OpenJDK 25.0.4.1+1 LTS and javac 25.0.4.1.
 - No new installation, service startup or configuration changes were performed for this confirmation.
 - The response to entry 25 is pending and must be appended on the next turn.
+
+26. **Assistant** - timestamp unavailable
+
+    **Confirmed: JDK 25 is installed and working.**
+
+    - **Java:** Eclipse Temurin OpenJDK `25.0.4.1+1` LTS
+    - **Compiler:** `javac 25.0.4.1`
+    - **User `JAVA_HOME`:** `[REDACTED: user-profile path]\Programs\Eclipse Adoptium\jdk-25.0.4.101-hotspot\`
+
+    Both version commands succeeded. Reopen PowerShell to pick up the installed environment settings.
+
+### Previously running installer completion
+
+- Received completion of the previously launched command; retrieved its final output without starting another installation.
+- Maven Wrapper successfully reported Apache Maven 3.9.11 running on Eclipse Adoptium Java 25.0.4.1.
+- WinGet reported successful installation of Podman Desktop 1.29.3 after verifying the installer hash.
+- Podman engine/Compose readiness remains unverified. WSL2 and Ollama installation have not been performed by this session.
+- Installation work remains paused as requested. No new installation or service startup was initiated.
+- The assistant's completion notice is pending and must be appended on the next turn.
