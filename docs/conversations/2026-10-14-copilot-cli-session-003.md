@@ -62,3 +62,28 @@
 8. **Assistant** - 14 October 2026
 
    > The immediate next step is to **restart Windows manually**, since WSL previously reported a pending restart. Then recheck `wsl --status` and `wsl --list --verbose`. If WSL still cannot start, ask an administrator to verify Virtual Machine Platform and firmware/host virtualization before installing Ubuntu. Once WSL2 works, configure the Podman machine and Compose provider; Ollama is already installed, but still needs an approved embedding model download and verification. Do not initialize Podman or download a model until those steps are authorized and ready.
+
+9. **User** - 14 October 2026, 00:36 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl --status
+   > Default Version: 2
+   > WSL1 is not supported with your current machine configuration.
+   > Please enable the "Windows Subsystem for Linux" optional component to use WSL1.
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl --list --verbose
+   > Windows Subsystem for Linux has no installed distributions.
+   > You can resolve this by installing a distribution with the instructions below:
+   >
+   > Use 'wsl.exe --list --online' to list available distributions
+   > and 'wsl.exe --install <Distro>' to install.
+
+10. **Assistant** - 14 October 2026
+
+   > WSL is set to use version 2, but **no Linux distribution is installed yet**. The “WSL1 is not supported” message is not itself an indication that WSL2 is broken.
+   >
+   > If the restart is complete and you have Administrator PowerShell, the next step is to install Ubuntu 24.04:
+   >
+   > ```powershell
+   > wsl --install -d Ubuntu-24.04
+   > ```
+   >
+   > Complete Ubuntu's first-run setup, then verify with `wsl --list --verbose` that Ubuntu is registered as version 2. If installation fails with a virtualization or Windows-feature error, stop there and share the full error; Podman setup depends on WSL working.
