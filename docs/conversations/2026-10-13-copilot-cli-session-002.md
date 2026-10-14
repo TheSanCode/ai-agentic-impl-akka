@@ -120,3 +120,21 @@ Commands will be provided for Temurin JDK 25, Podman Desktop, Podman engine and 
 - Skill metadata, local Markdown links and `git diff --check` passed. Package installations, WSL changes, engine setup and model downloads were not run. Skill auto-discovery in a fresh assistant session and non-Windows behavior were not runtime-tested.
 - No roadmap completion status changed: this is setup documentation, not evidence of application or full-lab acceptance.
 - The final response to entry 6 is pending and must be appended on the next turn.
+
+10. **Assistant** - timestamp unavailable
+
+    Updated **README.md** with Windows WinGet installation commands and added **`.github/skills/local-prerequisites/SKILL.md`**.
+
+    The skill detects the host OS, locates WinGet on Windows, checks prerequisites and **requires confirmation before installing**. Non-Windows installation is explicitly unsupported for now.
+
+    **Verified:** Windows/WinGet detection, skill metadata, documentation links and whitespace checks passed. No software was installed; fresh-session skill discovery remains untested. Next setup step is JDK 25 installation.
+
+    Committed locally as `dedb67e` on `feature/agentic`; nothing was pushed.
+
+11. **User** - 13 October 2026, 23:41:21 -04:00
+
+    > git status
+
+### Status check
+
+`git status` reported branch `feature/agentic`, ahead of `origin/feature/agentic` by three commits, and a clean working tree before this required conversation update. This update is being committed separately; the final status will be checked afterward. The final response is pending for the next turn.
