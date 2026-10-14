@@ -150,3 +150,37 @@ Commands will be provided for Temurin JDK 25, Podman Desktop, Podman engine and 
     > how to get commit informaiton
 
 The response will provide read-only Git commands for recent history, full commit details, changed-file summaries and unpushed commits. No Git history changes are requested. The final response is pending and must be appended on the next turn.
+
+14. **Assistant** - timestamp unavailable
+
+    Run these from the repository directory:
+
+    ```powershell
+    # Recent commits: short hash and title
+    git --no-pager log --oneline -10
+
+    # Latest commit: author, date, message and changed-file summary
+    git --no-pager show --stat HEAD
+
+    # Specific commit, including its code changes
+    git --no-pager show dedb67e
+
+    # Local commits not yet pushed to the tracked remote branch
+    git --no-pager log --oneline '@{upstream}..HEAD'
+    ```
+
+    Replace `dedb67e` with any commit hash shown by `git log`.
+
+15. **User** - 13 October 2026, 23:46:15 -04:00
+
+    > verify whether all required software has been installed
+
+### Prerequisite recheck
+
+- Branch remains `feature/agentic`; working tree was clean before recording.
+- Git 2.55.0.windows.5, Node.js 24.19.0, npm 11.17.0 and WinGet 1.29.380 remain available.
+- Java/Javac, Podman, Docker and Ollama are not on PATH. Checked installation registry records and conventional directories found no matching installations. Neither user nor machine JAVA_HOME is set; persisted PATH entries did not show these tools.
+- `.\mvnw.cmd --version` still fails because JAVA_HOME is not configured. Application builds and tests were not run.
+- WSL status and distribution listing still report WSL is not installed.
+- Ollama's local model-list endpoint still refuses connections.
+- No installation, environment modification or service startup was performed. The final response is pending and must be appended on the next turn.
