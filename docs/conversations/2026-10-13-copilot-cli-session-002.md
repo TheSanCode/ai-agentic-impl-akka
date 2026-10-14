@@ -56,3 +56,67 @@ Earlier conversations outside the messages visible in this session are unavailab
    > for the missing software get me the list winget command
 
 Commands will be provided for Temurin JDK 25, Podman Desktop, Podman engine and Ollama, plus the separate Windows WSL installation command. No installation is being performed. The response to entry 4 is pending and must be appended on the next turn.
+
+5. **Assistant** - timestamp unavailable
+
+   Run these individually in PowerShell.
+
+   **Required for the backend:**
+   ```powershell
+   winget install --id EclipseAdoptium.Temurin.25.JDK -e --source winget
+   ```
+
+   **Additional software for the full local lab:**
+   ```powershell
+   winget install --id RedHat.Podman-Desktop -e --source winget
+   winget install --id RedHat.Podman -e --source winget
+   winget install --id Ollama.Ollama -e --source winget
+   ```
+
+   **WSL2** uses a Windows command rather than WinGet. Run this in **Administrator PowerShell** before configuring Podman:
+   ```powershell
+   wsl --install -d Ubuntu-24.04
+   ```
+   Restart if prompted and complete Ubuntu’s first-run setup. Then open Podman Desktop to configure its engine and Compose provider.
+
+   Reopen PowerShell after installation and verify:
+   ```powershell
+   java -version
+   javac -version
+   .\mvnw.cmd --version
+   podman info
+   podman compose version
+   ollama --version
+   ```
+
+   Maven must report **Java 25**; if it does not, configure `JAVA_HOME` to the installed JDK 25 directory. Ollama models are downloaded separately.
+
+6. **User** - 13 October 2026, 23:36:26 -04:00
+
+   > update winget for windows in the reademe file and add as a skill file in this repository to auto dedect OS and install. For now include skill to find winget for windows machine
+
+7. **Assistant (clarification form)** - timestamp unavailable
+
+   > For the repository skill, should it install missing software automatically, or detect the OS and WinGet first, then require confirmation before installing? I recommend confirmation because WSL setup can require administrator access and a restart.
+
+   Choices: "Detect and require confirmation before installation" (default); "Automatically install missing prerequisites when the skill is invoked".
+
+8. **User (form response)** - timestamp unavailable
+
+   > Detect and require confirmation before installation
+
+9. **Assistant** - timestamp unavailable
+
+   > I’ll add Windows installation commands to the README and a repository skill that detects the OS and locates WinGet. The skill will ask for confirmation before installing anything; non-Windows installation will remain explicitly unsupported for now.
+
+## README and setup skill work record
+
+- Confirmed `feature/agentic` and a clean working tree before editing.
+- Added WinGet discovery, catalog refresh, JDK 25 and full-lab package commands, separate WSL setup and post-install verification to README.md.
+- Added `.github/skills/local-prerequisites/SKILL.md` with name/description frontmatter, host OS detection, Windows WinGet discovery including the WindowsApps fallback, prerequisite checks and confirmation-gated installation instructions.
+- The skill distinguishes backend-only prerequisites from the full lab, preserves existing installations and requires separate approval for elevation, WSL setup, persistent configuration, model downloads and service startup. Non-Windows installation is explicitly unsupported.
+- Consulted official GitHub agent-skills documentation to confirm `.github/skills` as a project skill location.
+- Executed read-only OS and WinGet discovery from the skill: Windows detected; WinGet resolved through the executable lookup and reported v1.29.380.
+- Skill metadata, local Markdown links and `git diff --check` passed. Package installations, WSL changes, engine setup and model downloads were not run. Skill auto-discovery in a fresh assistant session and non-Windows behavior were not runtime-tested.
+- No roadmap completion status changed: this is setup documentation, not evidence of application or full-lab acceptance.
+- The final response to entry 6 is pending and must be appended on the next turn.
