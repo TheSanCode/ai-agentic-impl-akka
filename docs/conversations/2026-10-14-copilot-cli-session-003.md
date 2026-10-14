@@ -547,3 +547,90 @@ Installation completion remains unverified. No duplicate installation, restart o
 - No proxy configuration, security settings, services or software were changed. No bypass or alternate registry was attempted.
 - Resolution requires an authorized network administrator to review the denied registry request and approve access if permitted.
 - Final response pending; append on the next turn.
+
+38. **Assistant** - timestamp unavailable
+
+   > **The download is blocked by Zscaler, not by Ollama.** The registry request returned HTTP 403 with `Server: Zscaler/6.2` and an "Internet Security by Zscaler" block page.
+   >
+   > This requires an authorized network-policy change. Send your IT/network administrator:
+   >
+   > > Please review the Zscaler denial for `https://registry.ollama.ai/v2/library/nomic-embed-text/manifests/latest` and approve the registry/model-download access if permitted. This is needed to download `nomic-embed-text:latest` for local development.
+   >
+   > Once access is approved, retry:
+   >
+   > ```powershell
+   > ollama pull nomic-embed-text:latest
+   > ```
+   >
+   > No proxy or security settings were changed; the model remains uninstalled.
+
+39. **User** - 14 October 2026, 01:10 -04:00
+
+   > ollama list model
+
+40. **Assistant** - timestamp unavailable
+
+   > Ran `ollama list`: **no models are installed**. The command succeeded but returned only the column headings.
+
+Tool outcome: `ollama list` exited 0 and returned `NAME    ID    SIZE    MODIFIED` with no model rows.
+
+41. **User** - 14 October 2026, 01:10 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> ollama install model  nomic-embed-text:latest
+   > Error: unknown command "install" for "ollama"
+
+42. **Assistant** - timestamp unavailable
+
+   > Ollama uses **`pull`**, not `install model`:
+   >
+   > ```powershell
+   > ollama pull nomic-embed-text:latest
+   > ```
+   >
+   > The command is correct, but downloading will remain blocked until the Zscaler access restriction is resolved.
+
+43. **User** - 14 October 2026, 01:11 -04:00
+
+   > pulling manifest
+   > Error: pull model manifest: 403: <!--# [REDACTED: opaque block-page marker]-->
+
+44. **Assistant** - timestamp unavailable
+
+   > The command is now correct, but **the download is still denied**. This matches the Zscaler block confirmed earlier; reinstalling Ollama or repeating the command will not resolve that policy restriction.
+   >
+   > Ask your IT/network administrator to review and approve access to:
+   >
+   > ```text
+   > https://registry.ollama.ai/v2/library/nomic-embed-text/manifests/latest
+   > ```
+   >
+   > Include the HTTP 403 error and the time of the attempt. After approval, retry `ollama pull nomic-embed-text:latest`. No model has been installed.
+
+45. **User** - 14 October 2026, 01:13 -04:00
+
+   > my company has restriction for ollama, can use actual model proposed by my company
+
+46. **Assistant (clarification form)** - timestamp unavailable
+
+   > Yes—an approved company model can replace Ollama through the repository's embedding-provider interface. For this step it must support text embeddings, not only chat. Share only non-sensitive details; do not paste API keys, tokens, confidential URLs or company documents.
+
+   Requested approved model/provider, supported integration/authentication type without credentials, and approved usage boundaries. The user accepted without supplying values.
+
+47. **Assistant** - timestamp unavailable
+
+   > **Yes—we can use a company-approved model instead of Ollama.** There is no need to bypass your company's restriction.
+   >
+   > The current retrieval task needs a **text-embedding model**; a chat-only model cannot directly replace `nomic-embed-text`. Integration requires the approved model name, API/SDK type and authentication method—not credentials.
+   >
+   > Once those details are available, we can add a replaceable embedding adapter and update the synthetic profile, vector dimensions and tests. Existing Ollama-specific digest checks would need a provider-appropriate replacement. **No provider has been changed yet.**
+
+48. **User** - 14 October 2026, 01:14 -04:00
+
+   > update md file
+
+## Prerequisite documentation update
+
+- Updated `docs/local-prerequisites.md` with verified WSL2/Podman/Compose progress, the blocked Ollama download and the pending company-approved embedding-provider decision.
+- Added approval/integration prerequisites and preserved the distinction between the existing Ollama-specific implementation and an unselected replacement.
+- No provider, runtime configuration or roadmap completion gate changed. No application tests were run for this documentation-only update.
+- Final response pending; append on the next turn.

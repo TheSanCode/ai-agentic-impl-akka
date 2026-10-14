@@ -6,11 +6,11 @@ Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
 ## Current setup context
 
-This guide checks development tools for the full lab. The [backend scaffold guide](implementation/backend-scaffold.md) now provides verified JDK 25 build and health-check commands without containers or models; Compose and full lab setup remain pending. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git, Ollama and Podman. VS Code is optional; VSCodium is an open-source alternative.
+This guide checks development tools for the full lab. The [backend scaffold guide](implementation/backend-scaffold.md) provides verified JDK 25 build and health-check commands without containers or models; the repository's full Compose lab remains pending. AKS and an Azure subscription are not needed for the initial synthetic local lab. Prefer open-source components where practical: Eclipse Temurin, Node.js, Git and Podman. Ollama is the implemented local embedding provider, but company policy currently blocks its model downloads; an approved replacement requires integration before use. VS Code is optional; VSCodium is an open-source alternative.
 
 ## Current Installation Status
 
-The table describes the current Windows checkout, checked on 13 October 2026 with WSL setup observations updated on 14 October. Earlier machine observations are not evidence of this machine's readiness. An installed runtime is not necessarily selected by an already-open shell.
+The table combines direct tool checks and user-provided WSL/Podman command output from 14 October 2026, recorded in the [setup conversation](conversations/2026-10-14-copilot-cli-session-003.md). Earlier machine observations are not evidence of this machine's readiness. An installed runtime is not necessarily selected by an already-open shell.
 
 | Tool | Observed status / version | Next action |
 | --- | --- | --- |
@@ -20,11 +20,25 @@ The table describes the current Windows checkout, checked on 13 October 2026 wit
 | Maven | Repository wrapper runs Apache Maven 3.9.11 on Java 25.0.4.1. | No standalone installation needed. Application build/tests were not run during this installation session. |
 | Node.js | PATH selects Node.js 24.19.0 and npm 11.17.0. | Confirm compatibility with the selected Angular release before frontend work. |
 | VS Code | 1.141.1 | `code --version` verified. VSCodium is an optional alternative. |
-| Container runtime | Podman Desktop 1.29.3 installed; installer success and installed-application record confirmed. Podman and Docker CLIs are not on the current PATH; engine and Compose readiness are unverified. | After WSL2 setup, install/configure the Podman engine and Compose provider. Desktop installation alone does not provide a verified engine. The pgvector acceptance test remains blocked. |
-| Ollama | WinGet installation of 0.40.3 started on 14 October; completion remains unconfirmed. No model availability verified on this machine. | Wait for the running installer result; do not launch a duplicate. Separately approve the selected embedding model download and verify service, digest and dimensions. |
-| WSL2 | WSL 3.0.3.0 installed, default version 2. No distribution registered. `wsl --status` reports WSL2 cannot start because virtualization is unavailable. A Windows component-servicing restart is pending. | Restart Windows manually before rechecking. If still blocked, an administrator must check Virtual Machine Platform and firmware/host virtualization before Ubuntu/Podman setup. |
+| Container runtime | Podman Desktop 1.29.3 installed. User-provided output confirms `podman-machine-default` running with WSL, successful `podman info` reporting client/server 6.0.2, and Docker Compose provider v5.6.0. Earlier CLI checks reported 5.8.3. | Engine connectivity and Compose availability are verified; application containers, Testcontainers compatibility and database-backed acceptance have not been rerun. |
+| Ollama | 0.40.3 installed and local API responsive. No models installed. `ollama pull nomic-embed-text:latest` failed with HTTP 403; the registry response identifies a Zscaler policy block. The user reports company restrictions on Ollama. | Do not bypass policy or repeat blocked downloads. Obtain non-sensitive company-approved embedding-provider details and approved usage boundaries before implementing a replacement. |
+| WSL2 | Ubuntu-24.04 registered as version 2. User-provided startup check returned kernel `6.18.54.1-microsoft-standard-WSL2`. | WSL2 startup is verified; the earlier virtualization/startup blocker is no longer observed. |
 
-The user authorized resuming installation with administrator assistance on 14 October. WSL installation returned zero, but runtime checks failed; WSL2/Ubuntu and Podman readiness are not established. Further dependent setup is blocked pending a manual restart and virtualization recheck. No automatic restart or model download is authorized. Remaining full-lab order: **resolve WSL2 virtualization/restart → Ubuntu and Podman engine/Compose configuration → verify Ollama installation and approved model → final service checks**. JDK 25 and Maven version checks passed; no application build or full-lab acceptance was performed. The previously selected synthetic embedding model remains `nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions; prior model evidence does not establish availability on this machine.
+JDK 25, Maven selection, WSL2 startup, Podman connectivity and Compose availability are verified. No application build or database-backed/full-lab acceptance was performed during this setup session. The next bounded task is to identify and integrate a company-approved text-embedding provider, then verify actual embeddings and database-backed retrieval. No replacement has been selected or implemented.
+
+### Company-approved embedding provider
+
+Company policy takes precedence over the local Ollama setup instructions below. Do not bypass Zscaler, use an unapproved mirror or send source content to an unapproved hosted service.
+
+Before integration, establish:
+
+- The approved model and provider, including **text-embedding** support. A chat-only model cannot directly replace the retrieval embedding model.
+- The supported API or SDK and authentication method. Keep credentials and confidential endpoints out of conversation records and committed documentation.
+- Approval to send synthetic development text to the provider, plus applicable licensing, retention and data-handling constraints. Requirements still prefer open-source components; any exception requires explicit review.
+
+The current opt-in synthetic profile implements Ollama-specific model/digest checks for `nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions. That remains the existing code configuration, not an approved or available replacement on this machine.
+
+A replacement requires an adapter behind the existing embedding interface, provider-appropriate model/version validation, confirmed vector dimensions and compatible index/profile configuration. Verify real embeddings, ingestion, hybrid retrieval, authorization/revocation and restart-reset behavior before claiming retrieval acceptance. Do not silently substitute fixed vectors or reuse vectors from a different model.
 
 ## 1 Check WinGet and refresh its catalog
 
