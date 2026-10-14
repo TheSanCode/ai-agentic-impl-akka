@@ -28,6 +28,8 @@ JDK 25, Maven selection, WSL2 startup, Podman connectivity and Compose availabil
 
 ### Company-approved embedding provider
 
+Follow the [company embedding-provider replacement guide](company-embedding-provider-setup.md) for the IT handoff, implementation surfaces and acceptance checks.
+
 Company policy takes precedence over the local Ollama setup instructions below. Do not bypass Zscaler, use an unapproved mirror or send source content to an unapproved hosted service.
 
 Before integration, establish:

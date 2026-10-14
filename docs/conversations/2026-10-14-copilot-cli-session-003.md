@@ -634,3 +634,20 @@ Tool outcome: `ollama list` exited 0 and returned `NAME    ID    SIZE    MODIFIE
 - Added approval/integration prerequisites and preserved the distinction between the existing Ollama-specific implementation and an unselected replacement.
 - No provider, runtime configuration or roadmap completion gate changed. No application tests were run for this documentation-only update.
 - Final response pending; append on the next turn.
+
+49. **Assistant** - timestamp unavailable
+
+   > Updated **`docs/local-prerequisites.md`** with the working WSL2/Podman/Compose status, the company restriction blocking Ollama downloads, and requirements for integrating a **company-approved embedding model**.
+   >
+   > No model provider or application configuration was changed. Committed locally as `de16cdb` on `feature/agentic`; working tree clean.
+
+50. **User** - 14 October 2026, 01:15 -04:00
+
+   > how to replace ollama with model provided by IT admin, create a md file
+
+## Company-provider replacement guide
+
+- Read the existing embedding port, Ollama adapter, synthetic profile configuration and decision 0008.
+- Created `docs/company-embedding-provider-setup.md` describing the IT information/approval requirements, exact implementation surfaces, provider/version/vector compatibility, authorization/reset safeguards and validation gates.
+- Linked the guide from `docs/local-prerequisites.md`. This is documentation only; no company provider was selected or integrated.
+- Final response pending; append on the next turn.
