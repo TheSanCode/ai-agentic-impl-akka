@@ -87,3 +87,67 @@
    > ```
    >
    > Complete Ubuntu's first-run setup, then verify with `wsl --list --verbose` that Ubuntu is registered as version 2. If installation fails with a virtualization or Windows-feature error, stop there and share the full error; Podman setup depends on WSL working.
+
+11. **User** - 14 October 2026, 00:38 -04:00
+
+   > proceeding with wsl --install -d Ubuntu-24.04
+
+12. **Assistant** - timestamp unavailable
+
+   > Let that command finish; do not start a second installation. Restart Windows manually only if prompted, then complete Ubuntu's first-run username/password setup.
+   >
+   > Afterward, run in PowerShell:
+   >
+   > ```powershell
+   > wsl --list --verbose
+   > wsl -d Ubuntu-24.04 -- uname -r
+   > ```
+   >
+   > Ubuntu should show **VERSION 2**, and the second command should return a Linux kernel version. If either fails, stop before configuring Podman.
+
+Installation completion remains unverified. No duplicate installation, restart or service startup was initiated by the assistant.
+
+13. **User** - 14 October 2026, 00:45 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl --list --verbos
+   > Invalid command line argument: --verbos
+   > Please use 'wsl.exe --help' to get a list of supported arguments.
+   > Error code: Wsl/E_INVALIDARG
+   > If this error was unexpected, please consider searching for existing issues or filing a new issue at https://github.com/microsoft/WSL/issues.
+
+14. **Assistant** - timestamp unavailable
+
+   > There is a typo: `--verbos` needs a final **e**.
+   >
+   > ```powershell
+   > wsl --list --verbose
+   > ```
+   >
+   > Or use the shorter equivalent:
+   >
+   > ```powershell
+   > wsl -l -v
+   > ```
+
+15. **User** - 14 October 2026, 00:45 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl -l -v
+   >   NAME            STATE           VERSION
+   > * Ubuntu-24.04    Stopped         2
+
+16. **Assistant** - timestamp unavailable
+
+   > **Ubuntu 24.04 is installed and registered with WSL2.** `Stopped` is normal when the distribution is not running.
+   >
+   > Next, confirm it can start:
+   >
+   > ```powershell
+   > wsl -d Ubuntu-24.04 -- uname -r
+   > ```
+   >
+   > A Linux kernel version confirms WSL2 can run. After that, the next setup task is creating and starting a Podman machine through Podman Desktop.
+
+## WSL registration milestone
+
+- User-provided output confirms Ubuntu-24.04 is registered as WSL version 2 and currently stopped.
+- Successful Linux startup remains unverified; no Podman machine was initialized or started by the assistant.
