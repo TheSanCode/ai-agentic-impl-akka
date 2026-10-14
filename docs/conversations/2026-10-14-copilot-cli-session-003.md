@@ -461,3 +461,44 @@ Installation completion remains unverified. No duplicate installation, restart o
    > ```
    >
    > It should report a Compose provider version instead of “executable file not found.” Ollama's embedding model and database-backed acceptance checks remain separate pending steps.
+
+29. **User** - 14 October 2026, 01:04 -04:00
+
+   > [image: copilot-image-eb77a3.png]
+
+   The screenshot shows Settings > CLI Tools. The top docker-compose card reports "No version detected" and offers "Install"; kind and kubectl have separate installation actions.
+
+30. **Assistant** - timestamp unavailable
+
+   > Click **Install** on the **top `docker-compose` card**. This installs the Compose CLI provider, not Docker Desktop.
+   >
+   > Leave **kind** and **kubectl** alone; they are not needed for this step.
+   >
+   > When installation finishes, reopen PowerShell and run:
+   >
+   > ```powershell
+   > podman compose version
+   > ```
+   >
+   > A Compose version confirms the provider is available.
+
+31. **User** - 14 October 2026, 01:05 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman compose version
+   > >>>> Executing external compose provider "C:\\Users\\andavsa\\AppData\\Local\\Microsoft\\WindowsApps\\docker-compose.exe". Please see podman-compose(1) for how to disable this message. <<<<
+   >
+   > Docker Compose version v5.6.0
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka>
+
+32. **Assistant** - timestamp unavailable
+
+   > **Compose is available: v5.6.0.** The external-provider message is informational, not an error.
+   >
+   > WSL2, the Podman engine and the Compose provider are now verified available. This does not yet verify application containers or database tests.
+   >
+   > The next setup task is the selected Ollama embedding model, `nomic-embed-text:latest`; it was absent at the last check. Its download requires separate approval before proceeding.
+
+## Compose availability milestone
+
+- User-provided output confirms `podman compose version` successfully invokes Docker Compose v5.6.0.
+- No container workload, database acceptance test or model download was performed.
