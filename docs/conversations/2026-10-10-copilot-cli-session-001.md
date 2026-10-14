@@ -1,0 +1,149 @@
+# Copilot CLI session 001 — 10 October 2026
+
+## Messages
+
+1. **User** — 10 October 2026, 09:44:41.665 -04:00
+
+   > proceed further in autonomous mode
+
+2. **Assistant** — timestamp unavailable
+
+   > I’m continuing with the autonomous plan’s next bounded item: P1-09 redacted execution tracing, staying on `feature/agentic` and within the existing process-local workflow. I’ll keep the trace allowlisted and bounded, then verify redaction and correlation with focused tests.
+
+3. **Assistant** — timestamp unavailable
+
+   > The existing execution flow has no tracing or logger hooks, and the tracing package is reserved. I’m adding a process-local bounded event buffer with a typed, fixed-field schema; event fields will exclude prompts, passages, project/user identity, credentials, and free-form failure details, with no new dependency or API exposure.
+
+4. **User** — timestamp unavailable
+
+   > remember choice I will step out consider as approval
+
+5. **Assistant** — timestamp unavailable
+
+   > I’ll treat that as approval for routine, reversible work within this local task; it does not authorize external or protected actions, deployment, or decisions that the plan reserves for a human. The implementation and docs are in place, so I’m running the full verification before saving the milestone.
+
+6. **Assistant** — timestamp unavailable
+
+   > P1-09 is implemented, fully verified, and committed locally as `8ae564b` on `feature/agentic`; nothing was pushed. I’m continuing to the next planned item, P1-03, by first checking whether the current synthetic data already satisfies reproducible local setup or what specific fixture/profile gap remains—without assuming containers or external services are needed.
+
+7. **Assistant** — timestamp unavailable
+
+   > The current adapters already generate synthetic knowledge/log/health records at startup from server-configured project grants, and restart recreates them; the gap is evidence for both Alpha and Beta through the authenticated API. I’ll add a loopback-JWKS integration case for two separately authorized synthetic users, document the reset/setup limits, and leave the broader infrastructure/profile work open.
+
+8. **User** — timestamp unavailable
+
+   The supplied continuation summary reports the P1-07 selection as **PostgreSQL full-text + pgvector; defer production use pending separate approval** and **ephemeral synthetic data, reset on process restart; no user or enterprise source content**. This is recorded as summary-provided wording, not a reconstruction of the earlier unsummarized turn.
+
+9. **Assistant** — timestamp unavailable
+
+   > The PostgreSQL/pgvector adapter now compiles and its disposable-database integration suite passes. I’m recording the selected synthetic-only boundary, then checking the full project before deciding what can safely be committed; the runtime adapter will remain inactive because restart reset and a real embedding provider are still unresolved.
+
+10. **Assistant** — timestamp unavailable
+
+   > Added and locally committed the synthetic PostgreSQL/pgvector retrieval foundation on `feature/agentic`: versioned evidence provenance, hybrid keyword/vector search, and authorization checks around ingestion and result release. The default application still uses `MockSearchGateway`; production use remains deferred.
+   >
+   > **Verification:** `clean verify` passed all 155 tests; the PostgreSQL/pgvector integration tests passed against a digest-pinned, disposable container. Markdown links and `git diff --check` passed, and no test container remains running.
+   >
+   > **Still open:** Application wiring and reset-on-application-restart are not implemented; no embedding provider was selected, so semantic quality is unverified. Commits `962e5fa` and `d5e8fc2` are local and were not pushed. Next: implement a safely isolated synthetic-only database profile that enforces the selected restart-reset behavior, keeping production use disabled.
+
+11. **User** — 10 October 2026, 13:40:22.380 -04:00
+
+   > RECORD SESSION CONVERSATION
+
+## Work record
+
+- Confirmed the worktree was clean and the active branch was `feature/agentic`.
+- Followed the autonomous plan's next task, P1-09 redacted execution tracing. Added a process-local bounded trace buffer with a 10,000-event cap, an oldest-event eviction policy and a fixed allowlist of generated execution/correlation IDs, timestamp, event/status enums and step count. No prompts, passages, user/project/source identifiers, credentials, free-form errors or model reasoning are recorded. No HTTP route, exporter or new dependency was added.
+- Added lifecycle records for admission, execution start, reserved tool steps, authentication waits, resume and terminal outcomes. Updated README, Phase 1 instructions, decision 0007 and the roadmap from the test evidence.
+- The first focused test attempt used the PATH Java 21 installation and failed because Maven could not compile with `--release 25`. Re-ran with the documented Temurin 25 installation:
+  - `.\mvnw.cmd -B -ntp '-Dtest=ProcessLocalInvestigationServiceTest,ExecutionTraceTest' test` — 8 tests passed, zero failures/errors/skips.
+  - `.\mvnw.cmd -B -ntp clean verify` — 146 tests passed, zero failures/errors/skips; `BUILD SUCCESS`.
+  - `git diff --check` passed.
+- No deployment or external action was performed. The trace is process-local operational metadata, not a durable audit log, and is not exposed through a public API.
+- Committed P1-09 as `8ae564b` (`ai-agentic-testing: feat add redacted execution tracing`) on `feature/agentic`; it is local only and not pushed.
+- For P1-03, extended the authenticated OIDC API fixture to configure separate Alpha/Beta subjects with mock knowledge/log/health grants. Both users retrieve their own synthetic runbook/log evidence; requests across projects are denied. Documented that the test generates its own signing keys/JWKS and requires no external identity provider, enterprise credential, database, model or container. This is automated fixture evidence, not a manual local login profile or full lab.
+- `.\mvnw.cmd -B -ntp '-Dtest=OidcResourceServerIntegrationTest' test` passed **4 tests** on Temurin 25. The same suite passed from a fresh source-only copy without `target` output, using the local Maven cache.
+- Final `.\mvnw.cmd -B -ntp clean verify` passed **147 tests**, zero failures/errors/skips; `BUILD SUCCESS`. Changed Markdown relative links resolve and `git diff --check` passes.
+- Roadmap evidence was updated only for the bounded execution trace and seeded synthetic fixtures. Phase 0/1 remain In progress; manual identity setup, ingestion/hybrid search and full lab acceptance remain incomplete. P1-07 requires human agreement on the minimal data/provenance model and policy-approved storage/embedding choices; those will not be selected autonomously.
+
+### P1-07 synthetic retrieval foundation
+
+- The continuation summary reports the user's choices: local PostgreSQL full-text plus pgvector; production use deferred for separate approval; synthetic-only ephemeral data reset on application restart; no user or enterprise content. No embedding provider/model was selected.
+- Added a provenance-preserving `KnowledgeChunk`, model/dimension-bound `EmbeddingVector`, replaceable embedding/index ports, and a Flyway schema for versioned chunks with generated PostgreSQL full-text vectors and pgvector embeddings.
+- Added a PostgreSQL index using project/source/model/dimension filters and reciprocal-rank fusion of keyword and cosine-vector candidates. The query limits are explicitly ordered by rank before limiting. Index/search remain unwired; the default continues to use `MockSearchGateway`.
+- Added interactive-authorized ingestion and retrieval checks. Ingestion checks identity, project/source access and `READ_EVIDENCE` before embedding and again before upsert/delete. Retrieval filters to current grants in SQL and rechecks passage/project/source authorization before release.
+- Extended `EvidenceRef` compatibly with an optional HTTP(S) source link; malformed, unsupported-scheme and user-info links are rejected without echoing the supplied URI. Added embedding-vector contract tests.
+- Added Testcontainers integration coverage for migrations, hybrid retrieval, project/source/model filtering, provenance links, versioned upsert/deletion, denied cross-project ingestion and membership revocation during embedding. The pgvector image is digest-pinned; the test database is disposable and contains only synthetic fixtures.
+- Dependency compatibility: Testcontainers 1.21.3 compiled, but its Docker client API 1.32 was rejected by this Docker Engine 29 environment (minimum API 1.40). Verified official Testcontainers 2.0.5 release/module coordinates and selected its renamed PostgreSQL/JUnit artifacts. No standalone database was provisioned.
+- Verification on Temurin 25:
+  - `.\mvnw.cmd -B -ntp '-Dtest=PostgresKnowledgeIndexTest' test` — 5 database integration tests passed.
+  - `.\mvnw.cmd -B -ntp '-Dtest=PostgresKnowledgeIndexTest,EmbeddingVectorTest,ContractValidationTest' test` — 50 tests passed.
+  - `.\mvnw.cmd -B -ntp clean verify` — 155 tests passed, zero failures/errors/skips; `BUILD SUCCESS`.
+  - Updated Markdown relative links resolve; `git diff --check` passed. Testcontainers shut down its PostgreSQL container after the run.
+- Decision 0008 and the roadmap/implementation docs record the limitation: the selected reset-on-application-restart behavior is **not implemented or verified for an active application database**. There is no database runtime wiring, local application reset routine, or actual embedding provider, and production use remains deferred. Do not claim P1-07 complete.
+- Committed this bounded foundation locally on `feature/agentic` as `962e5fa` (`ai-agentic-testing: add synthetic pgvector retrieval foundation`) with the required Copilot co-author trailer. The worktree is clean; the commit was not pushed.
+
+## Session status
+
+This session remains in progress. P1-07's synthetic retrieval foundation is committed, but the feature remains unwired and incomplete as described above. Do not push. The response to the user's conversation-recording request is pending its transcript entry and must be appended on the next turn.
+
+## Continued session — 12 October 2026
+
+### Messages
+
+12. **User** — 12 October 2026, 23:11:04 -04:00
+
+   > Complete P1-07 only.
+   >
+   > 1. Inspect available Ollama models and explicitly select an embedding model.
+   >    Do not substitute fixed test vectors for real embeddings.
+   > 2. Wire PostgreSQL/pgvector into an opt-in synthetic local profile.
+   > 3. Preserve project/source authorization and citation provenance.
+   > 4. Implement restart-reset behavior only for a positively verified,
+   >    application-owned synthetic database. Never reset an arbitrary database.
+   > 5. Test ingestion, hybrid retrieval, revocation and restart-reset behavior.
+   > 6. Record actual results and update the roadmap's review date and status.
+   >
+   > Keep UI, durable recovery and model-driven agent execution pending.
+   > Follow AGENTS.md conversation and commit rules. Do not deploy.
+
+13. **Assistant** — timestamp unavailable
+
+   > I’ll inspect the current P1-07 implementation, repository rules and recorded session state, then check which Ollama models are actually available before selecting one. If there is no usable local model or safe database ownership proof, I’ll report that blocker rather than fall back to fixed vectors or risk resetting unrelated data.
+
+14. **Assistant** — timestamp unavailable
+
+   > The running Ollama instance has only chat-capable models, not an embedding model, and the Docker Engine is currently unavailable. I’m selecting `nomic-embed-text` as the real embedding model and will install/verify it locally; I’ll also check whether a local PostgreSQL server can support the required database tests before deciding whether test execution is blocked.
+
+### Work record
+
+- Confirmed clean worktree and `feature/agentic`, synchronized with `origin/feature/agentic`; recent head `29219f3`.
+- Read current AGENTS.md, README, roadmap, Phase 1 instructions, decision 0008, technical design retrieval guidance, and previous session log before implementation.
+- `ollama list` initially showed only chat models. Pulled `nomic-embed-text:latest` (274 MB) from Ollama. Verified through `/api/show` that it supports `embedding`, its local model digest is `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, and a real synthetic-text `/api/embeddings` request returned 768 finite dimensions.
+- Docker CLI exists but Docker Engine is unavailable (`dockerDesktopLinuxEngine` named pipe missing); Podman, `psql`, `postgres`, and `pg_ctl` are not installed. The `PostgresKnowledgeIndexTest` results in the earlier record were not rerun in this session.
+- Implementation and validation outcomes are pending.
+
+### Continued session — 12 October 2026
+
+15. **User** — timestamp unavailable
+
+   > Some of the conversation history has been summarized to free up context.
+
+   The supplied continuation included the earlier requests and a P1-07 work summary. The original status-review and P1-07 requests are already recorded above; no unavailable conversation was reconstructed.
+
+16. **Assistant — work record** — 12 October 2026, 23:40 -04:00
+
+- Implemented the `synthetic-postgres` opt-in profile with a real, digest-pinned Ollama embedding adapter (`nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions), synthetic runbook ingestion route, PostgreSQL/pgvector composition and current identity/policy checks.
+- Added a non-destructive local database provisioning script requiring a restricted pre-existing app role. Startup verifies loopback URL, exact database/schema, connection catalog and the application/owner/synthetic-only marker before Flyway; disables Flyway clean and clears only synthetic knowledge rows after verification. Moved pgvector extension creation to provisioning/test setup rather than application migrations.
+- Added profile-level Testcontainers acceptance coverage for actual Ollama ingestion and hybrid retrieval, project/source provenance, denied cross-project ingestion, membership revocation, wrong-owner refusal without clearing data, and valid-owner restart reset. This end-to-end test was not executed because the local Docker Engine is unavailable and PostgreSQL/Podman tools are absent.
+- `.\mvnw.cmd -B -ntp clean verify '-Dtest=!PostgresKnowledgeIndexTest' '-Dollama.embedding.live=true'` completed successfully: 155 tests total, 0 failures, 0 errors, 1 skipped (154 passed). The live Ollama embedding test and three ownership-guard tests passed; the skipped test was the profile-level PostgreSQL integration test.
+- `.\mvnw.cmd -B -ntp '-Dtest=SyntheticPostgresProfileIntegrationTest' test` completed with 1 skipped and no failures because Testcontainers found no valid Docker environment. Thus database-backed ingestion, hybrid retrieval, revocation and restart-reset results remain unverified.
+- `git diff --check` passed. Relative Markdown links in 8 changed documentation files were checked; no broken targets were found. Updated README, decision 0008, Phase 1 instructions, local prerequisites, technology stack, backend guide, autonomous plan and roadmap. Roadmap date is 12 October 2026; P1-07 remains unchecked and explicitly blocked on its database-backed acceptance run. UI, durable recovery and model-driven agent execution remain pending.
+- No deployment or push occurred. The implementation/documentation changes are not yet committed. The final assistant response is pending its transcript entry.
+
+17. **Assistant — commit/worktree update** — 12 October 2026
+
+- Committed this conversation update alone as `8eab138` (`ai-agentic-testing: record P1-07 implementation results`).
+- Committed the P1-07 code and documentation as `f5cf349` (`ai-agentic-testing: wire synthetic postgres retrieval profile`). Both commits include the required Copilot co-author trailer.
+- Final worktree is clean on `feature/agentic`; branch is ahead of `origin/feature/agentic`. Neither commit was pushed. No deployment occurred.
+- Final outcome: implementation and local embedding/guard/build checks are committed, but P1-07 remains open because the requested PostgreSQL-backed ingestion, hybrid retrieval, revocation and restart-reset test could not run without a local database engine. Final assistant response is pending its transcript entry.

@@ -16,9 +16,9 @@ AI agents work together to investigate issues, suggest fixes and check whether t
 
 ## Browser web application
 
-The application is accessible through an authenticated browser interface on desktop and mobile. Users can select a project, start an investigation, view background progress and evidence, and cancel permitted tasks.
+The target is an authenticated browser interface on desktop and mobile. The current local investigation slice exposes authenticated APIs only; a browser interface, project-selection screens and accessibility checks are not implemented.
 
-Later workflow phases add protected-action approvals, manual business validation and the admin eagle view. The first local lab includes a working browser investigation interface; it is not API-only. Messaging channels complement this interface.
+Later workflow phases add protected-action approvals, manual business validation and the admin eagle view. Messaging channels complement the planned interface.
 
 ## WhatsApp Telegram and SMS
 
@@ -28,9 +28,9 @@ Unlinked users must securely link their account first. Login, MFA, protected app
 
 ## Background tasks and agent loops
 
-Investigations run asynchronously and return an execution ID, so users can close the browser and check progress later. Agents repeat reasoning, authorized tool calls and result evaluation within step, time, token and retry limits. They pause for authentication, approvals or business review rather than holding a thread open.
+The current Phase 1 API runs a deterministic, read-only Coordinator/Investigation sequence over synthetic knowledge, logs and health adapters. It returns an execution ID; authorized status, result, cancellation and same-subject reauthentication/resume routes work only while the same process remains running. Tool steps, elapsed time, active work, queue size, retained execution count and lifecycle trace events are bounded. Traces use an allowlisted metadata schema, are process-local, and have no public retrieval route; they are not an audit log. The workflow does not call a model or run Akka actors.
 
-Phase 1 demonstrates this while the application stays running. Phase 2 adds persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery. Authorization is rechecked during execution; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
+Execution state, checkpoints and revocation are process-local. A restart loses all executions; another application instance does not share or observe this state. Phase 2 must add persisted checkpoints, durable waits, scheduled wake-ups and restart-safe recovery before those capabilities can be claimed. Authorization is rechecked during execution and before stored evidence is returned; background operation does not grant indefinite access or authorize recurring unattended work. See requirements Section 20.
 
 ## Access and control
 
@@ -38,7 +38,7 @@ Phase 1 demonstrates this while the application stays running. Phase 2 adds pers
 - Each user sees only authorized project and source information. Admin status does not bypass source permissions.
 - Interactive source calls act on behalf of the user using the source's supported delegated authentication. Unsupported sources cannot silently use shared accounts.
 - Authentication, authorization, search and vector storage use open-source components. Other licenses and exceptions require review.
-- Execution state survives application restarts. Audit records show who requested, approved and performed actions.
+- Restart-safe execution state and audit records are production requirements, not capabilities of the current local process-only implementation.
 
 ## Production requirements
 
@@ -70,9 +70,57 @@ See the [recommended technology stack](docs/design/technology-stack.md): Angular
 
 Start with the [Windows backend scaffold guide](docs/implementation/backend-scaffold.md) for verified JDK 25 build and health-check commands. The scaffold needs no containers or models. The [Windows local prerequisites](docs/local-prerequisites.md) cover tools for the later full lab; Compose remains pending.
 
+### Windows installation with WinGet
+
+Check WinGet in PowerShell before installing anything:
+
+```powershell
+Get-Command winget.exe
+winget --version
+winget source update
+```
+
+If WinGet is missing, install or update Microsoft's **App Installer** using the [official WinGet installation guidance](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget), then reopen PowerShell. Do not download an installer from an unverified mirror.
+
+Install only missing prerequisites, one command at a time. **JDK 25 is required for the backend**:
+
+```powershell
+winget install --id EclipseAdoptium.Temurin.25.JDK -e --source winget
+```
+
+For the **full local lab**, install WSL2 first in **Administrator PowerShell**:
+
+```powershell
+wsl --install -d Ubuntu-24.04
+```
+
+Restart if prompted and complete Ubuntu's first-run setup. Then install the additional lab tools:
+
+```powershell
+winget install --id RedHat.Podman-Desktop -e --source winget
+winget install --id RedHat.Podman -e --source winget
+winget install --id Ollama.Ollama -e --source winget
+```
+
+Configure the Podman machine and Compose provider through Podman Desktop. Do not install a second container engine if an existing supported engine already works. Ollama models require a separate, approved download; installing Ollama alone does not make the retrieval profile ready.
+
+Reopen PowerShell, ensure `JAVA_HOME` points to JDK 25 and its `bin` directory is on `PATH`, then verify:
+
+```powershell
+java -version
+javac -version
+.\mvnw.cmd --version
+wsl --list --verbose
+podman info
+podman compose version
+ollama --version
+```
+
+Maven must report Java 25. No standalone Maven or global Angular CLI installation is needed. Node.js/npm are needed for later frontend work; check existing versions before installing them. The [local prerequisite setup skill](.github/skills/local-prerequisites/SKILL.md) detects the host OS, locates WinGet on Windows and asks for confirmation before installing missing tools. Non-Windows installation is not implemented in this skill yet.
+
 ## Implementation instructions
 
-Follow the [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for the remaining local lab tasks. The backend scaffold is tested; agents, identity, sources, frontend and full lab acceptance remain pending. See the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for limited Spring AI evidence and unresolved Akka access, runtime and licensing gates.
+Follow The [Phase 1 implementation instructions](docs/implementation/phase-1-instructions.md) for remaining local lab tasks. The backend scaffold, local identity/policy/mock-source adapters, OIDC/JWT verification and process-local deterministic read-only investigation API are implemented and tested. P1-07 has a real Ollama embedding model and an opt-in PostgreSQL/pgvector profile with an ownership-guarded synthetic-only reset; its database-backed ingestion/retrieval/revocation/restart test remains blocked because no local PostgreSQL-capable engine is available. Model-driven agent behavior, durable recovery, browser UI, real-source OBO, production source adapters and full lab acceptance remain pending. See [decision 0007](docs/decisions/0007-process-local-investigation-workflow.md) for workflow boundaries, [decision 0008](docs/decisions/0008-synthetic-postgres-hybrid-retrieval.md) for retrieval status, the [OIDC/JWT decision](docs/decisions/0006-oidc-jwt-authentication.md), the [dependency decision](docs/decisions/0001-backend-scaffold.md) for verified scaffold versions, and the [isolated Spring AI/Akka probes](docs/decisions/0002-integration-probes.md) for compatibility evidence and the still-open Akka production-license decision.
 
 ## Roadmap
 
@@ -107,4 +155,4 @@ Example request:
 
 ## Current status
 
-Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold builds on Temurin 25 with 9 passing tests and a verified packaged-JAR health check. No deployment has occurred; the full investigation lab remains pending.
+Documentation review completed with corrections to access-expiry handling, historical evidence authorization and change-verification states. Read the [documentation review](docs/reviews/documentation-review.md) for findings and open decisions. Phases 0 and 1 remain In progress. The backend scaffold, mock identity/policy/delegated-source adapters, OIDC/JWT authentication and a process-local read-only investigation API are implemented and tested. The workflow uses deterministic synthetic evidence rather than AI inference; it has no durable recovery, multi-instance state, UI or full-lab setup. Real-source OBO, production Akka licensing/runtime-key decisions and full lab acceptance remain open. No deployment has occurred.

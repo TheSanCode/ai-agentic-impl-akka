@@ -1,12 +1,14 @@
 # AgenticaWithAkka Roadmap
 
-Last reviewed: 7 October 2026
+Last reviewed: 12 October 2026
 
 ## Current position
 
-Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold only; Phases 2–6 are **Planned**. The scaffold does not establish lab completion or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
+Requirements v0.7 and the phased design are documented. Phase 0 is **In progress** because approval of open decisions, contracts and technology selection remains outstanding. Phase 1 is **In progress** with a tested backend scaffold, verified Spring AI/Akka compatibility probes, versioned domain contracts/ports, a policy-gated read-only tool registry, OIDC/JWT identity mapping and a process-local deterministic investigation API over synthetic sources. Bounded allowlisted execution tracing is tested; an authenticated synthetic Alpha/Beta integration fixture proves project-isolated runbook/log retrieval without an external identity provider and passed from a fresh source-only copy. P1-07 now has an opt-in synthetic PostgreSQL/pgvector profile and a digest-pinned Ollama embedding model, but the end-to-end ingestion/retrieval/revocation/restart-reset test was skipped because no Docker engine or local PostgreSQL server is available; keep P1-07 open. The local workflow has no model calls, durable recovery, multi-instance state or browser UI; real-source OBO remains open. Phases 2–6 are **Planned**. The scaffold does not establish full lab acceptance or production readiness. Owners and dates remain unassigned; no delivery estimates are committed.
 
 Sources: [production requirements](requirements/agenticawithakka-production-requirements.md) and [agentic design](design/agentic-design-and-phased-plan.md).
+
+For a proposed, dependency-aware execution order of remaining work, see the [autonomous development plan](implementation/autonomous-development-plan.md). The plan does not change roadmap status or authorize external actions.
 
 ## Phase overview
 
@@ -67,17 +69,28 @@ Deliverables:
 
 - [x] P1-02 backend scaffold: Maven Wrapper, package boundaries, configuration validation and local health endpoint; JDK 25 build, 9 tests and packaged-JAR HTTP check passed, including a fresh source-only copy.
 - [x] P1-01 partial evidence: resolve Spring AI 2.0.1 and pass an isolated Boot 4.0.8 / Temurin 25 Ollama HTTP-fixture integration test; [results and limits](decisions/0002-integration-probes.md).
-- [ ] Finish P1-01 combined Spring AI/Akka compatibility, repository access and license decisions; artifact availability is not runtime compatibility.
+- [x] P1-01 partial evidence: isolated Akka Typed 2.10.23 request/reply and shutdown test passed on Temurin 25 from locally cached artifacts, including a user-run full hardened script with the repository profile active (fresh resolution and combined test are recorded below); [results and limits](decisions/0002-integration-probes.md).
+- [x] P1-01 partial evidence: combined Spring AI 2.0.1 + Akka Typed 2.10.23 probe passed on Temurin 25 in one Boot 4.0.8 context (actor delegates a ChatClient call to a bounded executor; loopback model fixture); [results and limits](decisions/0002-integration-probes.md).
+- [x] P1-01 partial evidence: fresh Akka 2.10.23 resolution from the authorized `akka-repository` into an empty isolated Maven cache, with the combined probe passing on Temurin 25 (user-run, 8 October 2026); [results and limits](decisions/0002-integration-probes.md).
+- [x] P1-04 local adapter slice: opaque expiring/revocable identity contexts, deny-first project/resource/source policy, and HMAC-bound mock delegated credentials with independent source ACL checks; 8 new tests pass (122 total); [decision and limits](decisions/0005-identity-policy-mock-connectors.md).
+- [x] P1-04 OIDC/JWT and local authorization revalidation: Spring Security verifies signature, issuer, audience and expiry; `(iss, sub)` maps to server-configured grants. Tool/source access, resume and stored-result gates recheck current membership and citations; revocation tests included; full suite passes (137 tests); [decision and evidence](decisions/0006-oidc-jwt-authentication.md).
+- [ ] Finish P1-04 source integration: real-source OBO, consent and revocation are not implemented; mock adapters are not vendor token exchange.
+- [x] P1-05 versioned task/tool/evidence contracts and Phase 1 ports (AgentRuntime, ModelGateway, SearchGateway, SourceConnector, DelegatedTokenProvider, PolicyDecisionService); 50 new validation/serialization/boundary tests pass (59 total); approval/verification contracts deferred; [decision](decisions/0003-domain-contracts-and-ports.md).
+- [x] P1-06 tool part: read-only tool registry exposing only searchKnowledge, queryMockLogs and inspectMockHealth. Discovery and invocation are gated by role, argument schema and policy (tool and resource arguments), with deadline/timeout, bounded retries and per-source evidence re-authorization before release. Verified with test fakes: 55 new tests pass (114 total); [decision](decisions/0004-tool-registry-and-permissions.md).
+- [ ] P1-06 skill registry (SKL-01..03) and production policy/identity/search adapters; process-local wiring to the mock adapters is implemented under P1-08; see [decision 0007](decisions/0007-process-local-investigation-workflow.md).
+- [ ] Finish P1-01 with the deferred Akka production-license decision (current policy: dev/non-production only; key injected from a secret store); artifact availability is not runtime compatibility.
 - [ ] Complete P1-11 full lab setup/demo documentation; only backend build and smoke commands are verified.
 - [ ] Build separate UI/API container images from approved base images
 - [ ] Build browser login, project selection, investigation, progress/results and cancellation screens
 - [ ] Test browser reconnect, safe rendering and primary keyboard navigation
-- [ ] Seed synthetic runbooks and mock logs
-- [ ] Implement two agents with bounded execution
-- [ ] Return background execution IDs and support authorized disconnect/reconnect progress
-- [ ] Test cumulative loop budgets, authentication expiry and cancellation
-- [ ] Add project and user authorization
-- [ ] Return cited evidence and test prompt-injection resistance
+- [x] Seed synthetic runbook, log and health evidence per configured project grant; the authenticated Alpha/Beta integration fixture verifies project isolation and evidence retrieval ([decision 0007](decisions/0007-process-local-investigation-workflow.md)).
+- [x] Implement bounded local Coordinator and Investigation roles using registered read tools; deterministic synthetic workflow only, no model or Akka runtime; tested in `ProcessLocalInvestigationServiceTest`.
+- [x] Return execution IDs and provide same-process authorized status/result reconnect, cancellation and same-subject authentication resume; HTTP bearer flow tested in `OidcResourceServerIntegrationTest`.
+- [x] Test cumulative step exhaustion, authentication expiry/resume, cancellation before and during a read, cross-project access and membership revocation during execution and after completion; focused suite passes (35 tests); see [decision 0007](decisions/0007-process-local-investigation-workflow.md).
+- [x] Enforce project/user authorization at create, status, cancel, resume, each tool call and evidence retrieval; supported by OIDC integration and authorization-revalidation tests.
+- [x] Return reauthorized evidence citations; prompt-injection resistance remains untested.
+- [x] Add bounded, redacted process-local execution tracing with correlated lifecycle events; focused tests verify the allowlisted event shape, sensitive-data exclusion and retention bound ([decision 0007](decisions/0007-process-local-investigation-workflow.md)).
+- [ ] P1-07 synthetic ingestion/hybrid retrieval: wired only under the opt-in `synthetic-postgres` profile, using `nomic-embed-text:latest` pinned to the locally verified digest. Loopback database-name/schema/owner-marker checks gate Flyway and a reset limited to synthetic knowledge rows; ingestion/search retain project/source authorization and citation provenance. The live embedding test and 3 ownership-guard tests passed; `clean verify` passed 154 tests with 1 skipped, including the live Ollama embedding test. The PostgreSQL profile end-to-end test (real-embedding ingestion, hybrid retrieval, revocation and restart-reset) was skipped because Docker Engine is unavailable and no local PostgreSQL server exists, so P1-07 acceptance remains unverified. See [decision 0008](decisions/0008-synthetic-postgres-hybrid-retrieval.md).
 
 Exit criteria: An authorized investigation succeeds; cross-project access is denied and runaway tasks terminate.
 
