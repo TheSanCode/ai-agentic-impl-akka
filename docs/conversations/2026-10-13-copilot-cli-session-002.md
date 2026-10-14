@@ -184,3 +184,77 @@ The response will provide read-only Git commands for recent history, full commit
 - WSL status and distribution listing still report WSL is not installed.
 - Ollama's local model-list endpoint still refuses connections.
 - No installation, environment modification or service startup was performed. The final response is pending and must be appended on the next turn.
+
+16. **Assistant** - timestamp unavailable
+
+    **No—the required setup is still incomplete in this environment.**
+
+    | Software | Latest check |
+    |---|---|
+    | Git | Installed: 2.55.0 |
+    | Node.js / npm | Installed: 24.19.0 / 11.17.0 |
+    | WinGet | Installed: 1.29.380 |
+    | **JDK 25** | Not found; `JAVA_HOME` unset |
+    | WSL2 | Reports not installed |
+    | Podman / Docker | Neither found |
+    | Ollama | Not found; local service unreachable |
+    | Maven Wrapper | Present, but cannot run without Java |
+
+    I checked executable paths, installed-application records, conventional installation directories and persisted Java configuration—not just the current shell’s PATH.
+
+    **Next step:** install JDK 25 for the backend. WSL2, Podman/Compose and Ollama are additional full-lab requirements. No software was installed, and builds/tests remain blocked by missing Java.
+
+17. **User** - 13 October 2026, 23:47:49 -04:00
+
+    > proceed to install
+
+18. **Assistant** - timestamp unavailable
+
+    > I’ll install JDK 25, Podman Desktop, Podman and Ollama, checking each result. WSL2 needs separate approval because it may require administrator access and a restart; I won’t restart Windows or download models.
+
+19. **Assistant (clarification form)** - timestamp unavailable
+
+    > May I also install WSL2 with Ubuntu 24.04 (`wsl --install -d Ubuntu-24.04`)? The Windows installers may request administrator approval. I will not restart Windows automatically; if elevation or a restart is needed, I will report it.
+
+    Fields: "Approve WSL2 and Ubuntu installation"; "Allow installer administrator/UAC prompts".
+
+20. **User (form response)** - timestamp unavailable
+
+    > wsl=true, elevation=true
+
+21. **Assistant (clarification form)** - timestamp unavailable
+
+    > The JDK installer returned Windows error 1602: installation cancelled. No installation success is confirmed. How should I proceed?
+
+    Choices: "Retry the JDK installer; I will approve its prompt"; "Stop installations and provide manual commands" (default).
+
+22. **User (form response)** - timestamp unavailable
+
+    > Retry the JDK installer; I will approve its prompt
+
+23. **User** - timestamp unavailable
+
+    > wait I dont have enough permission
+
+24. **Assistant** - timestamp unavailable
+
+    Paused—no further installation commands will be run.
+
+    **JDK 25 installed successfully.** The last command included Java/Maven verification followed by Podman Desktop installation, but its outcome is not yet confirmed. If an installer or administrator prompt is open, cancel it.
+
+    Podman, Ollama and WSL2 setup remain incomplete or unverified. An administrator will need to complete steps requiring elevated permissions.
+
+25. **User** - 13 October 2026, 23:52:20 -04:00
+
+    > confirm jdk 25 is installed
+
+### Installation and JDK confirmation results
+
+- Verified the exact WinGet package identities for Temurin JDK 25, Podman Desktop, Podman and Ollama. Catalog refresh succeeded.
+- Initial JDK installation returned MSI error 1602 (cancelled). The user approved retrying with visible prompts.
+- `winget install --id EclipseAdoptium.Temurin.25.JDK -e --source winget --interactive` reported successful installation.
+- A verification attempt using the conventional Program Files directory failed because the actual installation is per-user. Registry and user JAVA_HOME identified the correct location.
+- The command combining Maven verification and Podman Desktop installation was moved to the background by the user. Its outcome remains unconfirmed; no follow-up interaction with that command was performed after the user paused installations.
+- The latest read-only check executed `java.exe -version` and `javac.exe -version` from the persisted user JAVA_HOME. Both succeeded: Temurin OpenJDK 25.0.4.1+1 LTS and javac 25.0.4.1.
+- No new installation, service startup or configuration changes were performed for this confirmation.
+- The response to entry 25 is pending and must be appended on the next turn.
