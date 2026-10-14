@@ -519,3 +519,31 @@ Installation completion remains unverified. No duplicate installation, restart o
 - Rechecked the local API: zero installed models. Digest and embedding-dimension verification could not run.
 - No alternate registry, network-policy bypass or substitute model was attempted.
 - Final response pending; append on the next turn.
+
+35. **Assistant** - timestamp unavailable
+
+   > **The model download failed.** `ollama pull nomic-embed-text:latest` encountered **HTTP 403 Forbidden** from `registry.ollama.ai`.
+   >
+   > Ollama is running, but no models are installed. Digest and embedding verification remain blocked.
+   >
+   > Have your network administrator check access to the Ollama registry, then retry:
+   >
+   > ```powershell
+   > ollama pull nomic-embed-text:latest
+   > ```
+
+36. **User** - 14 October 2026, 01:08 -04:00
+
+   > fix The model download failed.  ollama pull nomic-embed-text:latest  encountered HTTP 403 Forbidden from  registry.ollama.ai .
+
+37. **Assistant** - timestamp unavailable
+
+   > I'll check whether the 403 is coming from Ollama's registry or a network filter, without changing proxy settings or bypassing access controls.
+
+## Registry denial diagnosis
+
+- A bounded request to the official registry manifest endpoint returned HTTP 403, `Content-Type: text/html`, `Server: Zscaler/6.2`, and page title `Internet Security by Zscaler`, with block/policy wording.
+- This establishes a network security filter denial rather than a missing model or local Ollama installation failure.
+- No proxy configuration, security settings, services or software were changed. No bypass or alternate registry was attempted.
+- Resolution requires an authorized network administrator to review the denied registry request and approve access if permitted.
+- Final response pending; append on the next turn.
