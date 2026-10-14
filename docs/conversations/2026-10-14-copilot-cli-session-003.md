@@ -502,3 +502,20 @@ Installation completion remains unverified. No duplicate installation, restart o
 
 - User-provided output confirms `podman compose version` successfully invokes Docker Compose v5.6.0.
 - No container workload, database acceptance test or model download was performed.
+
+33. **User** - 14 October 2026, 01:07 -04:00
+
+   > ollama install model  nomic-embed-text:latest
+
+34. **Assistant** - timestamp unavailable
+
+   > I'll download `nomic-embed-text:latest`, then check its digest and verify it produces the required 768-dimensional embeddings.
+
+## Model download attempt
+
+- Confirmed `feature/agentic`, an initially clean working tree, Ollama 0.40.3 and a responsive local model-list API with zero models.
+- Executed `ollama pull nomic-embed-text:latest`; it failed with exit code 1 and returned an HTML response for the registry manifest request.
+- A separate bounded HTTPS request to `https://registry.ollama.ai/v2/library/nomic-embed-text/manifests/latest` returned HTTP 403 Forbidden.
+- Rechecked the local API: zero installed models. Digest and embedding-dimension verification could not run.
+- No alternate registry, network-policy bypass or substitute model was attempted.
+- Final response pending; append on the next turn.
