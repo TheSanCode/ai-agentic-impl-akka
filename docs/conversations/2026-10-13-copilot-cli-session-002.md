@@ -277,3 +277,22 @@ The response will provide read-only Git commands for recent history, full commit
 - Podman engine/Compose readiness remains unverified. WSL2 and Ollama installation have not been performed by this session.
 - Installation work remains paused as requested. No new installation or service startup was initiated.
 - The assistant's completion notice is pending and must be appended on the next turn.
+
+27. **Assistant** - timestamp unavailable
+
+    The previously running command finished: **Maven 3.9.11 works with JDK 25**, and **Podman Desktop 1.29.3 installed successfully**.
+
+    Podman engine/Compose readiness remains unverified. Further installations remain paused.
+
+28. **User** - 13 October 2026, 23:58:15 -04:00
+
+    > update software installation status
+
+### Installation status documentation update
+
+- Rechecked branch and working tree: feature/agentic, initially clean.
+- Installed-application records confirm Temurin JDK 25 and Podman Desktop 1.29.3. Podman, Docker and Ollama remain unavailable on the current PATH; WSL still reports not installed.
+- Updated docs/local-prerequisites.md with current-machine status dated 13 October 2026, verified Java/Javac and Maven versions, current Node/npm/VS Code versions and remaining full-lab blockers.
+- Removed contradictory current-machine claims about Java 21, older Node, Docker and a reachable Ollama/model. Preserved the selected embedding digest as a requirement, not evidence of current availability.
+- Installation remains paused. No software or service changes were performed. Roadmap gates remain unchanged because no application/full-lab acceptance was demonstrated.
+- Final response pending; append on the next turn.
