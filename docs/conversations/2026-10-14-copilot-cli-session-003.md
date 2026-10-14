@@ -54,3 +54,11 @@
 - `git status --short --branch` reported `## feature/agentic...origin/feature/agentic [ahead 2]` with no working-tree changes.
 - `git --no-pager log --oneline --decorate -8` showed `c7051ee` at HEAD and `0bb8d64` at `origin/feature/agentic`.
 - `git --no-pager log --oneline '@{upstream}..HEAD'` listed `c7051ee` and `205c0bd`; neither has been pushed.
+
+7. **User** - 14 October 2026, 00:35 -04:00
+
+   > what is the next step
+
+8. **Assistant** - 14 October 2026
+
+   > The immediate next step is to **restart Windows manually**, since WSL previously reported a pending restart. Then recheck `wsl --status` and `wsl --list --verbose`. If WSL still cannot start, ask an administrator to verify Virtual Machine Platform and firmware/host virtualization before installing Ubuntu. Once WSL2 works, configure the Podman machine and Compose provider; Ollama is already installed, but still needs an approved embedding model download and verification. Do not initialize Podman or download a model until those steps are authorized and ready.
