@@ -118,7 +118,7 @@ The installed JDK is under `%LOCALAPPDATA%\Programs\Eclipse Adoptium\jdk-25.0.4.
 
 Use `where.exe node` if `node --version` does not show the intended Node.js LTS. Current checks select 24.19.0; do not remove or replace runtimes used by other projects. If PowerShell blocks npm's script wrapper, try `npm.cmd --version` rather than broadly disabling execution policy.
 
-Podman must be running for `podman info`; the CLI version alone does not prove the engine works. `podman compose` also requires a supported Compose provider. Ollama installation does not install or start a chat or embedding model. Model selection, weight licenses, downloads and resource budgets are separate bootstrap tasks.
+Podman must be running for `podman info`; the CLI version alone does not prove the engine works. Follow the [Podman Desktop machine setup guide](podman-desktop-setup.md) to create, start and verify a machine. `podman compose` also requires a supported Compose provider. Ollama installation does not install or start a chat or embedding model. Model selection, weight licenses, downloads and resource budgets are separate bootstrap tasks.
 
 ## 6 Tools and services for later phases
 

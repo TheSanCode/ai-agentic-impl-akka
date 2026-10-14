@@ -180,3 +180,76 @@ Installation completion remains unverified. No duplicate installation, restart o
 
 - User-provided `uname -r` output confirms successful Ubuntu startup on kernel `6.18.54.1-microsoft-standard-WSL2`.
 - This supersedes the earlier startup-unverified observation. Podman machine/engine and Compose remain unverified.
+
+19. **User** - 14 October 2026, 00:47 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman info
+   > OS: windows/amd64
+   > provider: wsl
+   > version: 5.8.3
+   >
+   > Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM
+   > Error: unable to connect to Podman socket: Get "http://d/v5.8.3/libpod/_ping": dial unix /run/podman/podman.sock: connect: A socket operation encountered a dead network.
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman compose version
+   > Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM
+   > Error: unable to connect to Podman socket: Get "http://d/v5.8.3/libpod/_ping": dial unix /run/podman/podman.sock: connect: A socket operation encountered a dead network.
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka>
+
+20. **Assistant** - timestamp unavailable
+
+   > **Podman is installed, but its Linux engine is not reachable.** Starting Ubuntu does not start a Podman machine. The Compose error is the same engine connection failure, not proof that Compose is missing.
+   >
+   > Check the machine state:
+   >
+   > ```powershell
+   > podman machine list
+   > podman system connection list
+   > ```
+   >
+   > If no machine is listed, open **Podman Desktop** and create/start one through its Podman setup. If a machine exists but is stopped, start that existing machine through Podman Desktop instead of creating another.
+   >
+   > Once running, retry `podman info` and `podman compose version`.
+
+21. **User** - 14 October 2026, 00:49 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman machine list
+   > NAME        VM TYPE     CREATED     LAST UP     CPUS        MEMORY      DISK SIZE
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman system connection list
+   > Name        URI         Identity    Default     ReadWrite
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman info
+   > OS: windows/amd64
+   > provider: wsl
+   > version: 5.8.3
+   >
+   > Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM
+   > Error: unable to connect to Podman socket: Get "http://d/v5.8.3/libpod/_ping": dial unix /run/podman/podman.sock: connect: A socket operation encountered a dead network.
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman compose version
+   > Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM
+   > Error: unable to connect to Podman socket: Get "http://d/v5.8.3/libpod/_ping": dial unix /run/podman/podman.sock: connect: A socket operation encountered a dead network.
+
+22. **Assistant** - timestamp unavailable
+
+   > **No Podman machine or connection exists yet.** Repeating `podman info` will not fix that.
+   >
+   > Open **Podman Desktop**, select its Podman setup, and **create a Podman machine**, then **start it**. Creation downloads the Linux machine image and allocates local disk/memory; your existing Ubuntu distribution is separate.
+   >
+   > After setup finishes, verify:
+   >
+   > ```powershell
+   > podman machine list
+   > podman info
+   > podman compose version
+   > ```
+   >
+   > The machine should show as running, and `podman info` should return engine details without a connection error. Configure a Compose provider through Podman Desktop if the final command then reports one is missing.
+
+23. **User** - 14 October 2026, 00:51 -04:00
+
+   > Open Podman Desktop and use its Podman setup to create a machine, then start it. This downloads a Linux machine image and allocates local disk/memory; your Ubuntu distribution is separate. Create a md file
+
+## Podman setup documentation
+
+- Created `docs/podman-desktop-setup.md` with prerequisites, Desktop machine creation/start instructions, engine/connection/Compose verification and troubleshooting boundaries.
+- Linked the guide from `docs/local-prerequisites.md`.
+- No machine was created or started; no software or image was downloaded. Roadmap completion gates remain unchanged.
+- The final response is pending and must be appended on the next turn.
