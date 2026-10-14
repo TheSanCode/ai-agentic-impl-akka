@@ -151,3 +151,32 @@ Installation completion remains unverified. No duplicate installation, restart o
 
 - User-provided output confirms Ubuntu-24.04 is registered as WSL version 2 and currently stopped.
 - Successful Linux startup remains unverified; no Podman machine was initialized or started by the assistant.
+
+17. **User** - 14 October 2026, 00:46 -04:00
+
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl -l -v
+   >   NAME            STATE           VERSION
+   > * Ubuntu-24.04    Stopped         2
+   > PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> wsl -d Ubuntu-24.04 -- uname -r
+   > 6.18.54.1-microsoft-standard-WSL2
+
+18. **Assistant** - timestamp unavailable
+
+   > **WSL2 is working:** Ubuntu started successfully and returned kernel `6.18.54.1-microsoft-standard-WSL2`.
+   >
+   > Next, open **Podman Desktop** and use its Podman setup to create and start a Podman machine. This creates a separate container environment; Ubuntu itself is not the Podman engine.
+   >
+   > Once the machine is running, check in PowerShell:
+   >
+   > ```powershell
+   > podman machine list
+   > podman info
+   > podman compose version
+   > ```
+   >
+   > If Compose is unavailable, configure its provider through Podman Desktop. Do not proceed to database tests until the engine and Compose checks succeed.
+
+## WSL2 startup milestone
+
+- User-provided `uname -r` output confirms successful Ubuntu startup on kernel `6.18.54.1-microsoft-standard-WSL2`.
+- This supersedes the earlier startup-unverified observation. Podman machine/engine and Compose remain unverified.
