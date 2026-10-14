@@ -253,3 +253,211 @@ Installation completion remains unverified. No duplicate installation, restart o
 - Linked the guide from `docs/local-prerequisites.md`.
 - No machine was created or started; no software or image was downloaded. Roadmap completion gates remain unchanged.
 - The final response is pending and must be appended on the next turn.
+
+24. **Assistant** - timestamp unavailable
+
+   > Created **[docs/podman-desktop-setup.md](docs/podman-desktop-setup.md)** with instructions to create and start a Podman machine, verify the engine and Compose, and troubleshoot connection errors. Linked it from the local prerequisites guide.
+   >
+   > Committed locally as `d033b72` on `feature/agentic`. No machine was created or started.
+
+25. **User** - 14 October 2026, 00:58 -04:00
+
+   > [image: copilot-image-520dc6.png]
+
+   The screenshot shows Podman Desktop's Create Podman machine form: name `podman-machine-default`, empty optional image fields, root privileges enabled, user-mode networking disabled, immediate startup enabled, and host CA import enabled.
+
+26. **Assistant** - timestamp unavailable
+
+   > You're on the correct screen. Keep the name `podman-machine-default` and leave **Image Path** and **Image URL/reference** blank so Podman selects its default machine image.
+   >
+   > Keep **Start the machine now** enabled. The other switches can remain as shown for this local setup; root privileges apply inside the Linux machine, not to your Windows account.
+   >
+   > Click **Create**, wait for the download and startup to finish, then run:
+   >
+   > ```powershell
+   > podman machine list
+   > podman info
+   > podman compose version
+   > ```
+
+27. **User** - 14 October 2026, 01:02 -04:00
+
+   ```text
+   PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman machine list
+   NAME                    VM TYPE     CREATED        LAST UP            CPUS        MEMORY      DISK SIZE
+   podman-machine-default  wsl         3 minutes ago  Currently running  7           2GiB        100GiB
+   PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman info
+   Client:
+     APIVersion: 6.0.2
+     Built: 1784689050
+     BuiltTime: Tue Jul 21 22:57:30 2026
+     GitCommit: b28edb9ad70ce4317dc762ee9ce0a6d081d154e9
+     GoVersion: go1.26.5
+     Os: windows
+     OsArch: windows/amd64
+     Version: 6.0.2
+   host:
+     arch: amd64
+     buildahVersion: 1.44.1
+     cdiSpecDirs:
+     - /etc/cdi
+     - /var/run/cdi
+     cgroupControllers:
+     - cpuset
+     - cpu
+     - io
+     - memory
+     - hugetlb
+     - pids
+     - rdma
+     cgroupManager: systemd
+     cgroupVersion: v2
+     conmon:
+       package: conmon-2.2.1-2.fc44.x86_64
+       path: /usr/bin/conmon
+       version: 'conmon version 2.2.1, commit: '
+     cpuUtilization:
+       idlePercent: 98.76
+       systemPercent: 0.81
+       userPercent: 0.43
+     cpus: 14
+     databaseBackend: sqlite
+     distribution:
+       distribution: fedora
+       variant: podman-machine-os
+       version: "44"
+     eventLogger: journald
+     freeLocks: 2048
+     hostname: [REDACTED: machine hostname]
+     idMappings:
+       gidmap: null
+       uidmap: null
+     kernel: 6.18.54.1-microsoft-standard-WSL2
+     linkmode: dynamic
+     logDriver: journald
+     memFree: 32262868992
+     memTotal: 33370234880
+     networkBackend: netavark
+     networkBackendInfo:
+       backend: netavark
+       dns:
+         package: aardvark-dns-2.0.0-1.fc44.x86_64
+         path: /usr/libexec/podman/aardvark-dns
+         version: aardvark-dns 2.0.0
+       package: netavark-2.0.0-2.fc44.x86_64
+       path: /usr/libexec/podman/netavark
+       version: netavark 2.0.0
+     ociRuntime:
+       name: crun
+       package: crun-1.28-1.fc44.x86_64
+       path: /usr/bin/crun
+       version: |-
+         crun version 1.28
+         commit: 54f16ffbefcd022bf032af768b5c5ce075c18bfc
+         rundir: /run/crun
+         spec: 1.0.0
+         +SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +LIBKRUN +WASM:wasmedge +JSON_C
+     os: linux
+     pasta:
+       executable: /usr/bin/pasta
+       package: passt-0^20260716.g090d739-2.fc44.x86_64
+       version: |
+         pasta 0^20260716.g090d739-2.fc44.x86_64
+         Copyright Red Hat
+         GNU General Public License, version 2 or later
+           <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+         This is free software: you are free to change and redistribute it.
+         There is NO WARRANTY, to the extent permitted by law.
+     remoteSocket:
+       exists: true
+       path: unix:///run/podman/podman.sock
+     rootlessNetworkCmd: pasta
+     rootlessPortForwarder: rootlessport
+     security:
+       apparmorEnabled: false
+       capabilities: CAP_CHOWN,CAP_DAC_OVERRIDE,CAP_FOWNER,CAP_FSETID,CAP_KILL,CAP_NET_BIND_SERVICE,CAP_SETFCAP,CAP_SETGID,CAP_SETPCAP,CAP_SETUID,CAP_SYS_CHROOT
+       rootless: false
+       seccompEnabled: true
+       seccompProfilePath: /usr/share/containers/seccomp.json
+       selinuxEnabled: false
+     serviceIsRemote: true
+     swapFree: 8589934592
+     swapTotal: 8589934592
+     uptime: 0h 2m 29.00s
+     variant: ""
+   plugins:
+     authorization: null
+     log:
+     - k8s-file
+     - none
+     - passthrough
+     - journald
+     network:
+     - bridge
+     - macvlan
+     - ipvlan
+     volume:
+     - local
+   registries:
+     search:
+     - docker.io
+   store:
+     containerStore:
+       number: 0
+       paused: 0
+       running: 0
+       stopped: 0
+     graphDriverName: overlay
+     graphOptions:
+       additionalImageStores:
+       - /usr/lib/containers/storage
+       imagestore: /usr/lib/containers/storage
+       overlay.mountopt: nodev,metacopy=on
+     graphRoot: /var/lib/containers/storage
+     graphRootAllocated: 1081101176832
+     graphRootUsed: 853389312
+     graphStatus:
+       Backing Filesystem: extfs
+       Native Overlay Diff: "false"
+       Supports d_type: "true"
+       Supports shifting: "true"
+       Supports volatile: "true"
+       Using metacopy: "true"
+     imageCopyTmpDir: /var/tmp
+     imageStore:
+       number: 0
+     runRoot: /run/containers/storage
+     transientStore: false
+     volumePath: /var/lib/containers/storage/volumes
+   version:
+     APIVersion: 6.0.2
+     BuildOrigin: 'Copr: packit/podman-container-tools-podman-29249'
+     Built: 1784592000
+     BuiltTime: Mon Jul 20 20:00:00 2026
+     GitCommit: b28edb9ad70ce4317dc762ee9ce0a6d081d154e9
+     GoVersion: go1.26.5-X:nodwarf5
+     Os: linux
+     OsArch: linux/amd64
+     Version: 6.0.2
+
+   PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka> podman compose version
+   Error: looking up compose provider failed
+   2 errors occurred:
+           * exec: "docker-compose": executable file not found in %PATH%
+           * exec: "podman-compose": executable file not found in %PATH%
+   PS C:\Users\andavsa\repository\akka\ai-agentic-impl-akka>
+   ```
+
+28. **Assistant** - timestamp unavailable
+
+   > **Podman is now running and reachable.** The remaining error is specifically a missing Compose provider.
+   >
+   > In **Podman Desktop > Settings > CLI Tools**, find **Compose** and use its setup/install action. Review any download or approval prompt; installing Docker Desktop is not required.
+   >
+   > After installation, reopen PowerShell if needed and run:
+   >
+   > ```powershell
+   > podman compose version
+   > ```
+   >
+   > It should report a Compose provider version instead of “executable file not found.” Ollama's embedding model and database-backed acceptance checks remain separate pending steps.
