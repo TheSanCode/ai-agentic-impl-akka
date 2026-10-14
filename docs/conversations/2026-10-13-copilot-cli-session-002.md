@@ -296,3 +296,46 @@ The response will provide read-only Git commands for recent history, full commit
 - Removed contradictory current-machine claims about Java 21, older Node, Docker and a reachable Ollama/model. Preserved the selected embedding digest as a requirement, not evidence of current availability.
 - Installation remains paused. No software or service changes were performed. Roadmap gates remain unchanged because no application/full-lab acceptance was demonstrated.
 - Final response pending; append on the next turn.
+
+29. **Assistant** - timestamp unavailable
+
+    Updated **`docs/local-prerequisites.md`** with the verified installation status:
+
+    - **Installed:** JDK 25, Maven Wrapper, Podman Desktop 1.29.3, Git, Node.js/npm and VS Code.
+    - **Still pending:** WSL2, a verified Podman engine/Compose setup, Ollama and the embedding model.
+
+    Java/Javac and Maven version checks passed; application tests were not run. Further installation remains paused pending sufficient permissions.
+
+    Committed locally as `0bb8d64` on `feature/agentic`; nothing pushed.
+
+30. **User** - 14 October 2026, 00:01:06 -04:00
+
+    > proceed further with pending installation
+
+31. **Assistant (clarification form)** - timestamp unavailable
+
+    > The remaining setup is WSL2/Ubuntu, the Podman engine/Compose provider, and Ollama. Installation was paused because of permissions. Do you now have administrator assistance for WSL2 and Podman, or should I attempt only the per-user Ollama installation? I will not restart Windows or download models.
+
+    Choices: "Proceed with all remaining software; administrator approval is available"; "Install only Ollama for now" (default).
+
+32. **User (form response)** - timestamp unavailable
+
+    > Proceed with all remaining software; administrator approval is available
+
+33. **Assistant** - timestamp unavailable
+
+    > I’ll install Ollama first, then set up WSL2 and Podman with administrator approval. I won’t restart Windows automatically or download models.
+
+34. **Assistant** - timestamp unavailable
+
+    > Ollama installation and administrator-approved WSL2/Ubuntu setup are still running. **Neither is confirmed complete yet.** Approve any expected installer/UAC prompts; Windows will not be restarted automatically.
+
+### Resumed installation results
+
+- Confirmed feature/agentic and an initially clean worktree. The current shell is not elevated.
+- Verified Ollama.Ollama package identity, then launched `winget install --id Ollama.Ollama -e --source winget --interactive`. Download/installation remains in progress in shell 26; final result is not yet available.
+- Launched `wsl --install -d Ubuntu-24.04 --no-launch` with an approved administrator prompt. Installer exit code was zero, but subsequent runtime checks failed.
+- WSL 3.0.3.0 is installed with default version 2. No distribution is registered. WSL reports virtualization unavailable and advises checking Virtual Machine Platform and firmware settings.
+- Read-only CIM checks reported virtualization capability flags false. The component-servicing RebootPending registry key exists. These observations do not distinguish a pending feature activation from a firmware/host restriction; restart and recheck before concluding.
+- Updated the prerequisite status document. No automatic restart, model download, Podman initialization or additional installation was performed after discovering the restart/virtualization blocker.
+- Final response pending; append on the next turn.

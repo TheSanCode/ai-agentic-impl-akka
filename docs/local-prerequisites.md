@@ -1,6 +1,6 @@
 # Windows Local Installation Prerequisites
 
-Last updated: 13 October 2026
+Last updated: 14 October 2026
 
 Target: Windows 11 x64 with WSL2, for the AgenticaWithAkka local lab.
 
@@ -10,7 +10,7 @@ This guide checks development tools for the full lab. The [backend scaffold guid
 
 ## Current Installation Status
 
-The table describes the current Windows checkout, checked on 13 October 2026. Earlier machine observations are not evidence of this machine's readiness. An installed runtime is not necessarily selected by an already-open shell.
+The table describes the current Windows checkout, checked on 13 October 2026 with WSL setup observations updated on 14 October. Earlier machine observations are not evidence of this machine's readiness. An installed runtime is not necessarily selected by an already-open shell.
 
 | Tool | Observed status / version | Next action |
 | --- | --- | --- |
@@ -21,10 +21,10 @@ The table describes the current Windows checkout, checked on 13 October 2026. Ea
 | Node.js | PATH selects Node.js 24.19.0 and npm 11.17.0. | Confirm compatibility with the selected Angular release before frontend work. |
 | VS Code | 1.141.1 | `code --version` verified. VSCodium is an optional alternative. |
 | Container runtime | Podman Desktop 1.29.3 installed; installer success and installed-application record confirmed. Podman and Docker CLIs are not on the current PATH; engine and Compose readiness are unverified. | After WSL2 setup, install/configure the Podman engine and Compose provider. Desktop installation alone does not provide a verified engine. The pgvector acceptance test remains blocked. |
-| Ollama | Not found in checked paths/installation records; local port 11434 refused connections. No model availability verified on this machine. | Install Ollama and separately approve the selected embedding model download; verify service, digest and dimensions before retrieval acceptance. |
-| WSL2 | `wsl --status` still reports not installed. | Requires administrator assistance to install WSL2/Ubuntu and any requested restart. |
+| Ollama | WinGet installation of 0.40.3 started on 14 October; completion remains unconfirmed. No model availability verified on this machine. | Wait for the running installer result; do not launch a duplicate. Separately approve the selected embedding model download and verify service, digest and dimensions. |
+| WSL2 | WSL 3.0.3.0 installed, default version 2. No distribution registered. `wsl --status` reports WSL2 cannot start because virtualization is unavailable. A Windows component-servicing restart is pending. | Restart Windows manually before rechecking. If still blocked, an administrator must check Virtual Machine Platform and firmware/host virtualization before Ubuntu/Podman setup. |
 
-Further installation is paused at the user's request because sufficient permissions are unavailable. Remaining full-lab order: **administrator-assisted WSL2 setup → Podman engine/Compose configuration → Ollama and approved model → final service checks**. JDK 25 and Maven version checks passed; no application build or full-lab acceptance was performed. The previously selected synthetic embedding model remains `nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions; prior model evidence does not establish availability on this machine.
+The user authorized resuming installation with administrator assistance on 14 October. WSL installation returned zero, but runtime checks failed; WSL2/Ubuntu and Podman readiness are not established. Further dependent setup is blocked pending a manual restart and virtualization recheck. No automatic restart or model download is authorized. Remaining full-lab order: **resolve WSL2 virtualization/restart → Ubuntu and Podman engine/Compose configuration → verify Ollama installation and approved model → final service checks**. JDK 25 and Maven version checks passed; no application build or full-lab acceptance was performed. The previously selected synthetic embedding model remains `nomic-embed-text:latest`, digest `0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f`, 768 dimensions; prior model evidence does not establish availability on this machine.
 
 ## 1 Check WinGet and refresh its catalog
 
