@@ -34,3 +34,15 @@ The local Akka dependency installation is confirmed. Test execution remains unve
 
 - Checked for an `akka` executable on PATH and SDK artifacts at the expected Maven cache location; neither was found.
 - The installed Akka artifact remains `com.typesafe.akka:akka-actor-typed_2.13:2.10.23`, a library dependency rather than SDK tooling.
+
+### Continued session — OpenAI API key
+
+5. **User** — 23 October 2026, 21:26:05 -04:00
+
+   > chatgpt open api key
+
+6. **Assistant** — timestamp unavailable
+
+   > I can’t retrieve or provide a private API key. Create one at https://platform.openai.com/api-keys; ChatGPT subscriptions and API billing are separate. Keep the key secret and configure it locally as `OPENAI_API_KEY` rather than pasting it into chat or committing it to the repository.
+
+- No API key was accessed, created, or stored.
