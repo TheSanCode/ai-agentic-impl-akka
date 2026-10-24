@@ -10,6 +10,14 @@
 
    > Yes—Akka 2.10.23 is present in the local Maven cache and declared by the `compatibility/akka` probe module. It is not declared in the root application POM. The offline Maven test reached test execution, but could not run because the cached test class was compiled for Java 25 while the active runtime supports Java 21.
 
+3. **User** — 23 October 2026, 20:31:07 -04:00
+
+   > as SDK?
+
+4. **Assistant** — timestamp unavailable
+
+   > No. The cached dependency is Akka Typed (the actor library), not the Akka SDK. There is no `akka` executable on PATH, and I found no Akka Java SDK artifacts in the checked Maven cache location.
+
 ## Work record
 
 - Confirmed the active branch is `feature/agentic` and the worktree was clean before recording this session.
@@ -21,3 +29,8 @@
 ## Session status
 
 The local Akka dependency installation is confirmed. Test execution remains unverified until Maven uses a Java 25 runtime.
+
+### Continued session — Akka SDK clarification
+
+- Checked for an `akka` executable on PATH and SDK artifacts at the expected Maven cache location; neither was found.
+- The installed Akka artifact remains `com.typesafe.akka:akka-actor-typed_2.13:2.10.23`, a library dependency rather than SDK tooling.
